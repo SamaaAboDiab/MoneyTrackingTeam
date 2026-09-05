@@ -1,9 +1,12 @@
 const nodemailer = require("nodemailer");
 
+const SMTP_PORT = Number(process.env.SMTP_PORT ?? 587);
+const SMTP_FROM = process.env.SMTP_FROM ?? process.env.SMTP_USER;
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST ?? "smtp.gmail.com",
-  port: Number(process.env.SMTP_PORT ?? 587),
-  secure: false, // TLS
+  port: SMTP_PORT,
+  secure: SMTP_PORT === 465, // 465 = implicit TLS, 587 = STARTTLS
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -14,7 +17,7 @@ async function sendPasswordResetEmail(toEmail, resetToken) {
   const resetUrl = `${process.env.CLIENT_URL ?? "http://localhost:3000"}/reset-password?token=${resetToken}`;
 
   await transporter.sendMail({
-    from: `"Money Tracker" <${process.env.SMTP_USER}>`,
+    from: `"Money Tracker" <${SMTP_FROM}>`,
     to: toEmail,
     subject: "Reset your password",
     html: `
@@ -55,7 +58,7 @@ async function sendPasswordResetEmail(toEmail, resetToken) {
 
 async function sendEmailVerificationCode(toEmail, code) {
   await transporter.sendMail({
-    from: `"Money Tracker" <${process.env.SMTP_USER}>`,
+    from: `"Money Tracker" <${SMTP_FROM}>`,
     to: toEmail,
     subject: "Email Verification Code",
     html: `
@@ -86,7 +89,7 @@ async function sendWelcomeEmail(toEmail, name, tempPassword, subscriptionEnd) {
     ? new Date(subscriptionEnd).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" })
     : "—";
   await transporter.sendMail({
-    from: `"Money Tracker" <${process.env.SMTP_USER}>`,
+    from: `"Money Tracker" <${SMTP_FROM}>`,
     to: toEmail,
     subject: "مرحباً بك في Money Tracker — بيانات دخولك",
     html: `
@@ -125,7 +128,7 @@ async function sendWelcomeEmail(toEmail, name, tempPassword, subscriptionEnd) {
 async function sendSubscriptionUpdateEmail(toEmail, name, planLabel, subscriptionEnd) {
   const endStr = new Date(subscriptionEnd).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" });
   await transporter.sendMail({
-    from: `"Money Tracker" <${process.env.SMTP_USER}>`,
+    from: `"Money Tracker" <${SMTP_FROM}>`,
     to: toEmail,
     subject: "تم تحديث اشتراكك في Money Tracker",
     html: `
