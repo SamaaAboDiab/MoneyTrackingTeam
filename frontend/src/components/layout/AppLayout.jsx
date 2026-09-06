@@ -18,9 +18,6 @@ function AppLayout() {
       <header className="app-header">
         <span className="app-brand">Money Tracker</span>
         <div className="app-header-actions">
-          <button type="button" onClick={() => navigate("/accounts")}>
-            الحسابات
-          </button>
           {user && <span className="app-user-name">{user.name}</span>}
           <button type="button" className="logout-btn" onClick={handleLogout}>
             تسجيل الخروج
