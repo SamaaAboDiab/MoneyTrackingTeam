@@ -1,14 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as accountsApi from "../../api/accountsApi";
-import { createAccount } from "./createAccountSlice";
-
-function extractError(err, fallback) {
-  const data = err.response?.data;
-  if (data?.code === "SUBSCRIPTION_EXPIRED") {
-    return "انتهى اشتراكك. جدّد اشتراكك عشان تقدر تعدّل بياناتك.";
-  }
-  return data?.message || fallback;
-}
+import { extractError } from "../../utils/errorHandler";
 
 export const fetchAccounts = createAsyncThunk(
   "accounts/fetchAccounts",
@@ -39,15 +31,30 @@ export const transferFunds = createAsyncThunk(
   }
 );
 
+export const createAccount = createAsyncThunk(
+  "accounts/createAccount",
+  async (account, { rejectWithValue }) => {
+    try {
+      const res = await accountsApi.createAccount(account);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "تعذّر إضافة الحساب"));
+    }
+  }
+);
+
 const initialState = {
   // اللي بداخلها قائمة الحسابات
   items: [],
   // الحالة الخاصة بعملية تحميل الحسابات
   status: "idle",
   error: null,
-  // الحالة الخاصة بعملية التحويل 
+  // الحالة الخاصة بعملية التحويل
   transferStatus: "idle",
   transferError: null,
+  // الحالة الخاصة بعملية إضافة حساب جديد
+  createStatus: "idle",
+  createError: null,
 };
 
 const accountsSlice = createSlice({
@@ -62,6 +69,12 @@ const accountsSlice = createSlice({
     },
     resetTransferStatus(state) {
       state.transferStatus = "idle";
+    },
+    clearCreateAccountError(state) {
+      state.createError = null;
+    },
+    resetCreateAccountStatus(state) {
+      state.createStatus = "idle";
     },
   },
 
@@ -80,10 +93,6 @@ const accountsSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(createAccount.fulfilled, (state, action) => {
-        state.items.push(action.payload);
-      })
-
       .addCase(transferFunds.pending, (state) => {
         state.transferStatus = "loading";
         state.transferError = null;
@@ -94,10 +103,28 @@ const accountsSlice = createSlice({
       .addCase(transferFunds.rejected, (state, action) => {
         state.transferStatus = "failed";
         state.transferError = action.payload;
+      })
+
+      .addCase(createAccount.pending, (state) => {
+        state.createStatus = "loading";
+        state.createError = null;
+      })
+      .addCase(createAccount.fulfilled, (state, action) => {
+        state.createStatus = "succeeded";
+        state.items.push(action.payload);
+      })
+      .addCase(createAccount.rejected, (state, action) => {
+        state.createStatus = "failed";
+        state.createError = action.payload;
       });
   },
 });
 
-export const { clearAccountsError, clearTransferError, resetTransferStatus } =
-  accountsSlice.actions;
+export const {
+  clearAccountsError,
+  clearTransferError,
+  resetTransferStatus,
+  clearCreateAccountError,
+  resetCreateAccountStatus,
+} = accountsSlice.actions;
 export default accountsSlice.reducer;
