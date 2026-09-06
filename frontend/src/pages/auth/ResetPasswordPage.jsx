@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { resetPassword, clearAuthError } from "../../features/auth/authSlice";
+import { useTranslation } from "react-i18next";
+import { resetPassword, clearAuthError } from "../../store/slices/authSlice";
 
 function ResetPasswordPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
+  const { t } = useTranslation();
   const { status, error } = useSelector((state) => state.auth);
 
   const [password, setPassword] = useState("");
@@ -24,7 +26,7 @@ function ResetPasswordPage() {
     dispatch(clearAuthError());
 
     if (password !== confirmPassword) {
-      setFormError("كلمة السر وتأكيدها مش متطابقين");
+      setFormError(t("auth.resetPassword.passwordMismatch"));
       return;
     }
 
@@ -38,12 +40,12 @@ function ResetPasswordPage() {
     return (
       <div className="auth-page">
         <div className="auth-form">
-          <h1>رابط غير صالح</h1>
-          <p className="auth-error">
-            الرابط ده ناقص أو غير صحيح. اطلب رابط استعادة جديد.
-          </p>
+          <h1>{t("auth.resetPassword.invalidTitle")}</h1>
+          <p className="auth-error">{t("auth.resetPassword.invalidMessage")}</p>
           <p>
-            <Link to="/forgot-password">طلب رابط جديد</Link>
+            <Link to="/forgot-password">
+              {t("auth.resetPassword.requestNewLink")}
+            </Link>
           </p>
         </div>
       </div>
@@ -53,13 +55,15 @@ function ResetPasswordPage() {
   return (
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>تعيين كلمة سر جديدة</h1>
+        <h1>{t("auth.resetPassword.title")}</h1>
 
         {(formError || error) && (
           <p className="auth-error">{formError || error}</p>
         )}
 
-        <label htmlFor="password">كلمة السر الجديدة</label>
+        <label htmlFor="password">
+          {t("auth.resetPassword.newPasswordLabel")}
+        </label>
         <input
           id="password"
           name="password"
@@ -70,7 +74,9 @@ function ResetPasswordPage() {
           minLength={6}
         />
 
-        <label htmlFor="confirmPassword">تأكيد كلمة السر</label>
+        <label htmlFor="confirmPassword">
+          {t("auth.resetPassword.confirmPasswordLabel")}
+        </label>
         <input
           id="confirmPassword"
           name="confirmPassword"
@@ -82,7 +88,9 @@ function ResetPasswordPage() {
         />
 
         <button type="submit" disabled={status === "loading"}>
-          {status === "loading" ? "جارٍ الحفظ..." : "حفظ كلمة السر"}
+          {status === "loading"
+            ? t("auth.resetPassword.submitting")
+            : t("auth.resetPassword.submit")}
         </button>
       </form>
     </div>

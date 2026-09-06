@@ -1,15 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axiosClient, { TOKEN_KEY } from "../../api/axiosClient";
+import { TOKEN_KEY } from "../../api/axiosClient";
+import * as authApi from "../../api/authApi";
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async ({ name, email, password }, { rejectWithValue }) => {
     try {
-      const res = await axiosClient.post("/auth/register", {
-        name,
-        email,
-        password,
-      });
+      const res = await authApi.register({ name, email, password });
       return res.data.data;
     } catch (err) {
       return rejectWithValue(
@@ -23,11 +20,7 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ email, password, rememberMe }, { rejectWithValue }) => {
     try {
-      const res = await axiosClient.post("/auth/login", {
-        email,
-        password,
-        rememberMe,
-      });
+      const res = await authApi.login({ email, password, rememberMe });
       return res.data.data;
     } catch (err) {
       const message = err.response?.data?.message;
@@ -43,7 +36,7 @@ export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async ({ email }, { rejectWithValue }) => {
     try {
-      const res = await axiosClient.post("/auth/forgot-password", { email });
+      const res = await authApi.forgotPassword({ email });
       return res.data.message;
     } catch (err) {
       return rejectWithValue(
@@ -57,10 +50,7 @@ export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
   async ({ token, password }, { rejectWithValue }) => {
     try {
-      const res = await axiosClient.post("/auth/reset-password", {
-        token,
-        password,
-      });
+      const res = await authApi.resetPassword({ token, password });
       return res.data.message;
     } catch (err) {
       return rejectWithValue(
@@ -74,7 +64,7 @@ export const fetchCurrentUser = createAsyncThunk(
   "auth/fetchCurrentUser",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axiosClient.get("/auth/me");
+      const res = await authApi.fetchMe();
       return res.data.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Unauthorized");

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { forgotPassword, clearAuthError } from "../../features/auth/authSlice";
+import { useTranslation } from "react-i18next";
+import { forgotPassword, clearAuthError } from "../../store/slices/authSlice";
 
 function ForgotPasswordPage() {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { status, error } = useSelector((state) => state.auth);
 
   const [email, setEmail] = useState("");
@@ -26,20 +28,17 @@ function ForgotPasswordPage() {
   return (
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>نسيت كلمة السر</h1>
+        <h1>{t("auth.forgotPassword.title")}</h1>
 
         {sent ? (
-          <p className="auth-success">
-            لو الإيميل ده مسجّل عندنا، هيوصلك رابط لاستعادة كلمة السر. الرابط
-            صالح لمدة 24 ساعة فقط.
-          </p>
+          <p className="auth-success">{t("auth.forgotPassword.sentMessage")}</p>
         ) : (
           <>
-            <p>أدخل بريدك الإلكتروني وهنبعتلك رابط لإعادة تعيين كلمة السر.</p>
+            <p>{t("auth.forgotPassword.instructions")}</p>
 
             {error && <p className="auth-error">{error}</p>}
 
-            <label htmlFor="email">البريد الإلكتروني</label>
+            <label htmlFor="email">{t("auth.forgotPassword.emailLabel")}</label>
             <input
               id="email"
               name="email"
@@ -50,13 +49,15 @@ function ForgotPasswordPage() {
             />
 
             <button type="submit" disabled={status === "loading"}>
-              {status === "loading" ? "جارٍ الإرسال..." : "إرسال رابط الاستعادة"}
+              {status === "loading"
+                ? t("auth.forgotPassword.submitting")
+                : t("auth.forgotPassword.submit")}
             </button>
           </>
         )}
 
         <p>
-          <Link to="/login">الرجوع لتسجيل الدخول</Link>
+          <Link to="/login">{t("auth.forgotPassword.backToLogin")}</Link>
         </p>
       </form>
     </div>
