@@ -5,7 +5,6 @@ import axiosClient from "./axiosClient";
 export const getAccounts = () =>
    axiosClient.get("/accounts");
 
-
 // تحويل فلوس بين حسابين 
 export const transferFunds = ({ fromId, toId, amount, description }) =>
     axiosClient.post("/accounts/transfer", {

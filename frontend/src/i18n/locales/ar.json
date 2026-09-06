@@ -51,6 +51,7 @@
   "dashboard": {
     "title": "لوحة التحكم",
     "greeting": "أهلاً، {{name}}",
+    "accountsLink": "إدارة الحسابات والمحافظ",
     "transferLink": "تحويل بين حسابين"
   },
   "layout": {
@@ -74,5 +75,26 @@
     "descriptionLabel": "وصف (اختياري)",
     "submit": "تحويل",
     "submitting": "جارٍ التحويل..."
+  },
+  "accounts": {
+    "backToDashboard": "الرجوع للوحة التحكم",
+    "title": "حساباتي ومحافظي",
+    "nameLabel": "اسم الحساب",
+    "namePlaceholder": "مثال: حساب البنك الأهلي",
+    "typeLabel": "نوع الحساب",
+    "typePlaceholder": "اختار النوع",
+    "bank": "بنك",
+    "wallet": "محفظة إلكترونية",
+    "cash": "كاش",
+    "balanceLabel": "الرصيد الابتدائي",
+    "currencyLabel": "العملة",
+    "colorLabel": "اللون (اختياري)",
+    "submit": "إضافة الحساب",
+    "submitting": "جارٍ الإضافة...",
+    "success": "تمت إضافة الحساب بنجاح",
+    "loading": "جارٍ تحميل الحسابات...",
+    "empty": "لسه مفيش حسابات مضافة.",
+    "listTitle": "الحسابات المضافة",
+    "balance": "الرصيد"
   }
 }

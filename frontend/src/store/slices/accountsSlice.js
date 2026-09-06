@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as accountsApi from "../../api/accountsApi";
+import { createAccount } from "./createAccountSlice";
 
 function extractError(err, fallback) {
   const data = err.response?.data;
@@ -77,6 +78,10 @@ const accountsSlice = createSlice({
       .addCase(fetchAccounts.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+      })
+
+      .addCase(createAccount.fulfilled, (state, action) => {
+        state.items.push(action.payload);
       })
 
       .addCase(transferFunds.pending, (state) => {
