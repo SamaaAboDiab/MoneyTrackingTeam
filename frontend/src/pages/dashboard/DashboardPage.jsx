@@ -11,6 +11,9 @@ function DashboardPage() {
       <h1>{t("dashboard.title")}</h1>
       {user && <p>{t("dashboard.greeting", { name: user.name })}</p>}
       <p>
+        <Link to="/accounts">{t("dashboard.accountsLink")}</Link>
+      </p>
+      <p>
         <Link to="/accounts/transfer">{t("dashboard.transferLink")}</Link>
       </p>
     </div>
