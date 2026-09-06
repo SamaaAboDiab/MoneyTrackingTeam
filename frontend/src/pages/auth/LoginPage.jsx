@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { loginUser, clearAuthError } from "../../features/auth/authSlice";
+import { useTranslation } from "react-i18next";
+import { loginUser, clearAuthError } from "../../store/slices/authSlice";
 
 function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const { status, error } = useSelector((state) => state.auth);
 
   const [form, setForm] = useState({
@@ -36,23 +38,21 @@ function LoginPage() {
   return (
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>تسجيل الدخول</h1>
+        <h1>{t("auth.login.title")}</h1>
 
         {location.state?.registered && (
-          <p className="auth-success">
-            تم إنشاء الحساب بنجاح، سجّل دخولك الآن
-          </p>
+          <p className="auth-success">{t("auth.login.registeredSuccess")}</p>
         )}
 
         {location.state?.passwordReset && (
           <p className="auth-success">
-            تم تغيير كلمة السر بنجاح، سجّل دخولك بكلمة السر الجديدة
+            {t("auth.login.passwordResetSuccess")}
           </p>
         )}
 
         {error && <p className="auth-error">{error}</p>}
 
-        <label htmlFor="email">البريد الإلكتروني</label>
+        <label htmlFor="email">{t("auth.login.emailLabel")}</label>
         <input
           id="email"
           name="email"
@@ -62,7 +62,7 @@ function LoginPage() {
           required
         />
 
-        <label htmlFor="password">كلمة السر</label>
+        <label htmlFor="password">{t("auth.login.passwordLabel")}</label>
         <input
           id="password"
           name="password"
@@ -80,18 +80,21 @@ function LoginPage() {
             checked={form.rememberMe}
             onChange={handleChange}
           />
-          تذكرني
+          {t("auth.login.rememberMe")}
         </label>
 
         <button type="submit" disabled={status === "loading"}>
-          {status === "loading" ? "جارٍ الدخول..." : "تسجيل الدخول"}
+          {status === "loading"
+            ? t("auth.login.submitting")
+            : t("auth.login.submit")}
         </button>
 
         <p>
-          <Link to="/forgot-password">نسيت كلمة السر؟</Link>
+          <Link to="/forgot-password">{t("auth.login.forgotPassword")}</Link>
         </p>
         <p>
-          مفيش حساب؟ <Link to="/register">إنشاء حساب جديد</Link>
+          {t("auth.login.noAccount")}{" "}
+          <Link to="/register">{t("auth.login.registerLink")}</Link>
         </p>
       </form>
     </div>

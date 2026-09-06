@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { registerUser, clearAuthError } from "../../features/auth/authSlice";
+import { useTranslation } from "react-i18next";
+import { registerUser, clearAuthError } from "../../store/slices/authSlice";
 
 function RegisterPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { status, error } = useSelector((state) => state.auth);
 
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -30,11 +32,11 @@ function RegisterPage() {
   return (
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>إنشاء حساب جديد</h1>
+        <h1>{t("auth.register.title")}</h1>
 
         {error && <p className="auth-error">{error}</p>}
 
-        <label htmlFor="name">الاسم</label>
+        <label htmlFor="name">{t("auth.register.nameLabel")}</label>
         <input
           id="name"
           name="name"
@@ -44,7 +46,7 @@ function RegisterPage() {
           required
         />
 
-        <label htmlFor="email">البريد الإلكتروني</label>
+        <label htmlFor="email">{t("auth.register.emailLabel")}</label>
         <input
           id="email"
           name="email"
@@ -54,7 +56,7 @@ function RegisterPage() {
           required
         />
 
-        <label htmlFor="password">كلمة السر</label>
+        <label htmlFor="password">{t("auth.register.passwordLabel")}</label>
         <input
           id="password"
           name="password"
@@ -66,11 +68,14 @@ function RegisterPage() {
         />
 
         <button type="submit" disabled={status === "loading"}>
-          {status === "loading" ? "جارٍ الإنشاء..." : "إنشاء حساب"}
+          {status === "loading"
+            ? t("auth.register.submitting")
+            : t("auth.register.submit")}
         </button>
 
         <p>
-          عندك حساب بالفعل؟ <Link to="/login">تسجيل الدخول</Link>
+          {t("auth.register.haveAccount")}{" "}
+          <Link to="/login">{t("auth.register.loginLink")}</Link>
         </p>
       </form>
     </div>
