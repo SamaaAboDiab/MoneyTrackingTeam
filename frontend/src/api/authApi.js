@@ -1,21 +1,15 @@
 import axiosClient from "./axiosClient";
 
-export function register({ name, email, password }) {
-  return axiosClient.post("/auth/register", { name, email, password });
-}
+export const register = ({ name, email, password }) =>
+  axiosClient.post("/auth/register", { name, email, password });
 
-export function login({ email, password, rememberMe }) {
-  return axiosClient.post("/auth/login", { email, password, rememberMe });
-}
+export const login = ({ email, password, rememberMe }) =>
+  axiosClient.post("/auth/login", { email, password, rememberMe });
 
-export function fetchMe() {
-  return axiosClient.get("/auth/me");
-}
+export const fetchMe = () => axiosClient.get("/auth/me");
 
-export function forgotPassword({ email }) {
-  return axiosClient.post("/auth/forgot-password", { email });
-}
+export const forgotPassword = ({ email }) =>
+  axiosClient.post("/auth/forgot-password", { email });
 
-export function resetPassword({ token, password }) {
-  return axiosClient.post("/auth/reset-password", { token, password });
-}
+export const resetPassword = ({ token, password }) =>
+  axiosClient.post("/auth/reset-password", { token, password });
