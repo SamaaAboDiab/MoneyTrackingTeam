@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { fetchAccounts } from "../../store/slices/accountsSlice";
-import { createAccount } from "../../store/slices/createAccountSlice";
+import {
+  fetchAccounts,
+  createAccount,
+  clearCreateAccountError,
+  resetCreateAccountStatus,
+} from "../../store/slices/accountsSlice";
 import "../../App.css";
 
 const DEFAULT_COLOR = "#0d9488";
@@ -11,9 +15,13 @@ const DEFAULT_COLOR = "#0d9488";
 function AccountsPage() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { items, status, error } = useSelector((state) => state.accounts);
-  const { status: createStatus, error: createError } =
-    useSelector((state) => state.createAccount);
+  const {
+    items,
+    status,
+    error,
+    createStatus,
+    createError,
+  } = useSelector((state) => state.accounts);
   const [form, setForm] = useState({
     name: "",
     type: "",
@@ -24,9 +32,16 @@ function AccountsPage() {
 
   useEffect(() => {
     dispatch(fetchAccounts());
+    // بنصفّر حالة أي عملية إضافة قديمة عشان رسالة نجاح/خطأ من زيارة سابقة للصفحة متفضلش ظاهرة.
+    dispatch(resetCreateAccountStatus());
   }, [dispatch]);
 
   const handleChange = (event) => {
+    // لو فيه رسالة نجاح/خطأ من محاولة سابقة، امسحها أول ما المستخدم يبدأ يكتب من جديد.
+    if (createStatus === "succeeded" || createError) {
+      dispatch(resetCreateAccountStatus());
+      dispatch(clearCreateAccountError());
+    }
     setForm({ ...form, [event.target.name]: event.target.value });
   };
 

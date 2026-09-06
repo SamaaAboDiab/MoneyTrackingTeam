@@ -51,6 +51,7 @@
   "dashboard": {
     "title": "Dashboard",
     "greeting": "Welcome, {{name}}",
+    "accountsLink": "Manage accounts and wallets",
     "transferLink": "Transfer between accounts"
   },
   "layout": {
@@ -74,5 +75,26 @@
     "descriptionLabel": "Description (optional)",
     "submit": "Transfer",
     "submitting": "Transferring..."
+  },
+  "accounts": {
+    "backToDashboard": "Back to dashboard",
+    "title": "My accounts and wallets",
+    "nameLabel": "Account name",
+    "namePlaceholder": "e.g. National Bank account",
+    "typeLabel": "Account type",
+    "typePlaceholder": "Select type",
+    "bank": "Bank",
+    "wallet": "E-wallet",
+    "cash": "Cash",
+    "balanceLabel": "Opening balance",
+    "currencyLabel": "Currency",
+    "colorLabel": "Color (optional)",
+    "submit": "Add account",
+    "submitting": "Adding...",
+    "success": "Account added successfully",
+    "loading": "Loading accounts...",
+    "empty": "No accounts added yet.",
+    "listTitle": "Added accounts",
+    "balance": "Balance"
   }
 }
