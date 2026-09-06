@@ -6,7 +6,6 @@ import LoginPage from "./pages/auth/LoginPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
-import AccountsPage from "./pages/accounts/AccountsPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AppLayout from "./components/layout/AppLayout";
 import { fetchCurrentUser, markAuthChecked } from "./features/auth/authSlice";
@@ -40,7 +39,6 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/accounts" element={<AccountsPage />} />
         </Route>
       </Route>
 
