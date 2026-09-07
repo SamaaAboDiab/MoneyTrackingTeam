@@ -1,14 +1,14 @@
-const Account            = require("../models/Account");
+const Account = require("../models/Account");
 const AccountTransaction = require("../models/AccountTransaction");
-const User               = require("../models/User");
+const User = require("../models/User");
 
 /* ── helpers ─────────────────────────────────────── */
 async function recordTxn(userId, accountId, type, amount, description, date, relatedModel, relatedId, notes) {
   const account = await Account.findById(accountId);
   if (!account) return;
   const balanceBefore = account.balance;
-  if (type === "debit")   account.balance -= amount;
-  if (type === "credit")  account.balance += amount;
+  if (type === "debit") account.balance -= amount;
+  if (type === "credit") account.balance += amount;
   // "adjustment" sets balance directly — handled by adjustBalance
   await account.save();
   await AccountTransaction.create({
@@ -24,7 +24,7 @@ async function reverseTxn(userId, relatedModel, relatedId) {
   if (!txn) return;
   const account = await Account.findById(txn.account);
   if (account) {
-    if (txn.type === "debit")  account.balance += txn.amount;
+    if (txn.type === "debit") account.balance += txn.amount;
     if (txn.type === "credit") account.balance -= txn.amount;
     await account.save();
   }
@@ -46,13 +46,13 @@ exports.create = async (req, res, next) => {
     const { name, type, balance, currency, color } = req.body;
     if (!name?.trim()) return res.status(400).json({ success: false, message: "Account name is required." });
 
-    const user = await User.findById(req.userId).lean();
-    if (user?.subscriptionType === "trial") {
-      const count = await Account.countDocuments({ user: req.userId });
-      if (count >= 1) {
-        return res.status(403).json({ success: false, code: "TRIAL_LIMIT_1_ACCOUNT", message: "Only 1 account is allowed in trial mode." });
-      }
-    }
+    // const user = await User.findById(req.userId).lean();
+    // if (user?.subscriptionType === "trial") {
+    //   const count = await Account.countDocuments({ user: req.userId });
+    //   if (count >= 1) {
+    //     return res.status(403).json({ success: false, code: "TRIAL_LIMIT_1_ACCOUNT", message: "Only 1 account is allowed in trial mode." });
+    //   }
+    // }
 
     const exists = await Account.findOne({ user: req.userId, name: name.trim() });
     if (exists) return res.status(400).json({ success: false, message: "An account with this name already exists." });
@@ -92,10 +92,10 @@ exports.update = async (req, res, next) => {
     }
 
     const update = {};
-    if (name)     update.name     = name.trim();
-    if (type)     update.type     = type;
+    if (name) update.name = name.trim();
+    if (type) update.type = type;
     if (currency) update.currency = currency;
-    if (color)    update.color    = color;
+    if (color) update.color = color;
 
     const account = await Account.findOneAndUpdate(
       { _id: req.params.id, user: req.userId }, update, { new: true, runValidators: true }
@@ -126,7 +126,7 @@ exports.adjustBalance = async (req, res, next) => {
     if (!account) return res.status(404).json({ success: false, message: "Account not found" });
 
     const balanceBefore = account.balance;
-    const balanceAfter  = parseFloat(newBalance);
+    const balanceAfter = parseFloat(newBalance);
     const diff = Math.abs(balanceAfter - balanceBefore);
 
     account.balance = balanceAfter;
@@ -149,7 +149,11 @@ exports.toggleArchive = async (req, res, next) => {
   try {
     const account = await Account.findOne({ _id: req.params.id, user: req.userId });
     if (!account) return res.status(404).json({ success: false, message: "Account not found" });
-    account.isActive = !account.isActive;
+
+    // تبديل حالة الأرشفة وتحديث النشاط تلقائياً
+    account.isArchived = !account.isArchived;
+    account.isActive = !account.isArchived;
+
     await account.save();
     res.json({ success: true, data: account });
   } catch (err) { next(err); }
@@ -175,7 +179,7 @@ exports.getTransactions = async (req, res, next) => {
     if (start || end) {
       filter.date = {};
       if (start) filter.date.$gte = new Date(start);
-      if (end)   filter.date.$lte = new Date(end);
+      if (end) filter.date.$lte = new Date(end);
     }
     const txns = await AccountTransaction.find(filter).sort({ date: -1 });
     res.json({ success: true, data: txns });
@@ -193,10 +197,10 @@ exports.transfer = async (req, res, next) => {
 
     const [from, to] = await Promise.all([
       Account.findOne({ _id: fromId, user: req.userId }),
-      Account.findOne({ _id: toId,   user: req.userId }),
+      Account.findOne({ _id: toId, user: req.userId }),
     ]);
     if (!from) return res.status(404).json({ success: false, message: "Source account not found." });
-    if (!to)   return res.status(404).json({ success: false, message: "Destination account not found." });
+    if (!to) return res.status(404).json({ success: false, message: "Destination account not found." });
     if (from.balance < amt)
       return res.status(400).json({
         success: false,
@@ -204,7 +208,7 @@ exports.transfer = async (req, res, next) => {
       });
 
     const label = description || "Internal Transfer";
-    const now   = new Date();
+    const now = new Date();
 
     // Debit from source
     const fromBefore = from.balance;
@@ -233,5 +237,5 @@ exports.transfer = async (req, res, next) => {
 };
 
 /* ── used by expense / income controllers ─────────── */
-exports.recordTxn   = recordTxn;
-exports.reverseTxn  = reverseTxn;
+exports.recordTxn = recordTxn;
+exports.reverseTxn = reverseTxn;
