@@ -8,6 +8,10 @@ export const createAccount = ({ name, type, balance, currency, color }) =>
 // عشان يعرض الحسابات اللي المستخدم هيختار منها.
 export const getAccounts = () => axiosClient.get("/accounts");
 
+export const getAccountTransactions = (accountId, { start, end } = {}) =>
+  axiosClient.get(`/accounts/${accountId}/transactions`, {
+    params: { start, end },
+  });
 
 // تحويل فلوس بين حسابين
 export const transferFunds = ({ fromId, toId, amount, description }) =>
