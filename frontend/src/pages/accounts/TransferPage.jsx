@@ -42,7 +42,7 @@ function TransferPage() {
 
   // بنستبعد الحسابات المعطلة
   // US-306 (Archive): an archived account must not be selectable for a transfer.
-  const activeAccounts = useMemo(  // useMemo وظيفتها إنها تحفظ نتيجة عملية معينة
+  const activeAccounts = useMemo(
     () => items.filter((a) => a.isActive !== false),
     [items]
   );
@@ -50,7 +50,7 @@ function TransferPage() {
   // دي function بتشتغل لما المستخدم يغيّر أي input أو select.
   const handleChange = (e) => {
     // دي بتحدث قيمة الـ input.
-    setForm({ ...form, [e.target.name]: e.target.value }); // ...form دي بتعمل نسخة من القيم القديم
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   //  دي function بتشتغل لما المستخدم يعمل Submit للفورم وكتبنا async لأننا هنعمل API request ونستنى نتيجته.
@@ -70,26 +70,21 @@ function TransferPage() {
     dispatch(clearTransferError());
     dispatch(resetTransferStatus());
 
-    // بنتأكد إن المستخدم اختار: الحساب المصدر , الحساب المستهدف لو واحدة ناقصة يدخل هنا. 
     if (!form.fromId || !form.toId) {
       setFormError(t("transfer.selectBothAccounts"));
       return;
     }
 
-    // بنقارن الـ IDs.
-    // نتأكد إن الحسابين مش نفس الحساب
     if (form.fromId === form.toId) {
       setFormError(t("transfer.sameAccountError"));
       return;
     }
-
-    const amountNum = Number(form.amount); // تحويل المبلغ إلى Number
+    const amountNum = Number(form.amount);
     if (!amountNum || amountNum <= 0) {
       setFormError(t("transfer.amountPositiveError"));
       return;
     }
 
-    // نبدأ محاولة الـ API
     try {
       const payload = await dispatch(
         transferFunds({
