@@ -79,6 +79,12 @@
   "accounts": {
     "backToDashboard": "الرجوع للوحة التحكم",
     "title": "حساباتي ومحافظي",
+    "subtitle": "تابع أرصدتك وصافي وضعك المالي من مكان واحد",
+    "accountCount": "حساب",
+    "totalWealth": "إجمالي الثروة",
+    "baseCurrency": "بالعملة الأساسية {{currency}}",
+    "addTitle": "إضافة حساب جديد",
+    "archived": "مؤرشف",
     "nameLabel": "اسم الحساب",
     "namePlaceholder": "مثال: حساب البنك الأهلي",
     "typeLabel": "نوع الحساب",
@@ -96,5 +102,20 @@
     "empty": "لسه مفيش حسابات مضافة.",
     "listTitle": "الحسابات المضافة",
     "balance": "الرصيد"
+  },
+  "accountTransactions": {
+    "title": "تاريخ الحركات",
+    "backToAccounts": "الرجوع للحسابات",
+    "from": "من تاريخ",
+    "to": "إلى تاريخ",
+    "clearFilter": "مسح الفلتر",
+    "loading": "جارٍ تحميل الحركات...",
+    "empty": "لا توجد حركات في الفترة المحددة.",
+    "loadError": "تعذّر تحميل تاريخ الحركات",
+    "date": "التاريخ",
+    "description": "الوصف",
+    "amount": "المبلغ",
+    "balanceAfter": "الرصيد بعد الحركة",
+    "untitled": "حركة بدون وصف"
   }
 }
