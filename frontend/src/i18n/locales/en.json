@@ -79,12 +79,6 @@
   "accounts": {
     "backToDashboard": "Back to dashboard",
     "title": "My accounts and wallets",
-    "subtitle": "Track your balances and financial position in one place",
-    "accountCount": "accounts",
-    "totalWealth": "Total wealth",
-    "baseCurrency": "In base currency: {{currency}}",
-    "addTitle": "Add a new account",
-    "archived": "Archived",
     "nameLabel": "Account name",
     "namePlaceholder": "e.g. National Bank account",
     "typeLabel": "Account type",
@@ -102,20 +96,5 @@
     "empty": "No accounts added yet.",
     "listTitle": "Added accounts",
     "balance": "Balance"
-  },
-  "accountTransactions": {
-    "title": "Transaction history",
-    "backToAccounts": "Back to accounts",
-    "from": "From date",
-    "to": "To date",
-    "clearFilter": "Clear filter",
-    "loading": "Loading transactions...",
-    "empty": "No transactions for the selected period.",
-    "loadError": "Unable to load transaction history",
-    "date": "Date",
-    "description": "Description",
-    "amount": "Amount",
-    "balanceAfter": "Balance after",
-    "untitled": "Untitled transaction"
   }
 }
