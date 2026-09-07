@@ -9,6 +9,7 @@ const accountSchema = new mongoose.Schema(
     currency: { type: String, default: "EGP", maxlength: 10 },
     color:    { type: String, default: "#0d9488" },
     isActive: { type: Boolean, default: true },
+    isArchived: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
