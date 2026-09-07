@@ -1,0 +1,100 @@
+{
+  "common": {
+    "appName": "Money Tracker",
+    "loading": "جارٍ التحميل..."
+  },
+  "auth": {
+    "register": {
+      "title": "إنشاء حساب جديد",
+      "nameLabel": "الاسم",
+      "emailLabel": "البريد الإلكتروني",
+      "passwordLabel": "كلمة السر",
+      "submit": "إنشاء حساب",
+      "submitting": "جارٍ الإنشاء...",
+      "haveAccount": "عندك حساب بالفعل؟",
+      "loginLink": "تسجيل الدخول"
+    },
+    "login": {
+      "title": "تسجيل الدخول",
+      "registeredSuccess": "تم إنشاء الحساب بنجاح، سجّل دخولك الآن",
+      "passwordResetSuccess": "تم تغيير كلمة السر بنجاح، سجّل دخولك بكلمة السر الجديدة",
+      "emailLabel": "البريد الإلكتروني",
+      "passwordLabel": "كلمة السر",
+      "rememberMe": "تذكرني",
+      "submit": "تسجيل الدخول",
+      "submitting": "جارٍ الدخول...",
+      "forgotPassword": "نسيت كلمة السر؟",
+      "noAccount": "مفيش حساب؟",
+      "registerLink": "إنشاء حساب جديد"
+    },
+    "forgotPassword": {
+      "title": "نسيت كلمة السر",
+      "sentMessage": "لو الإيميل ده مسجّل عندنا، هيوصلك رابط لاستعادة كلمة السر. الرابط صالح لمدة 24 ساعة فقط.",
+      "instructions": "أدخل بريدك الإلكتروني وهنبعتلك رابط لإعادة تعيين كلمة السر.",
+      "emailLabel": "البريد الإلكتروني",
+      "submit": "إرسال رابط الاستعادة",
+      "submitting": "جارٍ الإرسال...",
+      "backToLogin": "الرجوع لتسجيل الدخول"
+    },
+    "resetPassword": {
+      "invalidTitle": "رابط غير صالح",
+      "invalidMessage": "الرابط ده ناقص أو غير صحيح. اطلب رابط استعادة جديد.",
+      "requestNewLink": "طلب رابط جديد",
+      "title": "تعيين كلمة سر جديدة",
+      "passwordMismatch": "كلمة السر وتأكيدها مش متطابقين",
+      "newPasswordLabel": "كلمة السر الجديدة",
+      "confirmPasswordLabel": "تأكيد كلمة السر",
+      "submit": "حفظ كلمة السر",
+      "submitting": "جارٍ الحفظ..."
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "greeting": "أهلاً، {{name}}",
+    "accountsLink": "إدارة الحسابات والمحافظ",
+    "transferLink": "تحويل بين حسابين"
+  },
+  "layout": {
+    "brand": "Money Tracker",
+    "logout": "تسجيل الخروج"
+  },
+  "transfer": {
+    "backToDashboard": "الرجوع للوحة التحكم",
+    "title": "تحويل بين حسابين",
+    "loadingAccounts": "جارٍ تحميل الحسابات...",
+    "needTwoAccounts": "محتاجة على الأقل حسابين نشطين عشان تقدري تحوّلي بينهم.",
+    "selectBothAccounts": "لازم تختاري الحساب المصدر والحساب المستهدف",
+    "sameAccountError": "مينفعش تحوّلي لنفس الحساب",
+    "amountPositiveError": "المبلغ لازم يكون أكبر من صفر",
+    "successMessage": "تم التحويل بنجاح. رصيد \"{{fromName}}\" دلوقتي {{fromBalance}} {{fromCurrency}}، ورصيد \"{{toName}}\" دلوقتي {{toBalance}} {{toCurrency}}.",
+    "fromLabel": "من حساب",
+    "fromPlaceholder": "اختاري الحساب المصدر",
+    "toLabel": "إلى حساب",
+    "toPlaceholder": "اختاري الحساب المستهدف",
+    "amountLabel": "المبلغ",
+    "descriptionLabel": "وصف (اختياري)",
+    "submit": "تحويل",
+    "submitting": "جارٍ التحويل..."
+  },
+  "accounts": {
+    "backToDashboard": "الرجوع للوحة التحكم",
+    "title": "حساباتي ومحافظي",
+    "nameLabel": "اسم الحساب",
+    "namePlaceholder": "مثال: حساب البنك الأهلي",
+    "typeLabel": "نوع الحساب",
+    "typePlaceholder": "اختار النوع",
+    "bank": "بنك",
+    "wallet": "محفظة إلكترونية",
+    "cash": "كاش",
+    "balanceLabel": "الرصيد الابتدائي",
+    "currencyLabel": "العملة",
+    "colorLabel": "اللون (اختياري)",
+    "submit": "إضافة الحساب",
+    "submitting": "جارٍ الإضافة...",
+    "success": "تمت إضافة الحساب بنجاح",
+    "loading": "جارٍ تحميل الحسابات...",
+    "empty": "لسه مفيش حسابات مضافة.",
+    "listTitle": "الحسابات المضافة",
+    "balance": "الرصيد"
+  }
+}

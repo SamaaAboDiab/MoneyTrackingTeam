@@ -1,0 +1,130 @@
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import * as accountsApi from "../../api/accountsApi";
+import { extractError } from "../../utils/errorHandler";
+
+export const fetchAccounts = createAsyncThunk(
+  "accounts/fetchAccounts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await accountsApi.getAccounts();
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "تعذّر تحميل الحسابات"));
+    }
+  }
+);
+
+export const transferFunds = createAsyncThunk(
+  "accounts/transferFunds",
+  async ({ fromId, toId, amount, description }, { rejectWithValue }) => {
+    try {
+      const res = await accountsApi.transferFunds({
+        fromId,
+        toId,
+        amount,
+        description,
+      });
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "تعذّر إتمام التحويل"));
+    }
+  }
+);
+
+export const createAccount = createAsyncThunk(
+  "accounts/createAccount",
+  async (account, { rejectWithValue }) => {
+    try {
+      const res = await accountsApi.createAccount(account);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "تعذّر إضافة الحساب"));
+    }
+  }
+);
+
+const initialState = {
+  // اللي بداخلها قائمة الحسابات
+  items: [],
+  // الحالة الخاصة بعملية تحميل الحسابات
+  status: "idle",
+  error: null,
+  // الحالة الخاصة بعملية التحويل
+  transferStatus: "idle",
+  transferError: null,
+  // الحالة الخاصة بعملية إضافة حساب جديد
+  createStatus: "idle",
+  createError: null,
+};
+
+const accountsSlice = createSlice({
+  name: "accounts",
+  initialState,
+  reducers: {
+    clearAccountsError(state) {
+      state.error = null;
+    },
+    clearTransferError(state) {
+      state.transferError = null;
+    },
+    resetTransferStatus(state) {
+      state.transferStatus = "idle";
+    },
+    clearCreateAccountError(state) {
+      state.createError = null;
+    },
+    resetCreateAccountStatus(state) {
+      state.createStatus = "idle";
+    },
+  },
+
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchAccounts.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchAccounts.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.items = action.payload;
+      })
+      .addCase(fetchAccounts.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+
+      .addCase(transferFunds.pending, (state) => {
+        state.transferStatus = "loading";
+        state.transferError = null;
+      })
+      .addCase(transferFunds.fulfilled, (state) => {
+        state.transferStatus = "succeeded";
+      })
+      .addCase(transferFunds.rejected, (state, action) => {
+        state.transferStatus = "failed";
+        state.transferError = action.payload;
+      })
+
+      .addCase(createAccount.pending, (state) => {
+        state.createStatus = "loading";
+        state.createError = null;
+      })
+      .addCase(createAccount.fulfilled, (state, action) => {
+        state.createStatus = "succeeded";
+        state.items.push(action.payload);
+      })
+      .addCase(createAccount.rejected, (state, action) => {
+        state.createStatus = "failed";
+        state.createError = action.payload;
+      });
+  },
+});
+
+export const {
+  clearAccountsError,
+  clearTransferError,
+  resetTransferStatus,
+  clearCreateAccountError,
+  resetCreateAccountStatus,
+} = accountsSlice.actions;
+export default accountsSlice.reducer;
