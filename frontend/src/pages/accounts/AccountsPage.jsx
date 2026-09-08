@@ -172,13 +172,15 @@ function AccountsPage() {
         {status === "succeeded" && items.length === 0 && <p>{t("accounts.empty")}</p>}
         {items.map((account) => (
           <article key={account._id} className={accountTypeClassNames[account.type] || "account-card"}>
-            <div className="account-card-header">
-              <strong style={{ color: account.color }}>{account.name}</strong>
-              <span className="account-type-badge">{t(`accounts.${account.type}`)}</span>
-            </div>
-            <p className={Number(account.balance) < 0 ? "account-balance amount-negative" : "account-balance"}>
-              {t("accounts.balance")}: {Number(account.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} {account.currency}
-            </p>
+            <Link to={`/accounts/${account._id}/transactions`} className="account-history-link">
+              <div className="account-card-header">
+                <strong style={{ color: account.color }}>{account.name}</strong>
+                <span className="account-type-badge">{t(`accounts.${account.type}`)}</span>
+              </div>
+              <p className={Number(account.balance) < 0 ? "account-balance amount-negative" : "account-balance"}>
+                {t("accounts.balance")}: {Number(account.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} {account.currency}
+              </p>
+            </Link>
             <AdjustBalanceButton account={account} onSubmit={handleAdjustBalance} />
           </article>
         ))}

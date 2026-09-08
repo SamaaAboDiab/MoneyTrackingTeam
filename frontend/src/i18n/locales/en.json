@@ -95,8 +95,22 @@
     "loading": "Loading accounts...",
     "empty": "No accounts added yet.",
     "listTitle": "Added accounts",
+    "historyTitle": "{{name}} transaction history",
     "balance": "Balance",
     "totalWealth": "Total wealth",
-    "noBalance": "No balances yet"
+    "noBalance": "No balances yet",
+    "transactions": {
+      "back": "Back to accounts",
+      "startDate": "From date",
+      "endDate": "To date",
+      "filter": "Apply filter",
+      "loading": "Loading transactions...",
+      "empty": "No transactions for the selected period.",
+      "error": "Unable to load account transactions.",
+      "date": "Date",
+      "description": "Description",
+      "amount": "Amount",
+      "balanceAfter": "Balance after"
+    }
   }
 }
