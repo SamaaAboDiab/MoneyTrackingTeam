@@ -43,16 +43,24 @@ export const createAccount = createAsyncThunk(
   }
 );
 
+export const toggleArchiveAccount = createAsyncThunk(
+  "accounts/toggleArchive",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await accountsApi.archiveAccountApi(id);
+      return res.data.data || res.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "تعذّر أرشفة الحساب"));
+    }
+  }
+);
+
 const initialState = {
-  // اللي بداخلها قائمة الحسابات
   items: [],
-  // الحالة الخاصة بعملية تحميل الحسابات
   status: "idle",
   error: null,
-  // الحالة الخاصة بعملية التحويل
   transferStatus: "idle",
   transferError: null,
-  // الحالة الخاصة بعملية إضافة حساب جديد
   createStatus: "idle",
   createError: null,
 };
@@ -116,6 +124,14 @@ const accountsSlice = createSlice({
       .addCase(createAccount.rejected, (state, action) => {
         state.createStatus = "failed";
         state.createError = action.payload;
+      })
+
+      .addCase(toggleArchiveAccount.fulfilled, (state, action) => {
+        const updatedAccount = action.payload;
+        const index = state.items.findIndex((acc) => acc._id === updatedAccount._id);
+        if (index !== -1) {
+          state.items[index] = updatedAccount;
+        }
       });
   },
 });
@@ -127,4 +143,5 @@ export const {
   clearCreateAccountError,
   resetCreateAccountStatus,
 } = accountsSlice.actions;
+
 export default accountsSlice.reducer;

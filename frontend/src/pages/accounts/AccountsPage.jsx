@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import {
   fetchAccounts,
   createAccount,
+  toggleArchiveAccount,
   clearCreateAccountError,
   resetCreateAccountStatus,
 } from "../../store/slices/accountsSlice";
@@ -22,6 +23,8 @@ function AccountsPage() {
     createStatus,
     createError,
   } = useSelector((state) => state.accounts);
+
+  const [showArchived, setShowArchived] = useState(false);
   const [form, setForm] = useState({
     name: "",
     type: "",
@@ -32,12 +35,10 @@ function AccountsPage() {
 
   useEffect(() => {
     dispatch(fetchAccounts());
-    // بنصفّر حالة أي عملية إضافة قديمة عشان رسالة نجاح/خطأ من زيارة سابقة للصفحة متفضلش ظاهرة.
     dispatch(resetCreateAccountStatus());
   }, [dispatch]);
 
   const handleChange = (event) => {
-    // لو فيه رسالة نجاح/خطأ من محاولة سابقة، امسحها أول ما المستخدم يبدأ يكتب من جديد.
     if (createStatus === "succeeded" || createError) {
       dispatch(resetCreateAccountStatus());
       dispatch(clearCreateAccountError());
@@ -65,6 +66,15 @@ function AccountsPage() {
       });
     }
   };
+
+  const handleToggleArchive = (id) => {
+    dispatch(toggleArchiveAccount(id));
+  };
+
+  // فلترة الحسابات حسب الحالة
+  const activeAccounts = items.filter((account) => !account.isArchived);
+  const archivedAccounts = items.filter((account) => account.isArchived);
+  const displayedAccounts = showArchived ? archivedAccounts : activeAccounts;
 
   return (
     <div>
@@ -126,17 +136,29 @@ function AccountsPage() {
       </form>
 
       <section>
-        <h2>{t("accounts.listTitle")}</h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h2>{showArchived ? "الحسابات المؤرشفة" : t("accounts.listTitle")}</h2>
+          <button type="button" onClick={() => setShowArchived(!showArchived)}>
+            {showArchived ? "عرض الحسابات النشطة" : `عرض الحسابات المؤرشفة (${archivedAccounts.length})`}
+          </button>
+        </div>
+
         {status === "loading" && <p>{t("accounts.loading")}</p>}
         {error && <p className="auth-error">{error}</p>}
-        {status === "succeeded" && items.length === 0 && <p>{t("accounts.empty")}</p>}
-        {items.map((account) => (
-          <article key={account._id}>
+        {status === "succeeded" && displayedAccounts.length === 0 && (
+          <p>{showArchived ? "لا توجد حسابات مؤرشفة." : t("accounts.empty")}</p>
+        )}
+
+        {displayedAccounts.map((account) => (
+          <article key={account._id} style={{ opacity: account.isArchived ? 0.6 : 1 }}>
             <strong style={{ color: account.color }}>{account.name}</strong>
             <span> {t(`accounts.${account.type}`)}</span>
             <p>
               {t("accounts.balance")}: {account.balance.toLocaleString()} {account.currency}
             </p>
+            <button type="button" onClick={() => handleToggleArchive(account._id)}>
+              {account.isArchived ? "إعادة تفعيل" : "أرشفة"}
+            </button>
           </article>
         ))}
       </section>
