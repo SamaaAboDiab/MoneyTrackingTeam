@@ -8,6 +8,12 @@ export const createAccount = ({ name, type, balance, currency, color }) =>
 // عشان يعرض الحسابات اللي المستخدم هيختار منها.
 export const getAccounts = () => axiosClient.get("/accounts");
 
+// تعديل رصيد حساب موجود وتسجيل سبب التعديل في تاريخ الحساب
+export const adjustBalance = ({ accountId, newBalance, notes }) =>
+  axiosClient.post(`/accounts/${accountId}/adjust`, {
+    newBalance,
+    notes,
+  });
 
 // تحويل فلوس بين حسابين
 export const transferFunds = ({ fromId, toId, amount, description }) =>

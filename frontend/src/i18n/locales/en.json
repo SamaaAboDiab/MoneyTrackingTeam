@@ -95,6 +95,8 @@
     "loading": "Loading accounts...",
     "empty": "No accounts added yet.",
     "listTitle": "Added accounts",
-    "balance": "Balance"
+    "balance": "Balance",
+    "totalWealth": "Total wealth",
+    "noBalance": "No balances yet"
   }
 }

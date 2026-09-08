@@ -5,12 +5,30 @@ import { useTranslation } from "react-i18next";
 import {
   fetchAccounts,
   createAccount,
+  adjustBalance,
   clearCreateAccountError,
   resetCreateAccountStatus,
 } from "../../store/slices/accountsSlice";
+import AdjustBalanceButton from "../../Components/AdjustBalanceModal";
 import "../../App.css";
 
 const DEFAULT_COLOR = "#0d9488";
+
+// نجمع الأرصدة القادمة من API حسب العملة، لأن جمع USD مع EGP بدون سعر تحويل غير صحيح.
+function calculateTotalsByCurrency(accounts) {
+  return accounts.reduce((totals, account) => {
+    const currency = account.currency || "UNKNOWN";
+    const balance = Number(account.balance) || 0;
+    totals[currency] = (totals[currency] || 0) + balance;
+    return totals;
+  }, {});
+}
+
+const accountTypeClassNames = {
+  bank: "account-card account-card-bank",
+  wallet: "account-card account-card-wallet",
+  cash: "account-card account-card-cash",
+};
 
 function AccountsPage() {
   const { t } = useTranslation();
@@ -65,6 +83,14 @@ function AccountsPage() {
       });
     }
   };
+
+  const handleAdjustBalance = ({ accountId, newBalance, notes }) =>
+    dispatch(adjustBalance({ accountId, newBalance, notes })).unwrap();
+
+  // items مصدرها state.accounts.items بعد fetchAccounts، لذلك الإجمالي يتغير تلقائيًا
+  // بعد الإضافة أو تعديل الرصيد أو أي تحديث يرجع من الخادم إلى Redux.
+  const totalsByCurrency = calculateTotalsByCurrency(items);
+  const totalCurrencies = Object.entries(totalsByCurrency);
 
   return (
     <div>
@@ -127,16 +153,33 @@ function AccountsPage() {
 
       <section>
         <h2>{t("accounts.listTitle")}</h2>
+        <aside className="wealth-summary" aria-label={t("accounts.totalWealth")}>
+          <p className="wealth-summary-label">{t("accounts.totalWealth")}</p>
+          {totalCurrencies.length === 0 ? (
+            <strong className="wealth-summary-empty">{t("accounts.noBalance")}</strong>
+          ) : (
+            <div className="wealth-summary-values">
+              {totalCurrencies.map(([currency, total]) => (
+                <strong key={currency} className={total < 0 ? "amount-negative" : ""}>
+                  {total.toLocaleString(undefined, { maximumFractionDigits: 2 })} {currency}
+                </strong>
+              ))}
+            </div>
+          )}
+        </aside>
         {status === "loading" && <p>{t("accounts.loading")}</p>}
         {error && <p className="auth-error">{error}</p>}
         {status === "succeeded" && items.length === 0 && <p>{t("accounts.empty")}</p>}
         {items.map((account) => (
-          <article key={account._id}>
-            <strong style={{ color: account.color }}>{account.name}</strong>
-            <span> {t(`accounts.${account.type}`)}</span>
-            <p>
-              {t("accounts.balance")}: {account.balance.toLocaleString()} {account.currency}
+          <article key={account._id} className={accountTypeClassNames[account.type] || "account-card"}>
+            <div className="account-card-header">
+              <strong style={{ color: account.color }}>{account.name}</strong>
+              <span className="account-type-badge">{t(`accounts.${account.type}`)}</span>
+            </div>
+            <p className={Number(account.balance) < 0 ? "account-balance amount-negative" : "account-balance"}>
+              {t("accounts.balance")}: {Number(account.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} {account.currency}
             </p>
+            <AdjustBalanceButton account={account} onSubmit={handleAdjustBalance} />
           </article>
         ))}
       </section>
