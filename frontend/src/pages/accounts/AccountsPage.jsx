@@ -6,6 +6,7 @@ import {
   fetchAccounts,
   createAccount,
   adjustBalance,
+  toggleArchiveAccount,
   clearCreateAccountError,
   resetCreateAccountStatus,
 } from "../../store/slices/accountsSlice";
@@ -40,6 +41,8 @@ function AccountsPage() {
     createStatus,
     createError,
   } = useSelector((state) => state.accounts);
+
+  const [showArchived, setShowArchived] = useState(false);
   const [form, setForm] = useState({
     name: "",
     type: "",
@@ -50,12 +53,10 @@ function AccountsPage() {
 
   useEffect(() => {
     dispatch(fetchAccounts());
-    // بنصفّر حالة أي عملية إضافة قديمة عشان رسالة نجاح/خطأ من زيارة سابقة للصفحة متفضلش ظاهرة.
     dispatch(resetCreateAccountStatus());
   }, [dispatch]);
 
   const handleChange = (event) => {
-    // لو فيه رسالة نجاح/خطأ من محاولة سابقة، امسحها أول ما المستخدم يبدأ يكتب من جديد.
     if (createStatus === "succeeded" || createError) {
       dispatch(resetCreateAccountStatus());
       dispatch(clearCreateAccountError());
@@ -87,10 +88,15 @@ function AccountsPage() {
   const handleAdjustBalance = ({ accountId, newBalance, notes }) =>
     dispatch(adjustBalance({ accountId, newBalance, notes })).unwrap();
 
-  // items مصدرها state.accounts.items بعد fetchAccounts، لذلك الإجمالي يتغير تلقائيًا
-  // بعد الإضافة أو تعديل الرصيد أو أي تحديث يرجع من الخادم إلى Redux.
+  const handleToggleArchive = (id) => {
+    dispatch(toggleArchiveAccount(id));
+  };
+
   const totalsByCurrency = calculateTotalsByCurrency(items);
   const totalCurrencies = Object.entries(totalsByCurrency);
+  const activeAccounts = items.filter((account) => !account.isArchived);
+  const archivedAccounts = items.filter((account) => account.isArchived);
+  const displayedAccounts = showArchived ? archivedAccounts : activeAccounts;
 
   return (
     <div>
@@ -152,7 +158,13 @@ function AccountsPage() {
       </form>
 
       <section>
-        <h2>{t("accounts.listTitle")}</h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h2>{showArchived ? "الحسابات المؤرشفة" : t("accounts.listTitle")}</h2>
+          <button type="button" onClick={() => setShowArchived(!showArchived)}>
+            {showArchived ? "عرض الحسابات النشطة" : `عرض الحسابات المؤرشفة (${archivedAccounts.length})`}
+          </button>
+        </div>
+
         <aside className="wealth-summary" aria-label={t("accounts.totalWealth")}>
           <p className="wealth-summary-label">{t("accounts.totalWealth")}</p>
           {totalCurrencies.length === 0 ? (
@@ -167,11 +179,19 @@ function AccountsPage() {
             </div>
           )}
         </aside>
+
         {status === "loading" && <p>{t("accounts.loading")}</p>}
         {error && <p className="auth-error">{error}</p>}
-        {status === "succeeded" && items.length === 0 && <p>{t("accounts.empty")}</p>}
-        {items.map((account) => (
-          <article key={account._id} className={accountTypeClassNames[account.type] || "account-card"}>
+        {status === "succeeded" && displayedAccounts.length === 0 && (
+          <p>{showArchived ? "لا توجد حسابات مؤرشفة." : t("accounts.empty")}</p>
+        )}
+
+        {displayedAccounts.map((account) => (
+          <article
+            key={account._id}
+            className={accountTypeClassNames[account.type] || "account-card"}
+            style={{ opacity: account.isArchived ? 0.6 : 1 }}
+          >
             <div className="account-card-header">
               <strong style={{ color: account.color }}>{account.name}</strong>
               <span className="account-type-badge">{t(`accounts.${account.type}`)}</span>
@@ -180,6 +200,9 @@ function AccountsPage() {
               {t("accounts.balance")}: {Number(account.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} {account.currency}
             </p>
             <AdjustBalanceButton account={account} onSubmit={handleAdjustBalance} />
+            <button type="button" onClick={() => handleToggleArchive(account._id)}>
+              {account.isArchived ? "إعادة تفعيل" : "أرشفة"}
+            </button>
           </article>
         ))}
       </section>

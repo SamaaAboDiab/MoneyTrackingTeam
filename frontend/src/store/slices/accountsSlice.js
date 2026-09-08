@@ -55,19 +55,26 @@ export const adjustBalance = createAsyncThunk(
   }
 );
 
+export const toggleArchiveAccount = createAsyncThunk(
+  "accounts/toggleArchive",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await accountsApi.archiveAccountApi(id);
+      return res.data.data || res.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "تعذّر أرشفة الحساب"));
+    }
+  }
+);
+
 const initialState = {
-  // اللي بداخلها قائمة الحسابات
   items: [],
-  // الحالة الخاصة بعملية تحميل الحسابات
   status: "idle",
   error: null,
-  // الحالة الخاصة بعملية التحويل
   transferStatus: "idle",
   transferError: null,
-  // الحالة الخاصة بعملية إضافة حساب جديد
   createStatus: "idle",
   createError: null,
-  // الحالة الخاصة بتعديل رصيد حساب
   adjustStatus: "idle",
   adjustError: null,
 };
@@ -149,6 +156,22 @@ const accountsSlice = createSlice({
       .addCase(adjustBalance.rejected, (state, action) => {
         state.adjustStatus = "failed";
         state.adjustError = action.payload;
+      })
+
+      .addCase(toggleArchiveAccount.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(toggleArchiveAccount.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const updatedAccount = action.payload;
+        const index = state.items.findIndex((acc) => acc._id === updatedAccount._id);
+        if (index !== -1) {
+          state.items[index] = updatedAccount;
+        }
+      })
+      .addCase(toggleArchiveAccount.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
       });
   },
 });
@@ -160,4 +183,5 @@ export const {
   clearCreateAccountError,
   resetCreateAccountStatus,
 } = accountsSlice.actions;
+
 export default accountsSlice.reducer;
