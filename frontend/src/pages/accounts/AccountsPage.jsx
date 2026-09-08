@@ -7,21 +7,20 @@ import {
   createAccount,
   fetchAccounts,
   resetCreateAccountStatus,
-  adjustAccountBalance,
-  archiveAccount,
-  unarchiveAccount,
-} from "../../features/accounts/accountsSlice";
+  adjustBalance,
+  toggleArchiveAccount,
+} from "../../store/slices/accountsSlice";
 
-import AdjustBalanceButton from "../../components/accounts/AdjustBalanceButton";
+import AdjustBalanceButton from "../../components/AdjustBalanceModal";
 
 import "../../App.css";
 
 const DEFAULT_COLOR = "#4f46e5";
 
 const accountTypeClassNames = {
-  bank: "account-card account-bank",
-  wallet: "account-card account-wallet",
-  cash: "account-card account-cash",
+  bank: "account-card account-card-bank",
+  wallet: "account-card account-card-wallet",
+  cash: "account-card account-card-cash",
 };
 
 const calculateTotalsByCurrency = (accounts) => {
@@ -82,7 +81,7 @@ function AccountsPage() {
       createAccount({
         name: form.name.trim(),
         type: form.type,
-        initialBalance: Number(form.initialBalance),
+        balance: Number(form.initialBalance),
         currency: form.currency,
         color: form.color || DEFAULT_COLOR,
       })
@@ -99,21 +98,18 @@ function AccountsPage() {
     }
   };
 
-  const handleAdjustBalance = async (accountId, amount) => {
-    await dispatch(
-      adjustAccountBalance({
+  const handleAdjustBalance = async ({ accountId, newBalance, notes }) => {
+    return dispatch(
+      adjustBalance({
         accountId,
-        amount,
+        newBalance,
+        notes,
       })
-    );
+    ).unwrap();
   };
 
-  const handleToggleArchive = async (accountId, isArchived) => {
-    if (isArchived) {
-      await dispatch(unarchiveAccount(accountId));
-    } else {
-      await dispatch(archiveAccount(accountId));
-    }
+  const handleToggleArchive = async (accountId) => {
+    await dispatch(toggleArchiveAccount(accountId));
   };
 
   const totalsByCurrency = calculateTotalsByCurrency(items);
@@ -139,7 +135,9 @@ function AccountsPage() {
         <div className="page-header">
           <div>
             <h1>{t("accounts.title")}</h1>
-            <p>{t("accounts.subtitle")}</p>
+            <p className="accounts-page-subtitle">
+              {t("accounts.formDescription")}
+            </p>
           </div>
 
           <Link to="/dashboard" className="back-link">
@@ -149,13 +147,13 @@ function AccountsPage() {
 
         {/* Add Account Form */}
         <section className="accounts-form-section">
-          <h2>{t("accounts.addAccount")}</h2>
+          <h2>{t("accounts.submit")}</h2>
 
           <form onSubmit={handleSubmit} className="accounts-form">
             {/* Account Name */}
             <div className="form-group">
               <label htmlFor="name">
-                {t("accounts.name")}
+                {t("accounts.nameLabel")}
               </label>
 
               <input
@@ -172,7 +170,7 @@ function AccountsPage() {
             {/* Account Type */}
             <div className="form-group">
               <label htmlFor="type">
-                {t("accounts.type")}
+                {t("accounts.typeLabel")}
               </label>
 
               <select
@@ -183,7 +181,7 @@ function AccountsPage() {
                 required
               >
                 <option value="">
-                  {t("accounts.selectType")}
+                  {t("accounts.typePlaceholder")}
                 </option>
 
                 <option value="bank">
@@ -203,7 +201,7 @@ function AccountsPage() {
             {/* Initial Balance */}
             <div className="form-group">
               <label htmlFor="initialBalance">
-                {t("accounts.initialBalance")}
+                {t("accounts.balanceLabel")}
               </label>
 
               <input
@@ -221,7 +219,7 @@ function AccountsPage() {
             {/* Currency */}
             <div className="form-group">
               <label htmlFor="currency">
-                {t("accounts.currency")}
+                {t("accounts.currencyLabel")}
               </label>
 
               <select
@@ -241,7 +239,7 @@ function AccountsPage() {
             {/* Color */}
             <div className="form-group">
               <label htmlFor="color">
-                {t("accounts.color")}
+                {t("accounts.colorLabel")}
               </label>
 
               <input
@@ -260,8 +258,8 @@ function AccountsPage() {
               disabled={createStatus === "loading"}
             >
               {createStatus === "loading"
-                ? t("common.loading")
-                : t("accounts.addAccount")}
+                ? t("accounts.submitting")
+                : t("accounts.submit")}
             </button>
 
             {createError && (
@@ -274,7 +272,7 @@ function AccountsPage() {
 
         {/* Wealth Summary */}
         <section className="accounts-summary">
-          <h2>{t("accounts.summary")}</h2>
+          <h2>{t("accounts.totalWealth")}</h2>
 
           {totalCurrencies.length === 0 ? (
             <p>{t("accounts.noBalance")}</p>
@@ -304,10 +302,8 @@ function AccountsPage() {
             <div>
               <h2>{t("accounts.listTitle")}</h2>
 
-              <p>
-                {showArchived
-                  ? "الحسابات المؤرشفة"
-                  : "الحسابات النشطة"}
+              <p className="accounts-list-status">
+                {showArchived ? "الحسابات المؤرشفة" : "الحسابات النشطة"}
               </p>
             </div>
 
@@ -407,6 +403,7 @@ function AccountsPage() {
               {/* Archive / Reactivate */}
               <button
                 type="button"
+                className="account-archive-button"
                 onClick={() =>
                   handleToggleArchive(
                     account._id,

@@ -79,6 +79,7 @@
   "accounts": {
     "backToDashboard": "Back to dashboard",
     "title": "My accounts and wallets",
+    "formDescription": "Add your bank accounts and wallets, then track every balance in one place.",
     "nameLabel": "Account name",
     "namePlaceholder": "e.g. National Bank account",
     "typeLabel": "Account type",

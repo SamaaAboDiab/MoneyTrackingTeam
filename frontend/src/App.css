@@ -236,3 +236,224 @@
 .amount-negative {
   color: #dc2626;
 }
+
+.accounts-page {
+  min-height: 100vh;
+  padding: 32px 24px 56px;
+  background: #f8fafc;
+  color: #0f172a;
+  text-align: start;
+}
+
+.accounts-container {
+  width: min(100%, 960px);
+  margin: 0 auto;
+}
+
+.accounts-page .page-header,
+.accounts-list-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.accounts-page h1 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: 0;
+}
+
+.accounts-page h2 {
+  color: #0f172a;
+  letter-spacing: 0;
+}
+
+.accounts-page-subtitle,
+.accounts-list-status {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.back-link {
+  flex: 0 0 auto;
+  color: #0f766e;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back-link:hover,
+.back-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.accounts-form-section,
+.accounts-summary,
+.accounts-list-section {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.accounts-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.accounts-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.accounts-form label {
+  color: #334155;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.accounts-form input,
+.accounts-form select {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  outline: none;
+}
+
+.accounts-form input:focus,
+.accounts-form select:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.14);
+}
+
+.accounts-form input[type="color"] {
+  width: 64px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.primary-button,
+.secondary-button,
+.account-archive-button {
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-button {
+  align-self: end;
+  border: 1px solid #0f766e;
+  background: #0f766e;
+  color: #fff;
+}
+
+.primary-button:hover {
+  background: #115e59;
+}
+
+.primary-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.secondary-button,
+.account-archive-button {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+}
+
+.secondary-button:hover,
+.account-archive-button:hover {
+  border-color: #0d9488;
+  color: #0f766e;
+}
+
+.summary-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f0fdfa;
+  color: #115e59;
+}
+
+.accounts-list-section {
+  display: grid;
+  gap: 14px;
+}
+
+.accounts-list-header {
+  align-items: center;
+}
+
+.account-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  padding: 18px;
+}
+
+.account-balance {
+  margin: 10px 0 0;
+  color: #334155;
+}
+
+.account-archive-button {
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .accounts-page {
+    padding: 24px 16px 40px;
+  }
+
+  .accounts-page .page-header,
+  .accounts-list-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .accounts-form {
+    grid-template-columns: 1fr;
+  }
+
+  .primary-button {
+    width: 100%;
+  }
+
+  .account-card {
+    grid-template-columns: 1fr;
+  }
+
+  .account-archive-button {
+    width: 100%;
+  }
+}
