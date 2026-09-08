@@ -28,3 +28,7 @@ export const transferFunds = ({ fromId, toId, amount, description }) =>
     amount,
     description,
   });
+
+// أرشفة أو إعادة تفعيل حساب
+export const archiveAccountApi = (id) =>
+  axiosClient.patch(`/accounts/${id}/archive`);
