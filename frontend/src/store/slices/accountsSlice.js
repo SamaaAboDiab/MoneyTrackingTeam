@@ -43,6 +43,18 @@ export const createAccount = createAsyncThunk(
   }
 );
 
+export const adjustBalance = createAsyncThunk(
+  "accounts/adjustBalance",
+  async ({ accountId, newBalance, notes }, { rejectWithValue }) => {
+    try {
+      const res = await accountsApi.adjustBalance({ accountId, newBalance, notes });
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "تعذّر تعديل رصيد الحساب"));
+    }
+  }
+);
+
 const initialState = {
   // اللي بداخلها قائمة الحسابات
   items: [],
@@ -55,6 +67,9 @@ const initialState = {
   // الحالة الخاصة بعملية إضافة حساب جديد
   createStatus: "idle",
   createError: null,
+  // الحالة الخاصة بتعديل رصيد حساب
+  adjustStatus: "idle",
+  adjustError: null,
 };
 
 const accountsSlice = createSlice({
@@ -116,6 +131,24 @@ const accountsSlice = createSlice({
       .addCase(createAccount.rejected, (state, action) => {
         state.createStatus = "failed";
         state.createError = action.payload;
+      })
+
+      .addCase(adjustBalance.pending, (state) => {
+        state.adjustStatus = "loading";
+        state.adjustError = null;
+      })
+      .addCase(adjustBalance.fulfilled, (state, action) => {
+        state.adjustStatus = "succeeded";
+        const accountIndex = state.items.findIndex(
+          (account) => account._id === action.payload._id
+        );
+        if (accountIndex !== -1) {
+          state.items[accountIndex] = action.payload;
+        }
+      })
+      .addCase(adjustBalance.rejected, (state, action) => {
+        state.adjustStatus = "failed";
+        state.adjustError = action.payload;
       });
   },
 });

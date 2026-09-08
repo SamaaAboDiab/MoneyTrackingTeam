@@ -1,5 +1,5 @@
 import { useState } from "react";
-export default function AdjustBalanceButton({ account, apiBaseUrl = "", onUpdated }) {
+export default function AdjustBalanceButton({ account, onSubmit, onUpdated }) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState("form"); // "form" | "confirm"
   const [newBalance, setNewBalance] = useState("");
@@ -37,25 +37,15 @@ export default function AdjustBalanceButton({ account, apiBaseUrl = "", onUpdate
     setSaving(true);
     setError("");
     try {
-      const res = await fetch(`${apiBaseUrl}/api/accounts/${account._id}/adjust`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // Once auth exists, add: Authorization: `Bearer ${token}`
-        body: JSON.stringify({
-          newBalance: Number(newBalance),
-          notes: notes.trim() || undefined,
-        }),
+      const updatedAccount = await onSubmit({
+        accountId: account._id,
+        newBalance: Number(newBalance),
+        notes: notes.trim() || undefined,
       });
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || "حصل خطأ أثناء حفظ التعديل.");
-      }
-
-      onUpdated?.(data.data);
+      onUpdated?.(updatedAccount);
       resetAndClose();
     } catch (err) {
-      setError(err.message || "تعذر الاتصال بالسيرفر.");
+      setError(typeof err === "string" ? err : err.message || "حصل خطأ أثناء حفظ التعديل.");
       setSaving(false);
     }
   }
