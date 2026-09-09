@@ -1,7 +1,8 @@
 {
   "common": {
     "appName": "Money Tracker",
-    "loading": "جارٍ التحميل..."
+    "loading": "جارٍ التحميل...",
+    "backToDashboard": "الرجوع للوحة التحكم"
   },
   "auth": {
     "register": {
@@ -112,6 +113,33 @@
       "description": "الوصف",
       "amount": "المبلغ",
       "balanceAfter": "الرصيد بعد الحركة"
+    }
+  },
+  "income": {
+    "title": "مصادر الدخل",
+    "description": "سجّل كل مصادر دخلك وتابعها في قائمة واحدة.",
+    "formTitle": "إضافة مصدر دخل",
+    "nameLabel": "اسم مصدر الدخل",
+    "namePlaceholder": "مثال: راتب شهر سبتمبر",
+    "categoryLabel": "نوع الدخل",
+    "categoryPlaceholder": "اختار نوع الدخل",
+    "amountLabel": "المبلغ",
+    "currencyLabel": "العملة",
+    "receivedDateLabel": "تاريخ الاستلام",
+    "notesLabel": "ملاحظات (اختياري)",
+    "notesPlaceholder": "أضف أي تفاصيل تساعدك لاحقاً",
+    "submit": "إضافة مصدر الدخل",
+    "submitting": "جارٍ الحفظ...",
+    "success": "تم إضافة مصدر الدخل بنجاح",
+    "listTitle": "مصادر الدخل المضافة",
+    "loading": "جارٍ تحميل مصادر الدخل...",
+    "empty": "لسه مفيش مصادر دخل مضافة.",
+    "categories": {
+      "salary": "مرتب",
+      "freelance": "فري لانس",
+      "rental": "إيجار",
+      "investment": "أرباح",
+      "other": "غيره"
     }
   }
 }
