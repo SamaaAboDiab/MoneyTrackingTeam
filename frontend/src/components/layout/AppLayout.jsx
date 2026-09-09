@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { logout } from "../../store/slices/authSlice";
 import LanguageSwitcher from "../common/LanguageSwitcher";
+import Sidebar from "./Sidebar";
 import "./AppLayout.css";
 
 function AppLayout() {
@@ -29,9 +30,12 @@ function AppLayout() {
         </div>
       </header>
 
-      <main className="app-content">
-        <Outlet />
-      </main>
+      <div className="app-body">
+        <Sidebar />
+        <main className="app-content">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

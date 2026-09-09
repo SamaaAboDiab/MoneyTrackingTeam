@@ -41,6 +41,11 @@
   background: #fee2e2;
 }
 
+.app-body {
+  display: flex;
+}
+
 .app-content {
+  flex: 1;
   padding: 24px;
 }

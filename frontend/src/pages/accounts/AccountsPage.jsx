@@ -1,29 +1,21 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
-  fetchAccounts,
   createAccount,
+  fetchAccounts,
+  resetCreateAccountStatus,
   adjustBalance,
   toggleArchiveAccount,
-  clearCreateAccountError,
-  resetCreateAccountStatus,
 } from "../../store/slices/accountsSlice";
-import AdjustBalanceButton from "../../Components/AdjustBalanceModal";
-import "../../App.css";
 
-const DEFAULT_COLOR = "#0d9488";
+import AdjustBalanceButton from "./components/AdjustBalanceModal";
 
-// نجمع الأرصدة القادمة من API حسب العملة، لأن جمع USD مع EGP بدون سعر تحويل غير صحيح.
-function calculateTotalsByCurrency(accounts) {
-  return accounts.reduce((totals, account) => {
-    const currency = account.currency || "UNKNOWN";
-    const balance = Number(account.balance) || 0;
-    totals[currency] = (totals[currency] || 0) + balance;
-    return totals;
-  }, {});
-}
+import "../../app/App.css";
+
+const DEFAULT_COLOR = "#4f46e5";
 
 const accountTypeClassNames = {
   bank: "account-card account-card-bank",
@@ -31,45 +23,66 @@ const accountTypeClassNames = {
   cash: "account-card account-card-cash",
 };
 
+const calculateTotalsByCurrency = (accounts) => {
+  return accounts.reduce((totals, account) => {
+    const currency = account.currency || "EGP";
+    const balance = Number(account.balance) || 0;
+
+    totals[currency] = (totals[currency] || 0) + balance;
+
+    return totals;
+  }, {});
+};
+
 function AccountsPage() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+
   const {
     items,
     status,
     error,
     createStatus,
     createError,
+    adjustStatus,
   } = useSelector((state) => state.accounts);
 
   const [showArchived, setShowArchived] = useState(false);
+
   const [form, setForm] = useState({
     name: "",
     type: "",
-    balance: "",
+    initialBalance: "",
     currency: "EGP",
     color: DEFAULT_COLOR,
   });
 
   useEffect(() => {
     dispatch(fetchAccounts());
-    dispatch(resetCreateAccountStatus());
+
+    return () => {
+      dispatch(resetCreateAccountStatus());
+    };
   }, [dispatch]);
 
   const handleChange = (event) => {
-    if (createStatus === "succeeded" || createError) {
-      dispatch(resetCreateAccountStatus());
-      dispatch(clearCreateAccountError());
-    }
-    setForm({ ...form, [event.target.name]: event.target.value });
+    const { name, value } = event.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     const result = await dispatch(
       createAccount({
-        ...form,
-        balance: Number(form.balance),
+        name: form.name.trim(),
+        type: form.type,
+        balance: Number(form.initialBalance),
+        currency: form.currency,
         color: form.color || DEFAULT_COLOR,
       })
     );
@@ -78,134 +91,334 @@ function AccountsPage() {
       setForm({
         name: "",
         type: "",
-        balance: "",
+        initialBalance: "",
         currency: "EGP",
         color: DEFAULT_COLOR,
       });
     }
   };
 
-  const handleAdjustBalance = ({ accountId, newBalance, notes }) =>
-    dispatch(adjustBalance({ accountId, newBalance, notes })).unwrap();
+  const handleAdjustBalance = async ({ accountId, newBalance, notes }) => {
+    return dispatch(
+      adjustBalance({
+        accountId,
+        newBalance,
+        notes,
+      })
+    ).unwrap();
+  };
 
-  const handleToggleArchive = (id) => {
-    dispatch(toggleArchiveAccount(id));
+  const handleToggleArchive = async (accountId) => {
+    await dispatch(toggleArchiveAccount(accountId));
   };
 
   const totalsByCurrency = calculateTotalsByCurrency(items);
+
   const totalCurrencies = Object.entries(totalsByCurrency);
-  const activeAccounts = items.filter((account) => !account.isArchived);
-  const archivedAccounts = items.filter((account) => account.isArchived);
-  const displayedAccounts = showArchived ? archivedAccounts : activeAccounts;
+
+  const activeAccounts = items.filter(
+    (account) => !account.isArchived
+  );
+
+  const archivedAccounts = items.filter(
+    (account) => account.isArchived
+  );
+
+  const displayedAccounts = showArchived
+    ? archivedAccounts
+    : activeAccounts;
 
   return (
-    <div>
-      <p>
-        <Link to="/dashboard">{t("accounts.backToDashboard")}</Link>
-      </p>
+    <div className="accounts-page">
+      <div className="accounts-container">
+        {/* Page Header */}
+        <div className="page-header">
+          <div>
+            <h1>{t("accounts.title")}</h1>
+            <p className="accounts-page-subtitle">
+              {t("accounts.formDescription")}
+            </p>
+          </div>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>{t("accounts.title")}</h1>
-        {createError && <p className="auth-error">{createError}</p>}
-        {createStatus === "succeeded" && (
-          <p className="auth-success">{t("accounts.success")}</p>
-        )}
-
-        <label htmlFor="name">{t("accounts.nameLabel")}</label>
-        <input
-          id="name"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder={t("accounts.namePlaceholder")}
-          maxLength="100"
-          required
-        />
-
-        <label htmlFor="type">{t("accounts.typeLabel")}</label>
-        <select id="type" name="type" value={form.type} onChange={handleChange} required>
-          <option value="">{t("accounts.typePlaceholder")}</option>
-          <option value="bank">{t("accounts.bank")}</option>
-          <option value="wallet">{t("accounts.wallet")}</option>
-          <option value="cash">{t("accounts.cash")}</option>
-        </select>
-
-        <label htmlFor="balance">{t("accounts.balanceLabel")}</label>
-        <input
-          id="balance"
-          name="balance"
-          type="number"
-          step="0.01"
-          value={form.balance}
-          onChange={handleChange}
-          required
-        />
-
-        <label htmlFor="currency">{t("accounts.currencyLabel")}</label>
-        <select id="currency" name="currency" value={form.currency} onChange={handleChange} required>
-          <option value="EGP">EGP</option>
-          <option value="USD">USD</option>
-          <option value="SAR">SAR</option>
-          <option value="AED">AED</option>
-        </select>
-
-        <label htmlFor="color">{t("accounts.colorLabel")}</label>
-        <input id="color" name="color" type="color" value={form.color} onChange={handleChange} />
-
-        <button type="submit" disabled={createStatus === "loading"}>
-          {createStatus === "loading" ? t("accounts.submitting") : t("accounts.submit")}
-        </button>
-      </form>
-
-      <section>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h2>{showArchived ? "الحسابات المؤرشفة" : t("accounts.listTitle")}</h2>
-          <button type="button" onClick={() => setShowArchived(!showArchived)}>
-            {showArchived ? "عرض الحسابات النشطة" : `عرض الحسابات المؤرشفة (${archivedAccounts.length})`}
-          </button>
+          <Link to="/dashboard" className="back-link">
+            {t("common.backToDashboard")}
+          </Link>
         </div>
 
-        <aside className="wealth-summary" aria-label={t("accounts.totalWealth")}>
-          <p className="wealth-summary-label">{t("accounts.totalWealth")}</p>
+        {/* Add Account Form */}
+        <section className="accounts-form-section">
+          <h2>{t("accounts.submit")}</h2>
+
+          <form onSubmit={handleSubmit} className="accounts-form">
+            {/* Account Name */}
+            <div className="form-group">
+              <label htmlFor="name">
+                {t("accounts.nameLabel")}
+              </label>
+
+              <input
+                id="name"
+                name="name"
+                type="text"
+                value={form.name}
+                onChange={handleChange}
+                placeholder={t("accounts.namePlaceholder")}
+                required
+              />
+            </div>
+
+            {/* Account Type */}
+            <div className="form-group">
+              <label htmlFor="type">
+                {t("accounts.typeLabel")}
+              </label>
+
+              <select
+                id="type"
+                name="type"
+                value={form.type}
+                onChange={handleChange}
+                required
+              >
+                <option value="">
+                  {t("accounts.typePlaceholder")}
+                </option>
+
+                <option value="bank">
+                  {t("accounts.bank")}
+                </option>
+
+                <option value="wallet">
+                  {t("accounts.wallet")}
+                </option>
+
+                <option value="cash">
+                  {t("accounts.cash")}
+                </option>
+              </select>
+            </div>
+
+            {/* Initial Balance */}
+            <div className="form-group">
+              <label htmlFor="initialBalance">
+                {t("accounts.balanceLabel")}
+              </label>
+
+              <input
+                id="initialBalance"
+                name="initialBalance"
+                type="number"
+                step="0.01"
+                value={form.initialBalance}
+                onChange={handleChange}
+                placeholder="0"
+                required
+              />
+            </div>
+
+            {/* Currency */}
+            <div className="form-group">
+              <label htmlFor="currency">
+                {t("accounts.currencyLabel")}
+              </label>
+
+              <select
+                id="currency"
+                name="currency"
+                value={form.currency}
+                onChange={handleChange}
+                required
+              >
+                <option value="EGP">EGP</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </div>
+
+            {/* Color */}
+            <div className="form-group">
+              <label htmlFor="color">
+                {t("accounts.colorLabel")}
+              </label>
+
+              <input
+                id="color"
+                name="color"
+                type="color"
+                value={form.color}
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="primary-button"
+              disabled={createStatus === "loading"}
+            >
+              {createStatus === "loading"
+                ? t("accounts.submitting")
+                : t("accounts.submit")}
+            </button>
+
+            {createError && (
+              <p className="auth-error">
+                {createError}
+              </p>
+            )}
+          </form>
+        </section>
+
+        {/* Wealth Summary */}
+        <section className="accounts-summary">
+          <h2>{t("accounts.totalWealth")}</h2>
+
           {totalCurrencies.length === 0 ? (
-            <strong className="wealth-summary-empty">{t("accounts.noBalance")}</strong>
+            <p>{t("accounts.noBalance")}</p>
           ) : (
-            <div className="wealth-summary-values">
+            <div className="summary-list">
               {totalCurrencies.map(([currency, total]) => (
-                <strong key={currency} className={total < 0 ? "amount-negative" : ""}>
-                  {total.toLocaleString(undefined, { maximumFractionDigits: 2 })} {currency}
-                </strong>
+                <div
+                  key={currency}
+                  className="summary-item"
+                >
+                  <span>{currency}</span>
+
+                  <strong>
+                    {Number(total).toLocaleString(undefined, {
+                      maximumFractionDigits: 2,
+                    })}
+                  </strong>
+                </div>
               ))}
             </div>
           )}
-        </aside>
+        </section>
 
-        {status === "loading" && <p>{t("accounts.loading")}</p>}
-        {error && <p className="auth-error">{error}</p>}
-        {status === "succeeded" && displayedAccounts.length === 0 && (
-          <p>{showArchived ? "لا توجد حسابات مؤرشفة." : t("accounts.empty")}</p>
-        )}
+        {/* Accounts Section */}
+        <section className="accounts-list-section">
+          <div className="accounts-list-header">
+            <div>
+              <h2>{t("accounts.listTitle")}</h2>
 
-        {displayedAccounts.map((account) => (
-          <article
-            key={account._id}
-            className={accountTypeClassNames[account.type] || "account-card"}
-            style={{ opacity: account.isArchived ? 0.6 : 1 }}
-          >
-            <div className="account-card-header">
-              <strong style={{ color: account.color }}>{account.name}</strong>
-              <span className="account-type-badge">{t(`accounts.${account.type}`)}</span>
+              <p className="accounts-list-status">
+                {showArchived ? "الحسابات المؤرشفة" : "الحسابات النشطة"}
+              </p>
             </div>
-            <p className={Number(account.balance) < 0 ? "account-balance amount-negative" : "account-balance"}>
-              {t("accounts.balance")}: {Number(account.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} {account.currency}
-            </p>
-            <AdjustBalanceButton account={account} onSubmit={handleAdjustBalance} />
-            <button type="button" onClick={() => handleToggleArchive(account._id)}>
-              {account.isArchived ? "إعادة تفعيل" : "أرشفة"}
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowArchived((prev) => !prev)
+              }
+              className="secondary-button"
+            >
+              {showArchived
+                ? "عرض الحسابات النشطة"
+                : "عرض الحسابات المؤرشفة"}
             </button>
-          </article>
-        ))}
-      </section>
+          </div>
+
+          {/* Loading */}
+          {status === "loading" && (
+            <p>{t("accounts.loading")}</p>
+          )}
+
+          {/* Error */}
+          {error && (
+            <p className="auth-error">
+              {error}
+            </p>
+          )}
+
+          {/* Empty State */}
+          {status === "succeeded" &&
+            displayedAccounts.length === 0 && (
+              <p>
+                {showArchived
+                  ? "لا توجد حسابات مؤرشفة."
+                  : t("accounts.empty")}
+              </p>
+            )}
+
+          {/* Accounts */}
+          {displayedAccounts.map((account) => (
+            <article
+              key={account._id}
+              className={
+                accountTypeClassNames[account.type] ||
+                "account-card"
+              }
+              style={{
+                opacity: account.isArchived ? 0.6 : 1,
+              }}
+            >
+              {/* Transaction History Link */}
+              <Link
+                to={`/accounts/${account._id}/transactions`}
+                className="account-history-link"
+              >
+                <div className="account-card-header">
+                  <strong
+                    style={{
+                      color: account.color,
+                    }}
+                  >
+                    {account.name}
+                  </strong>
+
+                  <span className="account-type-badge">
+                    {t(`accounts.${account.type}`)}
+                  </span>
+                </div>
+
+                <p
+                  className={
+                    Number(account.balance) < 0
+                      ? "account-balance amount-negative"
+                      : "account-balance"
+                  }
+                >
+                  {t("accounts.balance")}:{" "}
+                  {Number(account.balance).toLocaleString(
+                    undefined,
+                    {
+                      maximumFractionDigits: 2,
+                    }
+                  )}{" "}
+                  {account.currency}
+                </p>
+              </Link>
+
+              {/* Adjust Balance */}
+              {!account.isArchived && (
+                <AdjustBalanceButton
+                  account={account}
+                  onSubmit={handleAdjustBalance}
+                  disabled={adjustStatus === "loading"}
+                />
+              )}
+
+              {/* Archive / Reactivate */}
+              <button
+                type="button"
+                className="account-archive-button"
+                onClick={() =>
+                  handleToggleArchive(
+                    account._id,
+                    account.isArchived
+                  )
+                }
+              >
+                {account.isArchived
+                  ? "إعادة تفعيل"
+                  : "أرشفة"}
+              </button>
+            </article>
+          ))}
+        </section>
+      </div>
     </div>
   );
 }

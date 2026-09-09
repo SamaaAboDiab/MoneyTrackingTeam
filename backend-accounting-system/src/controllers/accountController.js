@@ -181,7 +181,9 @@ exports.getTransactions = async (req, res, next) => {
       if (start) filter.date.$gte = new Date(start);
       if (end) filter.date.$lte = new Date(end);
     }
-    const txns = await AccountTransaction.find(filter).sort({ date: -1 });
+    const txns = await AccountTransaction.find(filter)
+      .populate("account", "name currency")
+      .sort({ date: -1 });
     res.json({ success: true, data: txns });
   } catch (err) { next(err); }
 };
