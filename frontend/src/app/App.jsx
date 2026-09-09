@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import AppRoutes from "../routes/AppRoutes";
 import { fetchCurrentUser, markAuthChecked } from "../store/slices/authSlice";
-import "./App.css";
 
 function App() {
   const dispatch = useDispatch();
@@ -20,7 +19,11 @@ function App() {
   }, []);
 
   if (!authChecked) {
-    return <div className="auth-page">{t("common.loading")}</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center text-slate-500">
+        {t("common.loading")}
+      </div>
+    );
   }
 
   return <AppRoutes />;
