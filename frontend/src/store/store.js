@@ -7,6 +7,6 @@ export const store = configureStore({
   reducer: {
     auth: authReducer,
     accounts: accountsReducer,
-    income: incomeReducer,
+    incomes: incomeReducer,
   },
 });
