@@ -1,11 +1,10 @@
 import { Outlet } from "react-router-dom";
 import LanguageSwitcher from "../common/LanguageSwitcher";
-import "./AuthLayout.css";
 
 function AuthLayout() {
   return (
-    <div className="auth-layout">
-      <header className="auth-layout-header">
+    <div className="min-h-screen bg-linear-to-br from-brand-50 via-white to-slate-50">
+      <header className="flex items-center justify-end gap-3 p-4">
         <LanguageSwitcher />
       </header>
       <Outlet />
