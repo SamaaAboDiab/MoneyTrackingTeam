@@ -1,13 +1,5 @@
 import axiosClient from "./axiosClient";
 
-export const getIncomes = () => axiosClient.get("/income");
-
-export const createIncome = ({ name, category, amount, currency, receivedDate, notes }) =>
-  axiosClient.post("/income", {
-    name,
-    category,
-    amount,
-    currency,
-    receivedDate,
-    notes: notes || undefined,
-  });
+// إيقاف/استئناف الدخل المتكرر من غير حذفه
+export const toggleIncomeRecurrenceApi = (id) =>
+  axiosClient.patch(`/income/${id}/toggle-recurrence`);

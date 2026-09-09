@@ -101,6 +101,20 @@ exports.update = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// PATCH /api/income/:id/toggle-recurrence
+// Pauses/resumes a recurring income without deleting it (US-102 AC #3).
+exports.toggleRecurrence = async (req, res, next) => {
+  try {
+    const income = await Income.findOne({ _id: req.params.id, user: req.userId });
+    if (!income) return res.status(404).json({ success: false, message: "Income not found" });
+
+    income.isActive = !income.isActive;
+    await income.save();
+
+    res.json({ success: true, data: income });
+  } catch (err) { next(err); }
+};
+
 // DELETE /api/income/:id
 exports.remove = async (req, res, next) => {
   try {
