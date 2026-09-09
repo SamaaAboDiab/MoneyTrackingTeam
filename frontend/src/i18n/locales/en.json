@@ -1,7 +1,8 @@
 {
   "common": {
     "appName": "Money Tracker",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "backToDashboard": "Back to dashboard"
   },
   "auth": {
     "register": {
@@ -112,6 +113,33 @@
       "description": "Description",
       "amount": "Amount",
       "balanceAfter": "Balance after"
+    }
+  },
+  "income": {
+    "title": "Income sources",
+    "description": "Record every income source and keep it organized in one list.",
+    "formTitle": "Add income source",
+    "nameLabel": "Income source name",
+    "namePlaceholder": "e.g. September salary",
+    "categoryLabel": "Income type",
+    "categoryPlaceholder": "Select income type",
+    "amountLabel": "Amount",
+    "currencyLabel": "Currency",
+    "receivedDateLabel": "Received date",
+    "notesLabel": "Notes (optional)",
+    "notesPlaceholder": "Add any useful details",
+    "submit": "Add income source",
+    "submitting": "Saving...",
+    "success": "Income source added successfully",
+    "listTitle": "Added income sources",
+    "loading": "Loading income sources...",
+    "empty": "No income sources added yet.",
+    "categories": {
+      "salary": "Salary",
+      "freelance": "Freelance",
+      "rental": "Rental",
+      "investment": "Profit",
+      "other": "Other"
     }
   }
 }
