@@ -8,7 +8,7 @@ import {
   clearTransferError,
   resetTransferStatus,
 } from "../../store/slices/accountsSlice";
-import "../../App.css";
+import "../../app/App.css";
 
 function TransferPage() {
   const { t } = useTranslation();

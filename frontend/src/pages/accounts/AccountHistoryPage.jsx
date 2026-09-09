@@ -3,9 +3,9 @@ import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAccountTransactions } from "../../api/accountsApi";
 import { extractError } from "../../utils/errorHandler";
-import "../../App.css";
+import "../../app/App.css";
 
-function AccountTransactionsPage() {
+function AccountHistoryPage() {
   const { t } = useTranslation();
   const { accountId } = useParams();
   const [transactions, setTransactions] = useState([]);
@@ -99,4 +99,4 @@ function AccountTransactionsPage() {
   );
 }
 
-export default AccountTransactionsPage;
+export default AccountHistoryPage;

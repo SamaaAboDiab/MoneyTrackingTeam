@@ -11,9 +11,9 @@ import {
   toggleArchiveAccount,
 } from "../../store/slices/accountsSlice";
 
-import AdjustBalanceButton from "../../components/AdjustBalanceModal";
+import AdjustBalanceButton from "./components/AdjustBalanceModal";
 
-import "../../App.css";
+import "../../app/App.css";
 
 const DEFAULT_COLOR = "#4f46e5";
 
