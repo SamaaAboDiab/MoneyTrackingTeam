@@ -11,6 +11,7 @@ router.get("/summary", ctrl.summary);
 router.get("/",        ctrl.list);
 router.post("/",       ctrl.create);
 router.put("/:id",     ctrl.update);
+router.patch("/:id/toggle-recurrence", ctrl.toggleRecurrence);
 router.delete("/:id",  ctrl.remove);
 
 module.exports = router;
