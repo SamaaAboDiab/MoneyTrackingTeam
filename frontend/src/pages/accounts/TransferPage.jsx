@@ -9,6 +9,7 @@ import {
   resetTransferStatus,
 } from "../../store/slices/accountsSlice";
 import "../../app/App.css";
+import TransferForm from "./components/TransferForm";
 
 function TransferPage() {
   const { t } = useTranslation();
@@ -105,83 +106,8 @@ function TransferPage() {
 
   return (
     <div>
-      <p>
-        <Link to="/dashboard">{t("transfer.backToDashboard")}</Link>
-      </p>
-
-      <form className="auth-form" onSubmit={handleSubmit} style={{ maxWidth: 420 }}>
-        <h1>{t("transfer.title")}</h1>
-
-        {status === "loading" && <p>{t("transfer.loadingAccounts")}</p>}
-        {error && <p className="auth-error">{error}</p>}
-
-        {status === "succeeded" && activeAccounts.length < 2 && (
-          <p className="auth-error">{t("transfer.needTwoAccounts")}</p>
-        )}
-
-        {(formError || transferError) && (
-          <p className="auth-error">{formError || transferError}</p>
-        )}
-
-        {transferStatus === "succeeded" && lastTransfer && (
-          <p className="auth-success">
-            {t("transfer.successMessage", {
-              fromName: lastTransfer.from.name,
-              fromBalance: lastTransfer.from.balance.toLocaleString(),
-              fromCurrency: lastTransfer.from.currency,
-              toName: lastTransfer.to.name,
-              toBalance: lastTransfer.to.balance.toLocaleString(),
-              toCurrency: lastTransfer.to.currency,
-            })}
-          </p>
-        )}
-
-        <label htmlFor="fromId">{t("transfer.fromLabel")}</label>
-        <select id="fromId" name="fromId" value={form.fromId} onChange={handleChange}>
-          <option value="">{t("transfer.fromPlaceholder")}</option>
-          {activeAccounts.map((a) => (
-            <option key={a._id} value={a._id}>
-              {a.name} ({a.balance.toLocaleString()} {a.currency})
-            </option>
-          ))}
-        </select>
-
-        <label htmlFor="toId">{t("transfer.toLabel")}</label>
-        <select id="toId" name="toId" value={form.toId} onChange={handleChange}>
-          <option value="">{t("transfer.toPlaceholder")}</option>
-          {activeAccounts.map((a) => (
-            <option key={a._id} value={a._id}>
-              {a.name} ({a.balance.toLocaleString()} {a.currency})
-            </option>
-          ))}
-        </select>
-
-        <label htmlFor="amount">{t("transfer.amountLabel")}</label>
-        <input
-          id="amount"
-          name="amount"
-          type="number"
-          min="0.01"
-          step="0.01"
-          value={form.amount}
-          onChange={handleChange}
-          required
-        />
-
-        <label htmlFor="description">{t("transfer.descriptionLabel")}</label>
-        <input
-          id="description"
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-        />
-
-        <button type="submit" disabled={transferStatus === "loading"}>
-          {transferStatus === "loading"
-            ? t("transfer.submitting")
-            : t("transfer.submit")}
-        </button>
-      </form>
+      <p><Link to="/dashboard">{t("transfer.backToDashboard")}</Link></p>
+      <TransferForm form={form} accounts={activeAccounts} status={status} error={transferError || error} formError={formError} lastTransfer={lastTransfer} transferStatus={transferStatus} onChange={handleChange} onSubmit={handleSubmit} t={t} />
     </div>
   );
 }
