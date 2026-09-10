@@ -1,16 +1,33 @@
 function TransactionRow({ transaction, formatDate, t }) {
-  const amountClass = transaction.type === "credit"
-    ? "transaction-amount-credit"
-    : transaction.type === "debit" ? "transaction-amount-debit" : "";
-  const sign = transaction.type === "credit" ? "+" : transaction.type === "debit" ? "-" : "";
+  const isCredit = transaction.type === "credit";
+  const isDebit = transaction.type === "debit";
+  const amountClass = isCredit ? "text-income" : isDebit ? "text-expense" : "text-slate-900";
+  const sign = isCredit ? "+" : isDebit ? "-" : "";
   const currency = transaction.account?.currency || "";
 
   return (
-    <article className="transaction-row">
-      <div><span className="transaction-label">{t("accounts.transactions.date")}</span>{formatDate(transaction.date)}</div>
-      <div><span className="transaction-label">{t("accounts.transactions.description")}</span>{transaction.description}</div>
-      <div className={amountClass}><span className="transaction-label">{t("accounts.transactions.amount")}</span>{sign}{Number(transaction.amount).toLocaleString()} {currency}</div>
-      <div><span className="transaction-label">{t("accounts.transactions.balanceAfter")}</span>{Number(transaction.balanceAfter).toLocaleString()} {currency}</div>
+    <article className="grid grid-cols-2 gap-3 py-4 sm:grid-cols-4">
+      <div>
+        <span className="block text-xs font-medium text-slate-500">{t("accounts.transactions.date")}</span>
+        <span className="text-sm text-slate-700">{formatDate(transaction.date)}</span>
+      </div>
+      <div>
+        <span className="block text-xs font-medium text-slate-500">{t("accounts.transactions.description")}</span>
+        <span className="text-sm text-slate-700">{transaction.description}</span>
+      </div>
+      <div>
+        <span className="block text-xs font-medium text-slate-500">{t("accounts.transactions.amount")}</span>
+        <span className={`tabular-amount text-sm font-bold ${amountClass}`}>
+          {sign}
+          {Number(transaction.amount).toLocaleString()} {currency}
+        </span>
+      </div>
+      <div>
+        <span className="block text-xs font-medium text-slate-500">{t("accounts.transactions.balanceAfter")}</span>
+        <span className="tabular-amount text-sm font-bold text-slate-900">
+          {Number(transaction.balanceAfter).toLocaleString()} {currency}
+        </span>
+      </div>
     </article>
   );
 }

@@ -42,7 +42,7 @@ function ConfirmModal({
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-500/20 p-4 backdrop-blur-[2px] transition-opacity ease-out ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 transition-opacity ease-out ${
         visible ? "opacity-100 duration-200" : "opacity-0 duration-150"
       }`}
       onClick={onClose}

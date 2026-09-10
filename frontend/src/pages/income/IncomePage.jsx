@@ -13,9 +13,11 @@ const EMPTY_FORM = {
   status: "cleared",
   notes: "",
 };
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { TrendingUp } from "lucide-react";
+
+const inputClass =
+  "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500";
+const labelClass = "text-sm font-semibold text-slate-700";
+const errorClass = "rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense";
 
 function formatMoney(value) {
   const num = Number(value || 0);
@@ -102,126 +104,236 @@ function IncomePage() {
   };
 
   return (
-    <div className="accounts-page">
-      <div className="accounts-container">
-        <div className="page-header">
-          <div>
-            <h1>مصادر الدخل</h1>
-            <p className="accounts-page-subtitle">إدارة مصادر الدخل وتحديثها بسهولة</p>
-          </div>
-
-          <Link to="/dashboard" className="back-link">
-            العودة للوحة التحكم
-          </Link>
+    <div className="mx-auto max-w-5xl">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900">مصادر الدخل</h1>
+          <p className="mt-1 text-slate-500">إدارة مصادر الدخل وتحديثها بسهولة</p>
         </div>
 
-        <section className="wealth-summary" style={{ marginBottom: 32 }}>
-          <p className="wealth-summary-label">إجمالي الدخل</p>
-          <div className="wealth-summary-values">
-            <span>{formatMoney(totalIncome)} EGP</span>
-          </div>
-        </section>
-
-        {error && <p className="auth-error">{error}</p>}
-        {updateError && <p className="auth-error">{updateError}</p>}
-        {successMessage && <p className="auth-success">{successMessage}</p>}
-
-        {status === "loading" ? (
-          <p>جارٍ تحميل مصادر الدخل...</p>
-        ) : (
-          <div className="transactions-list">
-            {items.length === 0 ? (
-              <p>لا توجد مصادر دخل مسجلة حاليًا.</p>
-            ) : (
-              items.map((income) => (
-                <div key={income._id} className="transaction-row" style={{ gridTemplateColumns: "1.3fr 1fr 1fr 1fr auto" }}>
-                  <div>
-                    <span className="transaction-label">المصدر</span>
-                    <strong>{income.name}</strong>
-                  </div>
-                  <div>
-                    <span className="transaction-label">الفئة</span>
-                    <span>{income.category}</span>
-                  </div>
-                  <div>
-                    <span className="transaction-label">المبلغ</span>
-                    <span className="transaction-amount-credit">{formatMoney(income.amount)} {income.currency || "EGP"}</span>
-                  </div>
-                  <div>
-                    <span className="transaction-label">التاريخ</span>
-                    <span>{new Date(income.receivedDate).toLocaleDateString("ar-EG")}</span>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      className="primary-button"
-                      onClick={() => openEditModal(income)}
-                      style={{ padding: "8px 12px" }}
-                    >
-                      Edit
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        )}
+        <Link to="/dashboard" className="font-semibold text-brand-700 hover:underline">
+          العودة للوحة التحكم
+        </Link>
       </div>
 
+      <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+        <p className="text-sm font-medium text-slate-500">إجمالي الدخل</p>
+        <div className="mt-1 flex items-baseline gap-2">
+          <strong className="tabular-amount text-3xl font-extrabold text-slate-900">
+            {formatMoney(totalIncome)}
+          </strong>
+          <span className="text-sm font-medium text-slate-500">EGP</span>
+        </div>
+      </section>
+
+      {error && <p className={`mt-4 ${errorClass}`}>{error}</p>}
+      {updateError && <p className={`mt-4 ${errorClass}`}>{updateError}</p>}
+      {successMessage && (
+        <p className="mt-4 rounded-xl bg-income-soft px-4 py-2.5 text-sm font-medium text-income">
+          {successMessage}
+        </p>
+      )}
+
+      <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+        {status === "loading" ? (
+          <p className="text-slate-500">جارٍ تحميل مصادر الدخل...</p>
+        ) : items.length === 0 ? (
+          <p className="text-slate-500">لا توجد مصادر دخل مسجلة حاليًا.</p>
+        ) : (
+          <div className="flex flex-col divide-y divide-slate-100">
+            {items.map((income) => (
+              <div key={income._id} className="grid grid-cols-2 items-center gap-3 py-4 sm:grid-cols-5">
+                <div>
+                  <span className="block text-xs font-medium text-slate-500">المصدر</span>
+                  <strong className="text-slate-900">{income.name}</strong>
+                </div>
+                <div>
+                  <span className="block text-xs font-medium text-slate-500">الفئة</span>
+                  <span className="text-sm text-slate-700">{income.category}</span>
+                </div>
+                <div>
+                  <span className="block text-xs font-medium text-slate-500">المبلغ</span>
+                  <span className="tabular-amount text-sm font-bold text-income">
+                    {formatMoney(income.amount)} {income.currency || "EGP"}
+                  </span>
+                </div>
+                <div>
+                  <span className="block text-xs font-medium text-slate-500">التاريخ</span>
+                  <span className="text-sm text-slate-700">
+                    {new Date(income.receivedDate).toLocaleDateString("ar-EG")}
+                  </span>
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => openEditModal(income)}
+                    className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-brand-700"
+                  >
+                    Edit
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
       {isEditing && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.5)", display: "grid", placeItems: "center", padding: 16 }}>
-          <div style={{ width: "min(100%, 560px)", background: "#fff", borderRadius: 12, padding: 24 }}>
-            <h2 style={{ marginTop: 0 }}>تعديل مصدر الدخل</h2>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-500/20 p-4 backdrop-blur-[2px]"
+          onClick={closeEditModal}
+        >
+          <div
+            className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 className="text-lg font-bold text-slate-900">تعديل مصدر الدخل</h2>
 
-            <form onSubmit={handleSubmit} className="auth-form" style={{ maxWidth: "100%" }}>
-              <label htmlFor="name">اسم المصدر</label>
-              <input id="name" name="name" value={form.name} onChange={handleFormChange} required />
+            <form onSubmit={handleSubmit} className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
+                <label htmlFor="name" className={labelClass}>
+                  اسم المصدر
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleFormChange}
+                  required
+                  className={inputClass}
+                />
+              </div>
 
-              <label htmlFor="category">الفئة</label>
-              <select id="category" name="category" value={form.category} onChange={handleFormChange}>
-                <option value="salary">راتب</option>
-                <option value="freelance">عمل حر</option>
-                <option value="rental">إيجار</option>
-                <option value="investment">استثمار</option>
-                <option value="other">أخرى</option>
-              </select>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="category" className={labelClass}>
+                  الفئة
+                </label>
+                <select
+                  id="category"
+                  name="category"
+                  value={form.category}
+                  onChange={handleFormChange}
+                  className={inputClass}
+                >
+                  <option value="salary">راتب</option>
+                  <option value="freelance">عمل حر</option>
+                  <option value="rental">إيجار</option>
+                  <option value="investment">استثمار</option>
+                  <option value="other">أخرى</option>
+                </select>
+              </div>
 
-              <label htmlFor="amount">المبلغ</label>
-              <input id="amount" name="amount" type="number" min="0" step="0.01" value={form.amount} onChange={handleFormChange} required />
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="amount" className={labelClass}>
+                  المبلغ
+                </label>
+                <input
+                  id="amount"
+                  name="amount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.amount}
+                  onChange={handleFormChange}
+                  required
+                  className={inputClass}
+                />
+              </div>
 
-              <label htmlFor="currency">العملة</label>
-              <select id="currency" name="currency" value={form.currency} onChange={handleFormChange}>
-                <option value="EGP">EGP</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-              </select>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="currency" className={labelClass}>
+                  العملة
+                </label>
+                <select
+                  id="currency"
+                  name="currency"
+                  value={form.currency}
+                  onChange={handleFormChange}
+                  className={inputClass}
+                >
+                  <option value="EGP">EGP</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="GBP">GBP</option>
+                </select>
+              </div>
 
-              <label htmlFor="receivedDate">تاريخ الاستلام</label>
-              <input id="receivedDate" name="receivedDate" type="date" value={form.receivedDate} onChange={handleFormChange} required />
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="receivedDate" className={labelClass}>
+                  تاريخ الاستلام
+                </label>
+                <input
+                  id="receivedDate"
+                  name="receivedDate"
+                  type="date"
+                  value={form.receivedDate}
+                  onChange={handleFormChange}
+                  required
+                  className={inputClass}
+                />
+              </div>
 
-              <label htmlFor="recurrence">التكرار</label>
-              <select id="recurrence" name="recurrence" value={form.recurrence} onChange={handleFormChange}>
-                <option value="once">مرة واحدة</option>
-                <option value="weekly">أسبوعي</option>
-                <option value="monthly">شهري</option>
-                <option value="yearly">سنوي</option>
-              </select>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="recurrence" className={labelClass}>
+                  التكرار
+                </label>
+                <select
+                  id="recurrence"
+                  name="recurrence"
+                  value={form.recurrence}
+                  onChange={handleFormChange}
+                  className={inputClass}
+                >
+                  <option value="once">مرة واحدة</option>
+                  <option value="weekly">أسبوعي</option>
+                  <option value="monthly">شهري</option>
+                  <option value="yearly">سنوي</option>
+                </select>
+              </div>
 
-              <label htmlFor="status">الحالة</label>
-              <select id="status" name="status" value={form.status} onChange={handleFormChange}>
-                <option value="cleared">مستلمة</option>
-                <option value="pending">قيد الانتظار</option>
-              </select>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="status" className={labelClass}>
+                  الحالة
+                </label>
+                <select
+                  id="status"
+                  name="status"
+                  value={form.status}
+                  onChange={handleFormChange}
+                  className={inputClass}
+                >
+                  <option value="cleared">مستلمة</option>
+                  <option value="pending">قيد الانتظار</option>
+                </select>
+              </div>
 
-              <label htmlFor="notes">ملاحظات</label>
-              <textarea id="notes" name="notes" rows="3" value={form.notes} onChange={handleFormChange} />
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
+                <label htmlFor="notes" className={labelClass}>
+                  ملاحظات
+                </label>
+                <textarea
+                  id="notes"
+                  name="notes"
+                  rows="3"
+                  value={form.notes}
+                  onChange={handleFormChange}
+                  className={`${inputClass} resize-none`}
+                />
+              </div>
 
-              <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-                <button type="submit" className="primary-button" disabled={updateStatus === "loading"}>
+              <div className="flex gap-3 sm:col-span-2">
+                <button
+                  type="submit"
+                  disabled={updateStatus === "loading"}
+                  className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65"
+                >
                   {updateStatus === "loading" ? "جارٍ الحفظ..." : "حفظ التعديلات"}
                 </button>
-                <button type="button" className="secondary-button" onClick={closeEditModal}>
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-brand-300 hover:text-brand-700"
+                >
                   إلغاء
                 </button>
               </div>
@@ -229,18 +341,6 @@ function IncomePage() {
           </div>
         </div>
       )}
-  const { t } = useTranslation();
-
-  return (
-    <div className="mx-auto max-w-lg rounded-3xl bg-white p-10 text-center shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-income-soft text-income">
-        <TrendingUp size={26} />
-      </span>
-      <h1 className="mt-4 text-2xl font-extrabold text-slate-900">{t("nav.income")}</h1>
-      <p className="mt-2 text-slate-500">{t("common.comingSoon")}</p>
-      <Link to="/dashboard" className="mt-6 inline-block font-semibold text-brand-700 hover:underline">
-        {t("common.backToDashboard")}
-      </Link>
     </div>
   );
 }

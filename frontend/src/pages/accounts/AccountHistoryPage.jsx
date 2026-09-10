@@ -3,7 +3,6 @@ import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAccountTransactions } from "../../api/accountsApi";
 import { extractError } from "../../utils/errorHandler";
-import "../../app/App.css";
 import TransactionFilters from "./components/TransactionFilters";
 import TransactionList from "./components/TransactionList";
 
@@ -50,9 +49,15 @@ function AccountHistoryPage() {
   }).format(new Date(value));
 
   return (
-    <main className="transactions-page">
-      <p><Link to="/accounts">{t("accounts.transactions.back")}</Link></p>
-      <h1>{t("accounts.historyTitle", { name: accountName || "..." })}</h1>
+    <main className="mx-auto max-w-4xl">
+      <p>
+        <Link to="/accounts" className="font-semibold text-brand-700 hover:underline">
+          {t("accounts.transactions.back")}
+        </Link>
+      </p>
+      <h1 className="mt-2 text-2xl font-extrabold text-slate-900">
+        {t("accounts.historyTitle", { name: accountName || "..." })}
+      </h1>
 
       <TransactionFilters start={start} end={end} onStartChange={setStart} onEndChange={setEnd} onSubmit={(event) => { event.preventDefault(); loadTransactions(); }} t={t} />
       <TransactionList transactions={transactions} status={status} error={error} formatDate={formatDate} t={t} />

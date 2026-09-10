@@ -2,14 +2,29 @@
   "common": {
     "appName": "Money Tracker",
     "loading": "Loading...",
-    "backToDashboard": "Back to dashboard"
+    "backToDashboard": "Back to dashboard",
+    "comingSoon": "This page is under construction.",
+    "showAmount": "Show amount",
+    "hideAmount": "Hide amount"
+  },
+  "nav": {
+    "income": "Income",
+    "expenses": "Expenses",
+    "cash": "Cash",
+    "debts": "Debts"
   },
   "auth": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "register": {
       "title": "Create a new account",
       "nameLabel": "Name",
       "emailLabel": "Email",
       "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm password",
+      "passwordMismatch": "Password and confirmation do not match",
+      "agreeTerms": "I agree to the Terms & Conditions",
+      "mustAgreeTerms": "You must agree to the Terms & Conditions to continue",
       "submit": "Create account",
       "submitting": "Creating...",
       "haveAccount": "Already have an account?",
@@ -57,7 +72,17 @@
   },
   "layout": {
     "brand": "Money Tracker",
-    "logout": "Log out"
+    "logout": "Log out",
+    "logoutConfirmTitle": "Log Out?",
+    "logoutConfirmMessage": "Are you sure you want to log out of your account? You'll need to sign in again to access your data.",
+    "cancel": "Cancel",
+    "upgradeTitle": "Upgrade to Premium",
+    "upgradeSubtitle": "Unlock unlimited reports and more.",
+    "upgradeButton": "Upgrade Now",
+    "notifications": "Notifications",
+    "quickActionLabel": "New Transfer",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "transfer": {
     "backToDashboard": "Back to dashboard",
@@ -101,6 +126,26 @@
     "balance": "Balance",
     "totalWealth": "Total wealth",
     "noBalance": "No balances yet",
+    "adjustBalance": {
+      "trigger": "Adjust balance",
+      "title": "Adjust balance for {{name}}",
+      "currentBalance": "Current balance",
+      "newBalanceLabel": "New balance",
+      "notesLabel": "Note (optional)",
+      "notesPlaceholder": "Reason for the adjustment...",
+      "cancel": "Cancel",
+      "continue": "Continue",
+      "confirmTitle": "Confirm adjustment",
+      "confirmQuestion": "Are you sure you want to adjust the balance of \"{{name}}\"?",
+      "difference": "Difference",
+      "notePrefix": "Note:",
+      "back": "Back",
+      "saving": "Saving...",
+      "confirmSave": "Confirm save",
+      "invalidBalance": "Please enter a valid balance.",
+      "sameBalance": "The new balance is the same as the current one.",
+      "genericError": "Something went wrong while saving the adjustment."
+    },
     "transactions": {
       "back": "Back to accounts",
       "startDate": "From date",
@@ -141,5 +186,20 @@
       "investment": "Profit",
       "other": "Other"
     }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "View and update your personal information.",
+    "changePhoto": "Change photo",
+    "removePhoto": "Remove photo",
+    "avatarError": "Something went wrong with the photo.",
+    "editTitle": "Personal information",
+    "nameLabel": "Full name",
+    "phoneLabel": "Phone number",
+    "phonePlaceholder": "e.g. 01000000000",
+    "emailLabel": "Email",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "saveSuccess": "Your information has been updated."
   }
 }

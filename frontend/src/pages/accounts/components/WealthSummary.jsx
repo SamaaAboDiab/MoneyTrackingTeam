@@ -7,14 +7,19 @@ function WealthSummary({ accounts, t }) {
   const currencies = Object.entries(totalsByCurrency);
 
   return (
-    <section className="accounts-summary">
-      <h2>{t("accounts.totalWealth")}</h2>
-      {currencies.length === 0 ? <p>{t("accounts.noBalance")}</p> : (
-        <div className="summary-list">
+    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+      <h2 className="text-lg font-bold text-slate-900">{t("accounts.totalWealth")}</h2>
+
+      {currencies.length === 0 ? (
+        <p className="mt-3 text-slate-500">{t("accounts.noBalance")}</p>
+      ) : (
+        <div className="mt-3 flex flex-wrap gap-x-8 gap-y-2">
           {currencies.map(([currency, total]) => (
-            <div key={currency} className="summary-item">
-              <span>{currency}</span>
-              <strong>{Number(total).toLocaleString(undefined, { maximumFractionDigits: 2 })}</strong>
+            <div key={currency} className="flex items-baseline gap-2">
+              <span className="text-sm font-medium text-slate-500">{currency}</span>
+              <strong className="tabular-amount text-2xl font-extrabold text-slate-900">
+                {Number(total).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+              </strong>
             </div>
           ))}
         </div>

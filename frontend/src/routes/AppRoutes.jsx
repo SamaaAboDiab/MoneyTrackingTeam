@@ -11,6 +11,7 @@ import IncomePage from "../pages/income/IncomePage";
 import ExpensesPage from "../pages/expenses/ExpensesPage";
 import CashPage from "../pages/cash/CashPage";
 import DebtsPage from "../pages/debts/DebtsPage";
+import ProfilePage from "../pages/profile/ProfilePage";
 import ProtectedRoute from "./ProtectedRoute";
 import AppLayout from "../components/layout/AppLayout";
 import AuthLayout from "../components/layout/AuthLayout";
@@ -37,6 +38,7 @@ function AppRoutes() {
           <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/cash" element={<CashPage />} />
           <Route path="/debts" element={<DebtsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>
 

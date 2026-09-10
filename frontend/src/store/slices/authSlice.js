@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { TOKEN_KEY } from "../../api/axiosClient";
 import * as authApi from "../../api/authApi";
+import * as settingsApi from "../../api/settingsApi";
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
@@ -72,12 +73,50 @@ export const fetchCurrentUser = createAsyncThunk(
   }
 );
 
+export const updateProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async ({ name, phone }, { rejectWithValue }) => {
+    try {
+      const res = await settingsApi.updateProfile({ name, phone });
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "تعذّر تحديث البيانات");
+    }
+  }
+);
+
+export const uploadAvatar = createAsyncThunk(
+  "auth/uploadAvatar",
+  async (avatar, { rejectWithValue }) => {
+    try {
+      const res = await settingsApi.uploadPhoto(avatar);
+      return res.data.data.avatar;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "تعذّر رفع الصورة");
+    }
+  }
+);
+
+export const deleteAvatar = createAsyncThunk(
+  "auth/deleteAvatar",
+  async (_, { rejectWithValue }) => {
+    try {
+      await settingsApi.deletePhoto();
+      return true;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "تعذّر حذف الصورة");
+    }
+  }
+);
+
 const initialState = {
   user: null,
   token: localStorage.getItem(TOKEN_KEY) || null,
   status: "idle",
   error: null,
   authChecked: false,
+  profileStatus: "idle",
+  profileError: null,
 };
 
 const authSlice = createSlice({
@@ -97,6 +136,9 @@ const authSlice = createSlice({
     },
     markAuthChecked(state) {
       state.authChecked = true;
+    },
+    clearProfileError(state) {
+      state.profileError = null;
     },
   },
   extraReducers: (builder) => {
@@ -157,9 +199,27 @@ const authSlice = createSlice({
         state.token = null;
         state.authChecked = true;
         localStorage.removeItem(TOKEN_KEY);
+      })
+      .addCase(updateProfile.pending, (state) => {
+        state.profileStatus = "loading";
+        state.profileError = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.profileStatus = "succeeded";
+        state.user = action.payload;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.profileStatus = "failed";
+        state.profileError = action.payload;
+      })
+      .addCase(uploadAvatar.fulfilled, (state, action) => {
+        if (state.user) state.user.avatar = action.payload;
+      })
+      .addCase(deleteAvatar.fulfilled, (state) => {
+        if (state.user) state.user.avatar = "";
       });
   },
 });
 
-export const { logout, clearAuthError, markAuthChecked } = authSlice.actions;
+export const { logout, clearAuthError, markAuthChecked, clearProfileError } = authSlice.actions;
 export default authSlice.reducer;
