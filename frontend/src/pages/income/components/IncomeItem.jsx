@@ -10,13 +10,17 @@ function IncomeItem({ income }) {
   });
 
   return (
-    <article className="income-item">
-      <div>
-        <h3>{income.name}</h3>
-        <p>{t(`income.categories.${income.category}`)} · {date}</p>
-        {income.notes && <small>{income.notes}</small>}
+    <article className="flex items-center justify-between gap-4 py-4">
+      <div className="min-w-0 flex-1">
+        <h3 className="truncate font-semibold text-slate-900">{income.name}</h3>
+        <p className="text-sm text-slate-500">
+          {t(`income.categories.${income.category}`)} · {date}
+        </p>
+        {income.notes && <small className="text-xs text-slate-400">{income.notes}</small>}
       </div>
-      <strong>{amount} {income.currency}</strong>
+      <strong className="tabular-amount shrink-0 text-lg font-bold text-income">
+        {amount} {income.currency}
+      </strong>
     </article>
   );
 }

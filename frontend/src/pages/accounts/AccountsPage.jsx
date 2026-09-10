@@ -13,7 +13,6 @@ import {
 import AccountForm from "./components/AccountForm";
 import AccountsList from "./components/AccountsList";
 import WealthSummary from "./components/WealthSummary";
-import "../../app/App.css";
 
 const DEFAULT_COLOR = "#4f46e5";
 const emptyForm = {
@@ -61,29 +60,30 @@ function AccountsPage() {
   const displayedAccounts = items.filter((account) => Boolean(account.isArchived) === showArchived);
 
   return (
-    <div className="accounts-page">
-      <div className="accounts-container">
-        <div className="page-header">
-          <div>
-            <h1>{t("accounts.title")}</h1>
-            <p className="accounts-page-subtitle">{t("accounts.formDescription")}</p>
-          </div>
-          <Link to="/dashboard" className="back-link">{t("common.backToDashboard")}</Link>
+    <div className="mx-auto max-w-5xl">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900">{t("accounts.title")}</h1>
+          <p className="mt-1 text-slate-500">{t("accounts.formDescription")}</p>
         </div>
-        <AccountForm form={form} createStatus={createStatus} createError={createError} onChange={handleChange} onSubmit={handleSubmit} t={t} />
-        <WealthSummary accounts={items} t={t} />
-        <AccountsList
-          accounts={displayedAccounts}
-          showArchived={showArchived}
-          status={status}
-          error={error}
-          adjustStatus={adjustStatus}
-          onToggleView={() => setShowArchived((previous) => !previous)}
-          onAdjust={handleAdjustBalance}
-          onToggleArchive={handleToggleArchive}
-          t={t}
-        />
+        <Link to="/dashboard" className="font-semibold text-brand-700 hover:underline">
+          {t("common.backToDashboard")}
+        </Link>
       </div>
+
+      <AccountForm form={form} createStatus={createStatus} createError={createError} onChange={handleChange} onSubmit={handleSubmit} t={t} />
+      <WealthSummary accounts={items} t={t} />
+      <AccountsList
+        accounts={displayedAccounts}
+        showArchived={showArchived}
+        status={status}
+        error={error}
+        adjustStatus={adjustStatus}
+        onToggleView={() => setShowArchived((previous) => !previous)}
+        onAdjust={handleAdjustBalance}
+        onToggleArchive={handleToggleArchive}
+        t={t}
+      />
     </div>
   );
 }

@@ -8,7 +8,6 @@ import {
   clearTransferError,
   resetTransferStatus,
 } from "../../store/slices/accountsSlice";
-import "../../app/App.css";
 import TransferForm from "./components/TransferForm";
 
 function TransferPage() {
@@ -105,8 +104,12 @@ function TransferPage() {
   };
 
   return (
-    <div>
-      <p><Link to="/dashboard">{t("transfer.backToDashboard")}</Link></p>
+    <div className="mx-auto max-w-lg">
+      <p>
+        <Link to="/dashboard" className="font-semibold text-brand-700 hover:underline">
+          {t("transfer.backToDashboard")}
+        </Link>
+      </p>
       <TransferForm form={form} accounts={activeAccounts} status={status} error={transferError || error} formError={formError} lastTransfer={lastTransfer} transferStatus={transferStatus} onChange={handleChange} onSubmit={handleSubmit} t={t} />
     </div>
   );

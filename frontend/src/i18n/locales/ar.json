@@ -2,14 +2,29 @@
   "common": {
     "appName": "Money Tracker",
     "loading": "جارٍ التحميل...",
-    "backToDashboard": "الرجوع للوحة التحكم"
+    "backToDashboard": "الرجوع للوحة التحكم",
+    "comingSoon": "الصفحة دي قيد الإنشاء.",
+    "showAmount": "إظهار المبلغ",
+    "hideAmount": "إخفاء المبلغ"
+  },
+  "nav": {
+    "income": "الدخل",
+    "expenses": "المصروفات",
+    "cash": "الكاش",
+    "debts": "الديون"
   },
   "auth": {
+    "showPassword": "إظهار كلمة السر",
+    "hidePassword": "إخفاء كلمة السر",
     "register": {
       "title": "إنشاء حساب جديد",
       "nameLabel": "الاسم",
       "emailLabel": "البريد الإلكتروني",
       "passwordLabel": "كلمة السر",
+      "confirmPasswordLabel": "تأكيد كلمة السر",
+      "passwordMismatch": "كلمة السر وتأكيدها مش متطابقين",
+      "agreeTerms": "أوافق على الشروط والأحكام",
+      "mustAgreeTerms": "لازم توافقي على الشروط والأحكام عشان تكمّلي",
       "submit": "إنشاء حساب",
       "submitting": "جارٍ الإنشاء...",
       "haveAccount": "عندك حساب بالفعل؟",
@@ -57,7 +72,17 @@
   },
   "layout": {
     "brand": "Money Tracker",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "logoutConfirmTitle": "تسجيل الخروج؟",
+    "logoutConfirmMessage": "متأكد إنك عايز تسجل خروج من حسابك؟ هتحتاج تسجل دخولك تاني عشان توصل لبياناتك.",
+    "cancel": "إلغاء",
+    "upgradeTitle": "الترقية لـ Premium",
+    "upgradeSubtitle": "افتحي تقارير غير محدودة والمزيد.",
+    "upgradeButton": "رقّي دلوقتي",
+    "notifications": "الإشعارات",
+    "quickActionLabel": "تحويل جديد",
+    "collapseSidebar": "طي القائمة الجانبية",
+    "expandSidebar": "توسيع القائمة الجانبية"
   },
   "transfer": {
     "backToDashboard": "الرجوع للوحة التحكم",
@@ -101,6 +126,26 @@
     "balance": "الرصيد",
     "totalWealth": "إجمالي الثروة",
     "noBalance": "لا توجد أرصدة بعد",
+    "adjustBalance": {
+      "trigger": "تعديل الرصيد",
+      "title": "تعديل رصيد {{name}}",
+      "currentBalance": "الرصيد الحالي",
+      "newBalanceLabel": "الرصيد الجديد",
+      "notesLabel": "ملاحظة (اختياري)",
+      "notesPlaceholder": "سبب التعديل...",
+      "cancel": "إلغاء",
+      "continue": "متابعة",
+      "confirmTitle": "تأكيد التعديل",
+      "confirmQuestion": "هل أنت متأكد من تعديل رصيد \"{{name}}\"؟",
+      "difference": "الفرق",
+      "notePrefix": "ملاحظة:",
+      "back": "رجوع",
+      "saving": "جاري الحفظ...",
+      "confirmSave": "تأكيد الحفظ",
+      "invalidBalance": "من فضلك أدخل رصيد صحيح.",
+      "sameBalance": "الرصيد الجديد مطابق للرصيد الحالي.",
+      "genericError": "حصل خطأ أثناء حفظ التعديل."
+    },
     "transactions": {
       "back": "الرجوع للحسابات",
       "startDate": "من تاريخ",
@@ -141,5 +186,20 @@
       "investment": "أرباح",
       "other": "غيره"
     }
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "subtitle": "شوف بياناتك الشخصية وعدّلها.",
+    "changePhoto": "تغيير الصورة",
+    "removePhoto": "حذف الصورة",
+    "avatarError": "حصل خطأ في الصورة.",
+    "editTitle": "البيانات الشخصية",
+    "nameLabel": "الاسم بالكامل",
+    "phoneLabel": "رقم الهاتف",
+    "phonePlaceholder": "مثال: 01000000000",
+    "emailLabel": "البريد الإلكتروني",
+    "save": "حفظ التعديلات",
+    "saving": "جارٍ الحفظ...",
+    "saveSuccess": "تم تحديث بياناتك بنجاح."
   }
 }
