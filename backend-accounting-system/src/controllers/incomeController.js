@@ -4,6 +4,8 @@ const User     = require("../models/User");
 const { recordTxn, reverseTxn } = require("./accountController");
 
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const SUPPORTED_CURRENCIES = ["EGP", "USD", "EUR", "GBP"];
+const RATES_TO_EGP = { EGP: 1, USD: 50, EUR: 55, GBP: 65 };
 
 function contributionForMonth(inc, year, month) {
   const rd = new Date(inc.receivedDate);
@@ -25,6 +27,12 @@ function contributionForMonth(inc, year, month) {
     return inc.amount * count;
   }
   return 0;
+}
+
+function convertAmount(amount, fromCurrency, toCurrency) {
+  const fromRate = RATES_TO_EGP[fromCurrency] || RATES_TO_EGP.EGP;
+  const toRate = RATES_TO_EGP[toCurrency] || RATES_TO_EGP.EGP;
+  return (amount * fromRate) / toRate;
 }
 
 // GET /api/income
@@ -133,6 +141,34 @@ exports.remove = async (req, res, next) => {
 // GET /api/income/summary?months=6
 exports.summary = async (req, res, next) => {
   try {
+    const hasSelectedMonth = req.query.year !== undefined || req.query.month !== undefined;
+    if (hasSelectedMonth) {
+      const now = new Date();
+      const year = Number.parseInt(req.query.year, 10) || now.getFullYear();
+      const month = Number.parseInt(req.query.month, 10);
+      const selectedMonth = Number.isInteger(month) && month >= 0 && month <= 11 ? month : now.getMonth();
+      const requestedCurrency = String(req.query.currency || "EGP").toUpperCase();
+      const currency = SUPPORTED_CURRENCIES.includes(requestedCurrency) ? requestedCurrency : "EGP";
+      const allIncomes = await Income.find({ user: req.userId }).sort({ receivedDate: -1 });
+
+      const items = allIncomes
+        .map((inc) => {
+          const amount = contributionForMonth(inc, year, selectedMonth);
+          return {
+            ...inc.toObject(),
+            monthlyAmount: amount,
+            convertedAmount: convertAmount(amount, inc.currency, currency),
+          };
+        })
+        .filter((inc) => inc.monthlyAmount > 0);
+
+      const total = items.reduce((sum, inc) => sum + inc.convertedAmount, 0);
+      return res.json({
+        success: true,
+        data: { year, month: selectedMonth, currency, total, items },
+      });
+    }
+
     const months = Math.min(parseInt(req.query.months) || 6, 24);
     const allIncomes = await Income.find({ user: req.userId });
     const now = new Date();

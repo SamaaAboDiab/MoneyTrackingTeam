@@ -14,6 +14,18 @@ export const fetchIncomes = createAsyncThunk(
   }
 );
 
+export const fetchIncomeSummary = createAsyncThunk(
+  "incomes/fetchIncomeSummary",
+  async (params, { rejectWithValue }) => {
+    try {
+      const res = await incomeApi.getIncomeSummary(params);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "تعذّر تحميل ملخص الدخل"));
+    }
+  }
+);
+
 export const updateIncomeEntry = createAsyncThunk(
   "incomes/updateIncomeEntry",
   async ({ id, payload }, { rejectWithValue }) => {
@@ -40,6 +52,9 @@ export const toggleIncomeRecurrence = createAsyncThunk(
 
 const initialState = {
   items: [],
+  summary: null,
+  summaryStatus: "idle",
+  summaryError: null,
   status: "idle",
   error: null,
   updateStatus: "idle",
@@ -70,6 +85,18 @@ const incomeSlice = createSlice({
       .addCase(fetchIncomes.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+      })
+      .addCase(fetchIncomeSummary.pending, (state) => {
+        state.summaryStatus = "loading";
+        state.summaryError = null;
+      })
+      .addCase(fetchIncomeSummary.fulfilled, (state, action) => {
+        state.summaryStatus = "succeeded";
+        state.summary = action.payload;
+      })
+      .addCase(fetchIncomeSummary.rejected, (state, action) => {
+        state.summaryStatus = "failed";
+        state.summaryError = action.payload;
       })
       .addCase(updateIncomeEntry.pending, (state) => {
         state.updateStatus = "loading";

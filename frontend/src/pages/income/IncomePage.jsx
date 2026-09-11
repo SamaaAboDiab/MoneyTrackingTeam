@@ -1,7 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { fetchIncomes, updateIncomeEntry, clearIncomeUpdateError } from "../../store/slices/incomeSlice";
+import {
+  fetchIncomeSummary,
+  fetchIncomes,
+  updateIncomeEntry,
+  clearIncomeUpdateError,
+} from "../../store/slices/incomeSlice";
 
 const EMPTY_FORM = {
   name: "",
@@ -29,16 +34,34 @@ function formatMoney(value) {
 
 function IncomePage() {
   const dispatch = useDispatch();
-  const { items, status, error, updateStatus, updateError } = useSelector((state) => state.incomes);
+  const {
+    status,
+    error,
+    summary,
+    summaryStatus,
+    summaryError,
+    updateStatus,
+    updateError,
+  } = useSelector((state) => state.incomes);
 
   const [isEditing, setIsEditing] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [successMessage, setSuccessMessage] = useState("");
+  const today = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(
+    `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`
+  );
+  const [baseCurrency, setBaseCurrency] = useState("EGP");
 
   useEffect(() => {
     dispatch(fetchIncomes());
   }, [dispatch]);
+
+  useEffect(() => {
+    const [year, month] = selectedMonth.split("-").map(Number);
+    dispatch(fetchIncomeSummary({ year, month: month - 1, currency: baseCurrency }));
+  }, [dispatch, selectedMonth, baseCurrency]);
 
   useEffect(() => {
     if (!updateError) return;
@@ -46,10 +69,8 @@ function IncomePage() {
     return () => clearTimeout(timer);
   }, [updateError, dispatch]);
 
-  const totalIncome = useMemo(
-    () => items.reduce((sum, item) => sum + Number(item.amount || 0), 0),
-    [items]
-  );
+  const summaryItems = summary?.items || [];
+  const totalIncome = summary?.total || 0;
 
   const openEditModal = (income) => {
     setSelectedId(income._id);
@@ -100,6 +121,8 @@ function IncomePage() {
       setSuccessMessage("تم التعديل بنجاح");
       closeEditModal();
       dispatch(fetchIncomes());
+      const [year, month] = selectedMonth.split("-").map(Number);
+      dispatch(fetchIncomeSummary({ year, month: month - 1, currency: baseCurrency }));
     }
   };
 
@@ -117,14 +140,45 @@ function IncomePage() {
       </div>
 
       <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-        <p className="text-sm font-medium text-slate-500">إجمالي الدخل</p>
-        <div className="mt-1 flex items-baseline gap-2">
-          <strong className="tabular-amount text-3xl font-extrabold text-slate-900">
-            {formatMoney(totalIncome)}
-          </strong>
-          <span className="text-sm font-medium text-slate-500">EGP</span>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-slate-500">إجمالي الدخل الشهري</p>
+            <div className="mt-1 flex items-baseline gap-2">
+              <strong className="tabular-amount text-3xl font-extrabold text-slate-900">
+                {formatMoney(totalIncome)}
+              </strong>
+              <span className="text-sm font-medium text-slate-500">{baseCurrency}</span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <label className="flex flex-col gap-1 text-xs font-semibold text-slate-500">
+              الشهر والسنة
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(event) => setSelectedMonth(event.target.value)}
+                className={inputClass}
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-semibold text-slate-500">
+              العملة الأساسية
+              <select
+                value={baseCurrency}
+                onChange={(event) => setBaseCurrency(event.target.value)}
+                className={inputClass}
+              >
+                <option value="EGP">EGP</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </label>
+          </div>
         </div>
       </section>
+
+      {summaryError && <p className={`mt-4 ${errorClass}`}>{summaryError}</p>}
 
       {error && <p className={`mt-4 ${errorClass}`}>{error}</p>}
       {updateError && <p className={`mt-4 ${errorClass}`}>{updateError}</p>}
@@ -135,17 +189,23 @@ function IncomePage() {
       )}
 
       <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-        {status === "loading" ? (
+        {summaryStatus === "loading" || status === "loading" ? (
           <p className="text-slate-500">جارٍ تحميل مصادر الدخل...</p>
-        ) : items.length === 0 ? (
+        ) : summaryItems.length === 0 ? (
           <p className="text-slate-500">لا توجد مصادر دخل مسجلة حاليًا.</p>
         ) : (
           <div className="flex flex-col divide-y divide-slate-100">
-            {items.map((income) => (
+            {summaryItems.map((income) => (
               <div key={income._id} className="grid grid-cols-2 items-center gap-3 py-4 sm:grid-cols-5">
                 <div>
                   <span className="block text-xs font-medium text-slate-500">المصدر</span>
                   <strong className="text-slate-900">{income.name}</strong>
+                  <div className="mt-5">
+                    <span className="block text-xs font-medium text-slate-500">الإجمالي</span>
+                    <span className="tabular-amount text-sm font-bold text-income">
+                      {formatMoney(income.convertedAmount)} {baseCurrency}
+                    </span>
+                  </div>
                 </div>
                 <div>
                   <span className="block text-xs font-medium text-slate-500">الفئة</span>
@@ -154,8 +214,13 @@ function IncomePage() {
                 <div>
                   <span className="block text-xs font-medium text-slate-500">المبلغ</span>
                   <span className="tabular-amount text-sm font-bold text-income">
-                    {formatMoney(income.amount)} {income.currency || "EGP"}
+                    {formatMoney(income.convertedAmount)} {baseCurrency}
                   </span>
+                  {income.currency !== baseCurrency && (
+                    <span className="block text-xs text-slate-400">
+                      الأصل: {formatMoney(income.monthlyAmount)} {income.currency}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <span className="block text-xs font-medium text-slate-500">التاريخ</span>
