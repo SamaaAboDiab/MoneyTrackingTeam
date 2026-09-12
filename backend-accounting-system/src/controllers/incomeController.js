@@ -40,6 +40,23 @@ exports.create = async (req, res, next) => {
   try {
     const { name, category, amount, currency, receivedDate, recurrence, status, notes, accountId } = req.body;
 
+    const allowedCategories = ["salary", "freelance", "rental", "investment", "other"];
+    const parsedAmount = Number(amount);
+    const parsedDate = new Date(receivedDate);
+
+    if (!name?.trim() || !category || amount === undefined || amount === "" || !currency || !receivedDate) {
+      return res.status(400).json({ success: false, message: "Name, category, amount, currency, and receivedDate are required." });
+    }
+    if (!allowedCategories.includes(category)) {
+      return res.status(400).json({ success: false, message: "Invalid income category." });
+    }
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      return res.status(400).json({ success: false, message: "Amount must be greater than zero." });
+    }
+    if (Number.isNaN(parsedDate.getTime())) {
+      return res.status(400).json({ success: false, message: "receivedDate must be a valid date." });
+    }
+
     const user = await User.findById(req.userId).lean();
     if (user?.subscriptionType === "trial") {
       const [incCount, expCount] = await Promise.all([
@@ -53,19 +70,19 @@ exports.create = async (req, res, next) => {
 
     const income = await Income.create({
       user: req.userId,
-      name, category,
-      amount: parseFloat(amount),
+      name: name.trim(), category,
+      amount: parsedAmount,
       currency: currency || "EGP",
-      receivedDate, recurrence: recurrence || "once",
+      receivedDate: parsedDate, recurrence: recurrence || "once",
       status: status || "cleared", notes,
       account: accountId || null,
     });
 
     if (accountId) {
-      await recordTxn(req.userId, accountId, "credit", parseFloat(amount), name, new Date(receivedDate), "Income", income._id);
+      await recordTxn(req.userId, accountId, "credit", parsedAmount, name, parsedDate, "Income", income._id);
     }
 
-    res.status(201).json({ success: true, data: income });
+    res.status(201).json({ success: true, message: "تم إضافة مصدر الدخل بنجاح", data: income });
   } catch (err) { next(err); }
 };
 

@@ -1,6 +1,6 @@
 import IncomeItem from "./IncomeItem";
 
-function IncomeList({ items, status, error, t }) {
+function IncomeList({ items, status, error, onEdit, t }) {
   return (
     <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
       <div className="flex items-center justify-between gap-2">
@@ -20,7 +20,7 @@ function IncomeList({ items, status, error, t }) {
 
       <div className="mt-2 flex flex-col divide-y divide-slate-100">
         {items.map((income) => (
-          <IncomeItem key={income._id} income={income} />
+          <IncomeItem key={income._id} income={income} onEdit={onEdit} />
         ))}
       </div>
     </section>

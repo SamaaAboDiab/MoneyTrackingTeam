@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-function IncomeItem({ income }) {
+function IncomeItem({ income, onEdit }) {
   const { t, i18n } = useTranslation();
   const date = new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(
     new Date(income.receivedDate)
@@ -21,6 +21,15 @@ function IncomeItem({ income }) {
       <strong className="tabular-amount shrink-0 text-lg font-bold text-income">
         {amount} {income.currency}
       </strong>
+      {onEdit && (
+        <button
+          type="button"
+          onClick={() => onEdit(income)}
+          className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-brand-700"
+        >
+          تعديل
+        </button>
+      )}
     </article>
   );
 }

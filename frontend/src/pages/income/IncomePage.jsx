@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { fetchIncomes, updateIncomeEntry, clearIncomeUpdateError } from "../../store/slices/incomeSlice";
+import {
+  clearIncomeCreateState,
+  clearIncomeUpdateError,
+  createIncomeEntry,
+  fetchIncomes,
+  updateIncomeEntry,
+} from "../../store/slices/incomeSlice";
+import IncomeForm from "./components/IncomeForm";
+import IncomeList from "./components/IncomeList";
 
 const EMPTY_FORM = {
   name: "",
@@ -29,12 +37,20 @@ function formatMoney(value) {
 
 function IncomePage() {
   const dispatch = useDispatch();
-  const { items, status, error, updateStatus, updateError } = useSelector((state) => state.incomes);
+  const { items, status, error, createStatus, createError, updateStatus, updateError } = useSelector((state) => state.incomes);
 
   const [isEditing, setIsEditing] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [successMessage, setSuccessMessage] = useState("");
+  const [createForm, setCreateForm] = useState({
+    name: "",
+    category: "",
+    amount: "",
+    currency: "EGP",
+    receivedDate: "",
+    notes: "",
+  });
 
   useEffect(() => {
     dispatch(fetchIncomes());
@@ -45,6 +61,12 @@ function IncomePage() {
     const timer = setTimeout(() => dispatch(clearIncomeUpdateError()), 3000);
     return () => clearTimeout(timer);
   }, [updateError, dispatch]);
+
+  useEffect(() => {
+    if (createStatus !== "succeeded") return;
+    const timer = setTimeout(() => dispatch(clearIncomeCreateState()), 3000);
+    return () => clearTimeout(timer);
+  }, [createStatus, dispatch]);
 
   const totalIncome = useMemo(
     () => items.reduce((sum, item) => sum + Number(item.amount || 0), 0),
@@ -76,6 +98,25 @@ function IncomePage() {
   const handleFormChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateChange = (event) => {
+    const { name, value } = event.target;
+    setCreateForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateSubmit = async (event) => {
+    event.preventDefault();
+    const result = await dispatch(createIncomeEntry({
+      ...createForm,
+      name: createForm.name.trim(),
+      amount: Number(createForm.amount),
+      notes: createForm.notes.trim(),
+    }));
+
+    if (createIncomeEntry.fulfilled.match(result)) {
+      setCreateForm({ name: "", category: "", amount: "", currency: "EGP", receivedDate: "", notes: "" });
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -134,49 +175,34 @@ function IncomePage() {
         </p>
       )}
 
-      <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-        {status === "loading" ? (
-          <p className="text-slate-500">جارٍ تحميل مصادر الدخل...</p>
-        ) : items.length === 0 ? (
-          <p className="text-slate-500">لا توجد مصادر دخل مسجلة حاليًا.</p>
-        ) : (
-          <div className="flex flex-col divide-y divide-slate-100">
-            {items.map((income) => (
-              <div key={income._id} className="grid grid-cols-2 items-center gap-3 py-4 sm:grid-cols-5">
-                <div>
-                  <span className="block text-xs font-medium text-slate-500">المصدر</span>
-                  <strong className="text-slate-900">{income.name}</strong>
-                </div>
-                <div>
-                  <span className="block text-xs font-medium text-slate-500">الفئة</span>
-                  <span className="text-sm text-slate-700">{income.category}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-medium text-slate-500">المبلغ</span>
-                  <span className="tabular-amount text-sm font-bold text-income">
-                    {formatMoney(income.amount)} {income.currency || "EGP"}
-                  </span>
-                </div>
-                <div>
-                  <span className="block text-xs font-medium text-slate-500">التاريخ</span>
-                  <span className="text-sm text-slate-700">
-                    {new Date(income.receivedDate).toLocaleDateString("ar-EG")}
-                  </span>
-                </div>
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => openEditModal(income)}
-                    className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-brand-700"
-                  >
-                    Edit
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+      <IncomeForm
+        form={createForm}
+        createStatus={createStatus}
+        createError={createError}
+        onChange={handleCreateChange}
+        onSubmit={handleCreateSubmit}
+        t={(key) => ({
+          "income.formTitle": "إضافة مصدر دخل",
+          "income.nameLabel": "اسم مصدر الدخل",
+          "income.namePlaceholder": "مثال: راتب شهر سبتمبر",
+          "income.categoryLabel": "نوع الدخل",
+          "income.categoryPlaceholder": "اختار نوع الدخل",
+          "income.amountLabel": "المبلغ",
+          "income.currencyLabel": "العملة",
+          "income.receivedDateLabel": "تاريخ الاستلام",
+          "income.notesLabel": "ملاحظات (اختياري)",
+          "income.notesPlaceholder": "أضف أي تفاصيل تساعدك لاحقاً",
+          "income.submit": "إضافة مصدر الدخل",
+          "income.submitting": "جارٍ الحفظ...",
+          "income.success": "تم إضافة مصدر الدخل بنجاح",
+        }[key] || key)}
+      />
+
+      <IncomeList items={items} status={status} error={error} onEdit={openEditModal} t={(key) => ({
+        "income.listTitle": "مصادر الدخل المضافة",
+        "income.loading": "جارٍ تحميل مصادر الدخل...",
+        "income.empty": "لسه مفيش مصادر دخل مضافة.",
+      }[key] || key)} />
 
       {isEditing && (
         <div
