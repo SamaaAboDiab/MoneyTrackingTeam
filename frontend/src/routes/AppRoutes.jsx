@@ -15,7 +15,7 @@ import ProfilePage from "../pages/profile/ProfilePage";
 import ProtectedRoute from "./ProtectedRoute";
 import AppLayout from "../components/layout/AppLayout";
 import AuthLayout from "../components/layout/AuthLayout";
-
+import CategoriesPage from "../pages/categories/CategoriesPage";
 function AppRoutes() {
   return (
     <Routes>
@@ -36,6 +36,7 @@ function AppRoutes() {
           <Route path="/accounts/transfer" element={<TransferPage />} />
           <Route path="/income" element={<IncomePage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/cash" element={<CashPage />} />
           <Route path="/debts" element={<DebtsPage />} />
           <Route path="/profile" element={<ProfilePage />} />

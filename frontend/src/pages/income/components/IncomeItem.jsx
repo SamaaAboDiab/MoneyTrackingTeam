@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
+import DeleteIncomeButton from "./DeleteIncomeButton";
 
-function IncomeItem({ income, onEdit }) {
+function IncomeItem({ income, onEdit, onDeleted }) {
   const { t, i18n } = useTranslation();
   const date = new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(
     new Date(income.receivedDate)
@@ -18,18 +19,30 @@ function IncomeItem({ income, onEdit }) {
         </p>
         {income.notes && <small className="text-xs text-slate-400">{income.notes}</small>}
       </div>
-      <strong className="tabular-amount shrink-0 text-lg font-bold text-income">
-        {amount} {income.currency}
-      </strong>
-      {onEdit && (
-        <button
-          type="button"
-          onClick={() => onEdit(income)}
-          className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-brand-700"
-        >
-          تعديل
-        </button>
-      )}
+
+      <div className="flex items-center gap-3">
+        <strong className="tabular-amount shrink-0 text-lg font-bold text-income">
+          {amount} {income.currency}
+        </strong>
+
+        {onEdit && (
+          <button
+            type="button"
+            onClick={() => onEdit(income)}
+            className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-brand-700"
+          >
+            تعديل
+          </button>
+        )}
+
+        {onDeleted && (
+          <DeleteIncomeButton
+            incomeId={income._id}
+            incomeName={income.name}
+            onConfirmDelete={onDeleted}
+          />
+        )}
+      </div>
     </article>
   );
 }

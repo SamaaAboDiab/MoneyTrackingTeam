@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { apiFetch } from "../api/client";
-export default function DeleteIncomeButton({ incomeId, incomeName, onDeleted }) {
+
+export default function DeleteIncomeButton({ incomeId, incomeName, onConfirmDelete }) {
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -9,8 +9,7 @@ export default function DeleteIncomeButton({ incomeId, incomeName, onDeleted }) 
     setDeleting(true);
     setError("");
     try {
-      await apiFetch(`/api/income/${incomeId}`, { method: "DELETE" });
-      onDeleted?.(incomeId);
+      await onConfirmDelete(incomeId);
       setOpen(false);
     } catch (err) {
       setError(err.message || "تعذر حذف الدخل.");

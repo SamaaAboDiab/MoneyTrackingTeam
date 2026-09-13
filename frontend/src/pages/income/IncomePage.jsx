@@ -5,6 +5,7 @@ import {
   clearIncomeCreateState,
   clearIncomeUpdateError,
   createIncomeEntry,
+  deleteIncome,
   fetchIncomes,
   updateIncomeEntry,
 } from "../../store/slices/incomeSlice";
@@ -37,7 +38,8 @@ function formatMoney(value) {
 
 function IncomePage() {
   const dispatch = useDispatch();
-  const { items, status, error, createStatus, createError, updateStatus, updateError } = useSelector((state) => state.incomes);
+  const { items, status, error, createStatus, createError, updateStatus, updateError } =
+    useSelector((state) => state.incomes);
 
   const [isEditing, setIsEditing] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -80,7 +82,9 @@ function IncomePage() {
       category: income.category || "salary",
       amount: income.amount ?? "",
       currency: income.currency || "EGP",
-      receivedDate: income.receivedDate ? new Date(income.receivedDate).toISOString().slice(0, 10) : "",
+      receivedDate: income.receivedDate
+        ? new Date(income.receivedDate).toISOString().slice(0, 10)
+        : "",
       recurrence: income.recurrence || "once",
       status: income.status || "cleared",
       notes: income.notes || "",
@@ -107,15 +111,24 @@ function IncomePage() {
 
   const handleCreateSubmit = async (event) => {
     event.preventDefault();
-    const result = await dispatch(createIncomeEntry({
-      ...createForm,
-      name: createForm.name.trim(),
-      amount: Number(createForm.amount),
-      notes: createForm.notes.trim(),
-    }));
+    const result = await dispatch(
+      createIncomeEntry({
+        ...createForm,
+        name: createForm.name.trim(),
+        amount: Number(createForm.amount),
+        notes: createForm.notes.trim(),
+      })
+    );
 
     if (createIncomeEntry.fulfilled.match(result)) {
-      setCreateForm({ name: "", category: "", amount: "", currency: "EGP", receivedDate: "", notes: "" });
+      setCreateForm({
+        name: "",
+        category: "",
+        amount: "",
+        currency: "EGP",
+        receivedDate: "",
+        notes: "",
+      });
     }
   };
 
@@ -133,15 +146,18 @@ function IncomePage() {
       notes: form.notes.trim(),
     };
 
-    const result = await dispatch(
-      updateIncomeEntry({ id: selectedId, payload })
-    );
+    const result = await dispatch(updateIncomeEntry({ id: selectedId, payload }));
 
     if (updateIncomeEntry.fulfilled.match(result)) {
       setSuccessMessage("تم التعديل بنجاح");
       closeEditModal();
       dispatch(fetchIncomes());
     }
+  };
+
+  const handleDeleteIncome = async (id) => {
+    await dispatch(deleteIncome(id)).unwrap();
+    dispatch(fetchIncomes());
   };
 
   return (
@@ -202,11 +218,18 @@ function IncomePage() {
         }[key] || key)}
       />
 
-      <IncomeList items={items} status={status} error={error} onEdit={openEditModal} t={(key) => ({
-        "income.listTitle": "مصادر الدخل المضافة",
-        "income.loading": "جارٍ تحميل مصادر الدخل...",
-        "income.empty": "لسه مفيش مصادر دخل مضافة.",
-      }[key] || key)} />
+      <IncomeList
+        items={items}
+        status={status}
+        error={error}
+        onEdit={openEditModal}
+        onDeleted={handleDeleteIncome}
+        t={(key) => ({
+          "income.listTitle": "مصادر الدخل المضافة",
+          "income.loading": "جارٍ تحميل مصادر الدخل...",
+          "income.empty": "لسه مفيش مصادر دخل مضافة.",
+        }[key] || key)}
+      />
 
       {isEditing && (
         <div

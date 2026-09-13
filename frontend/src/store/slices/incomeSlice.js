@@ -26,6 +26,18 @@ export const createIncomeEntry = createAsyncThunk(
   }
 );
 
+export const deleteIncome = createAsyncThunk(
+  "incomes/deleteIncome",
+  async (id, { rejectWithValue }) => {
+    try {
+      await incomeApi.deleteIncome(id);
+      return id;
+    } catch (error) {
+      return rejectWithValue(extractError(error, "تعذّر حذف مصدر الدخل"));
+    }
+  }
+);
+
 export const fetchIncomeSummary = createAsyncThunk(
   "incomes/fetchIncomeSummary",
   async (params, { rejectWithValue }) => {
@@ -116,6 +128,17 @@ const incomeSlice = createSlice({
         state.createStatus = "failed";
         state.createError = action.payload;
       })
+      .addCase(deleteIncome.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteIncome.fulfilled, (state, action) => {
+        state.items = state.items.filter((item) => item._id !== action.payload);
+        state.status = "succeeded";
+      })
+      .addCase(deleteIncome.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
       .addCase(fetchIncomeSummary.pending, (state) => {
         state.summaryStatus = "loading";
         state.summaryError = null;
@@ -134,9 +157,7 @@ const incomeSlice = createSlice({
       })
       .addCase(updateIncomeEntry.fulfilled, (state, action) => {
         state.updateStatus = "succeeded";
-        const index = state.items.findIndex(
-          (item) => item._id === action.payload._id
-        );
+        const index = state.items.findIndex((item) => item._id === action.payload._id);
         if (index !== -1) {
           state.items[index] = action.payload;
         }
@@ -146,9 +167,7 @@ const incomeSlice = createSlice({
         state.updateError = action.payload;
       })
       .addCase(toggleIncomeRecurrence.fulfilled, (state, action) => {
-        const index = state.items.findIndex(
-          (item) => item._id === action.payload._id
-        );
+        const index = state.items.findIndex((item) => item._id === action.payload._id);
         if (index !== -1) {
           state.items[index] = action.payload;
         }
