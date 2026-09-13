@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { registerUser, clearAuthError } from "../../store/slices/authSlice";
 import AuthCard from "./components/AuthCard";
-import AuthLogo from "./components/AuthLogo";
+import AuthFormHeader from "./components/AuthFormHeader";
 import AuthBanner from "./components/AuthBanner";
 import PasswordField from "./components/PasswordField";
 import AuthSubmitButton from "./components/AuthSubmitButton";
@@ -57,7 +57,7 @@ function RegisterPage() {
 
   return (
     <AuthCard onSubmit={handleSubmit}>
-      <AuthLogo title={t("auth.register.title")} />
+      <AuthFormHeader title={t("auth.register.title")} subtitle={t("auth.register.subtitle")} />
 
       {(formError || error) && <AuthBanner>{formError || error}</AuthBanner>}
 

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { forgotPassword, clearAuthError } from "../../store/slices/authSlice";
 import AuthCard from "./components/AuthCard";
-import AuthLogo from "./components/AuthLogo";
+import AuthFormHeader from "./components/AuthFormHeader";
 import AuthBanner from "./components/AuthBanner";
 import AuthSubmitButton from "./components/AuthSubmitButton";
 
@@ -31,7 +31,7 @@ function ForgotPasswordPage() {
 
   return (
     <AuthCard onSubmit={handleSubmit}>
-      <AuthLogo title={t("auth.forgotPassword.title")} />
+      <AuthFormHeader title={t("auth.forgotPassword.title")} />
 
       {sent ? (
         <AuthBanner variant="success">{t("auth.forgotPassword.sentMessage")}</AuthBanner>
@@ -62,7 +62,7 @@ function ForgotPasswordPage() {
         </>
       )}
 
-      <p className="mt-6 text-center text-sm">
+      <p className="mt-4 text-center text-sm">
         <Link to="/login" className="font-semibold text-brand-600 hover:underline">
           {t("auth.forgotPassword.backToLogin")}
         </Link>

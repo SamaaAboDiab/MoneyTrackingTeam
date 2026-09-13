@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { resetPassword, clearAuthError } from "../../store/slices/authSlice";
 import AuthCard from "./components/AuthCard";
-import AuthLogo from "./components/AuthLogo";
+import AuthFormHeader from "./components/AuthFormHeader";
 import AuthBanner from "./components/AuthBanner";
 import PasswordField from "./components/PasswordField";
 import AuthSubmitButton from "./components/AuthSubmitButton";
@@ -44,7 +44,7 @@ function ResetPasswordPage() {
   if (!token) {
     return (
       <AuthCard as="div" className="text-center">
-        <AuthLogo title={t("auth.resetPassword.invalidTitle")} />
+        <AuthFormHeader title={t("auth.resetPassword.invalidTitle")} />
         <AuthBanner>{t("auth.resetPassword.invalidMessage")}</AuthBanner>
         <p className="text-sm">
           <Link to="/forgot-password" className="font-semibold text-brand-600 hover:underline">
@@ -57,7 +57,7 @@ function ResetPasswordPage() {
 
   return (
     <AuthCard onSubmit={handleSubmit}>
-      <AuthLogo title={t("auth.resetPassword.title")} />
+      <AuthFormHeader title={t("auth.resetPassword.title")} />
 
       {(formError || error) && <AuthBanner>{formError || error}</AuthBanner>}
 

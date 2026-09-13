@@ -16,8 +16,15 @@
   "auth": {
     "showPassword": "Show password",
     "hidePassword": "Hide password",
+    "panel": {
+      "headline1": "Track every expense.",
+      "headline2": "Save smarter daily.",
+      "headline3": "Grow with confidence.",
+      "subtitle": "Manage every account, transfer, and savings goal — all from one powerful, easy-to-use dashboard."
+    },
     "register": {
-      "title": "Create a new account",
+      "title": "Create your account",
+      "subtitle": "Start tracking your money in just a minute.",
       "nameLabel": "Name",
       "emailLabel": "Email",
       "passwordLabel": "Password",
@@ -31,7 +38,8 @@
       "loginLink": "Log in"
     },
     "login": {
-      "title": "Log in",
+      "title": "Welcome Back!",
+      "subtitle": "Log in to keep track of your money with ease.",
       "registeredSuccess": "Account created successfully, log in now",
       "passwordResetSuccess": "Password changed successfully, log in with your new password",
       "emailLabel": "Email",

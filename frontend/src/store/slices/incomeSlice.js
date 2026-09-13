@@ -38,7 +38,6 @@ export const fetchIncomeSummary = createAsyncThunk(
   }
 );
 
-
 export const updateIncomeEntry = createAsyncThunk(
   "incomes/updateIncomeEntry",
   async ({ id, payload }, { rejectWithValue }) => {
@@ -135,7 +134,9 @@ const incomeSlice = createSlice({
       })
       .addCase(updateIncomeEntry.fulfilled, (state, action) => {
         state.updateStatus = "succeeded";
-        const index = state.items.findIndex((item) => item._id === action.payload._id);
+        const index = state.items.findIndex(
+          (item) => item._id === action.payload._id
+        );
         if (index !== -1) {
           state.items[index] = action.payload;
         }
@@ -145,7 +146,9 @@ const incomeSlice = createSlice({
         state.updateError = action.payload;
       })
       .addCase(toggleIncomeRecurrence.fulfilled, (state, action) => {
-        const index = state.items.findIndex((item) => item._id === action.payload._id);
+        const index = state.items.findIndex(
+          (item) => item._id === action.payload._id
+        );
         if (index !== -1) {
           state.items[index] = action.payload;
         }
@@ -153,5 +156,7 @@ const incomeSlice = createSlice({
   },
 });
 
-export const { clearIncomeError, clearIncomeCreateState, clearIncomeUpdateError } = incomeSlice.actions;
+export const { clearIncomeError, clearIncomeCreateState, clearIncomeUpdateError } =
+  incomeSlice.actions;
+
 export default incomeSlice.reducer;
