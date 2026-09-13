@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { listCategories, createCategory, updateCategory, deleteCategory } from "../api/categoryApi";
+import { listCategories, createCategory, updateCategory, deleteCategory } from "../../../api/categoryApi";
 
 const DEFAULT_COLOR = "#6b7280";
 export default function CategoryManager() {

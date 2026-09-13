@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { listCategories, createCategory } from "../api/categoryApi";
+import { listCategories, createCategory } from "../../../api/categoryApi";
 
 const ADD_NEW_VALUE = "__add_new__";
 const DEFAULT_COLOR = "#6b7280";

@@ -1,6 +1,11 @@
 import { useState } from "react";
+import axiosClient from "../../../api/axiosClient";
 
-export default function DeleteIncomeButton({ incomeId, incomeName, onConfirmDelete }) {
+function getErrorMessage(err, fallback) {
+  return err.response?.data?.message || err.message || fallback;
+}
+
+export default function DeleteIncomeButton({ incomeId, incomeName, onDeleted }) {
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -9,10 +14,11 @@ export default function DeleteIncomeButton({ incomeId, incomeName, onConfirmDele
     setDeleting(true);
     setError("");
     try {
-      await onConfirmDelete(incomeId);
+      await axiosClient.delete(`/income/${incomeId}`);
+      onDeleted?.(incomeId);
       setOpen(false);
     } catch (err) {
-      setError(err.message || "تعذر حذف الدخل.");
+      setError(getErrorMessage(err, "تعذر حذف الدخل."));
     } finally {
       setDeleting(false);
     }
