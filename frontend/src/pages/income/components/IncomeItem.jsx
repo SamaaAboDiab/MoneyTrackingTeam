@@ -1,30 +1,87 @@
 import { useTranslation } from "react-i18next";
 import DeleteIncomeButton from "./DeleteIncomeButton";
 
-function IncomeItem({ income, onEdit, onDeleted }) {
+function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted }) {
   const { t, i18n } = useTranslation();
-  const date = new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(
-    new Date(income.receivedDate)
+
+  const date = new Intl.DateTimeFormat(i18n.language, {
+    dateStyle: "medium",
+  }).format(new Date(income.receivedDate));
+
+  const amount = Number(displayAmount ?? income.amount).toLocaleString(
+    i18n.language,
+    {
+      maximumFractionDigits: 2,
+    }
   );
-  const amount = Number(income.amount).toLocaleString(i18n.language, {
-    maximumFractionDigits: 2,
-  });
+
+  const originalAmount = Number(income.amount || 0).toLocaleString(
+    i18n.language,
+    {
+      maximumFractionDigits: 2,
+    }
+  );
+
+  const currency = displayCurrency || income.currency;
 
   return (
-    <article className="flex items-center justify-between gap-4 py-4">
-      <div className="min-w-0 flex-1">
-        <h3 className="truncate font-semibold text-slate-900">{income.name}</h3>
-        <p className="text-sm text-slate-500">
-          {t(`income.categories.${income.category}`)} · {date}
-        </p>
-        {income.notes && <small className="text-xs text-slate-400">{income.notes}</small>}
+    <article className="grid grid-cols-2 gap-4 py-5 md:grid-cols-[minmax(10rem,1.4fr)_minmax(7rem,1fr)_minmax(10rem,1fr)_minmax(8rem,1fr)_auto] md:items-center">
+      {/* اسم المصدر */}
+      <div className="min-w-0">
+        <span className="text-xs font-semibold text-slate-400">
+          اسم المصدر
+        </span>
+
+        <h3 className="mt-1 truncate font-semibold text-slate-900">
+          {income.name}
+        </h3>
+
+        {income.notes && (
+          <small className="text-xs text-slate-400">
+            {income.notes}
+          </small>
+        )}
       </div>
 
-      <div className="flex items-center gap-3">
-        <strong className="tabular-amount shrink-0 text-lg font-bold text-income">
-          {amount} {income.currency}
+      {/* الفئة */}
+      <div>
+        <span className="text-xs font-semibold text-slate-400">
+          الفئة
+        </span>
+
+        <p className="mt-1 font-semibold text-slate-700">
+          {t(`income.categories.${income.category}`)}
+        </p>
+      </div>
+
+      {/* المبلغ */}
+      <div className="flex flex-col items-start">
+        <span className="text-xs font-semibold text-slate-400">
+          المبلغ بالعملة المختارة
+        </span>
+
+        <strong className="mt-1 block tabular-amount text-lg font-bold text-income">
+          {amount} {currency}
         </strong>
 
+        <small className="mt-1 block text-xs text-slate-400">
+          الأصل: {originalAmount} {income.currency}
+        </small>
+      </div>
+
+      {/* التاريخ */}
+      <div>
+        <span className="text-xs font-semibold text-slate-400">
+          التاريخ
+        </span>
+
+        <p className="mt-1 font-semibold text-slate-700">
+          {date}
+        </p>
+      </div>
+
+      {/* الأزرار */}
+      <div className="col-span-2 flex items-center justify-end gap-2 md:col-span-1">
         {onEdit && (
           <button
             type="button"
