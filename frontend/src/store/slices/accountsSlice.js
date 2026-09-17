@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as accountsApi from "../../api/accountsApi";
-import { extractError } from "../../utils/errorHandler";
+import { extractError } from "../../api/error";
 
 export const fetchAccounts = createAsyncThunk(
   "accounts/fetchAccounts",

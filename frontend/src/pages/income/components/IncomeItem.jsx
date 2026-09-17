@@ -31,7 +31,7 @@ function IncomeItem({ income, onEdit, onDeleted }) {
             onClick={() => onEdit(income)}
             className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-brand-700"
           >
-            تعديل
+            {t("common.edit")}
           </button>
         )}
 

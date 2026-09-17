@@ -1,12 +1,11 @@
 import { useTranslation } from "react-i18next";
+import { changeLanguageSmoothly } from "../../i18n/i18n";
 
 function LanguageSwitcher() {
   const { i18n } = useTranslation();
 
   const changeLanguage = (lng) => {
-    if (i18n.language !== lng) {
-      i18n.changeLanguage(lng);
-    }
+    changeLanguageSmoothly(lng);
   };
 
   const baseBtn =

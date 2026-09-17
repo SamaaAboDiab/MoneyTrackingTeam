@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
@@ -28,15 +29,8 @@ const inputClass =
 const labelClass = "text-sm font-semibold text-slate-700";
 const errorClass = "rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense";
 
-function formatMoney(value) {
-  const num = Number(value || 0);
-  return new Intl.NumberFormat("ar-EG", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(num);
-}
-
 function IncomePage() {
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const { items, status, error, createStatus, createError, updateStatus, updateError } =
     useSelector((state) => state.incomes);
@@ -69,6 +63,12 @@ function IncomePage() {
     const timer = setTimeout(() => dispatch(clearIncomeCreateState()), 3000);
     return () => clearTimeout(timer);
   }, [createStatus, dispatch]);
+
+  const formatMoney = (value) =>
+    new Intl.NumberFormat(i18n.language, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Number(value || 0));
 
   const totalIncome = useMemo(
     () => items.reduce((sum, item) => sum + Number(item.amount || 0), 0),
@@ -149,7 +149,7 @@ function IncomePage() {
     const result = await dispatch(updateIncomeEntry({ id: selectedId, payload }));
 
     if (updateIncomeEntry.fulfilled.match(result)) {
-      setSuccessMessage("تم التعديل بنجاح");
+      setSuccessMessage(t("income.updateSuccess"));
       closeEditModal();
       dispatch(fetchIncomes());
     }
@@ -164,19 +164,19 @@ function IncomePage() {
     <div className="mx-auto max-w-5xl">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">مصادر الدخل</h1>
-          <p className="mt-1 text-slate-500">إدارة مصادر الدخل وتحديثها بسهولة</p>
+          <h1 className="text-2xl font-extrabold text-slate-900">{t("income.title")}</h1>
+          <p className="mt-1 text-slate-500">{t("income.description")}</p>
         </div>
 
         <Link to="/dashboard" className="font-semibold text-brand-700 hover:underline">
-          العودة للوحة التحكم
+          {t("common.backToDashboard")}
         </Link>
       </div>
 
       <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-slate-500">إجمالي الدخل</p>
+            <p className="text-sm font-medium text-slate-500">{t("income.totalLabel")}</p>
             <div className="mt-1 flex items-baseline gap-2">
               <strong className="tabular-amount text-3xl font-extrabold text-slate-900">
                 {formatMoney(totalIncome)}
@@ -201,21 +201,7 @@ function IncomePage() {
         createError={createError}
         onChange={handleCreateChange}
         onSubmit={handleCreateSubmit}
-        t={(key) => ({
-          "income.formTitle": "إضافة مصدر دخل",
-          "income.nameLabel": "اسم مصدر الدخل",
-          "income.namePlaceholder": "مثال: راتب شهر سبتمبر",
-          "income.categoryLabel": "نوع الدخل",
-          "income.categoryPlaceholder": "اختار نوع الدخل",
-          "income.amountLabel": "المبلغ",
-          "income.currencyLabel": "العملة",
-          "income.receivedDateLabel": "تاريخ الاستلام",
-          "income.notesLabel": "ملاحظات (اختياري)",
-          "income.notesPlaceholder": "أضف أي تفاصيل تساعدك لاحقاً",
-          "income.submit": "إضافة مصدر الدخل",
-          "income.submitting": "جارٍ الحفظ...",
-          "income.success": "تم إضافة مصدر الدخل بنجاح",
-        }[key] || key)}
+        t={t}
       />
 
       <IncomeList
@@ -224,11 +210,7 @@ function IncomePage() {
         error={error}
         onEdit={openEditModal}
         onDeleted={handleDeleteIncome}
-        t={(key) => ({
-          "income.listTitle": "مصادر الدخل المضافة",
-          "income.loading": "جارٍ تحميل مصادر الدخل...",
-          "income.empty": "لسه مفيش مصادر دخل مضافة.",
-        }[key] || key)}
+        t={t}
       />
 
       {isEditing && (
@@ -240,12 +222,12 @@ function IncomePage() {
             className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <h2 className="text-lg font-bold text-slate-900">تعديل مصدر الدخل</h2>
+            <h2 className="text-lg font-bold text-slate-900">{t("income.editTitle")}</h2>
 
             <form onSubmit={handleSubmit} className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5 sm:col-span-2">
                 <label htmlFor="name" className={labelClass}>
-                  اسم المصدر
+                  {t("income.nameLabel")}
                 </label>
                 <input
                   id="name"
@@ -259,7 +241,7 @@ function IncomePage() {
 
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="category" className={labelClass}>
-                  الفئة
+                  {t("income.categoryLabel")}
                 </label>
                 <select
                   id="category"
@@ -268,17 +250,17 @@ function IncomePage() {
                   onChange={handleFormChange}
                   className={inputClass}
                 >
-                  <option value="salary">راتب</option>
-                  <option value="freelance">عمل حر</option>
-                  <option value="rental">إيجار</option>
-                  <option value="investment">استثمار</option>
-                  <option value="other">أخرى</option>
+                  {["salary", "freelance", "rental", "investment", "other"].map((category) => (
+                    <option key={category} value={category}>
+                      {t(`income.categories.${category}`)}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="amount" className={labelClass}>
-                  المبلغ
+                  {t("income.amountLabel")}
                 </label>
                 <input
                   id="amount"
@@ -295,7 +277,7 @@ function IncomePage() {
 
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="currency" className={labelClass}>
-                  العملة
+                  {t("income.currencyLabel")}
                 </label>
                 <select
                   id="currency"
@@ -313,7 +295,7 @@ function IncomePage() {
 
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="receivedDate" className={labelClass}>
-                  تاريخ الاستلام
+                  {t("income.receivedDateLabel")}
                 </label>
                 <input
                   id="receivedDate"
@@ -328,7 +310,7 @@ function IncomePage() {
 
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="recurrence" className={labelClass}>
-                  التكرار
+                  {t("income.recurrenceLabel")}
                 </label>
                 <select
                   id="recurrence"
@@ -337,16 +319,17 @@ function IncomePage() {
                   onChange={handleFormChange}
                   className={inputClass}
                 >
-                  <option value="once">مرة واحدة</option>
-                  <option value="weekly">أسبوعي</option>
-                  <option value="monthly">شهري</option>
-                  <option value="yearly">سنوي</option>
+                  {["once", "weekly", "monthly", "yearly"].map((recurrence) => (
+                    <option key={recurrence} value={recurrence}>
+                      {t(`income.recurrence.${recurrence}`)}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="status" className={labelClass}>
-                  الحالة
+                  {t("income.statusLabel")}
                 </label>
                 <select
                   id="status"
@@ -355,14 +338,14 @@ function IncomePage() {
                   onChange={handleFormChange}
                   className={inputClass}
                 >
-                  <option value="cleared">مستلمة</option>
-                  <option value="pending">قيد الانتظار</option>
+                  <option value="cleared">{t("income.status.cleared")}</option>
+                  <option value="pending">{t("income.status.pending")}</option>
                 </select>
               </div>
 
               <div className="flex flex-col gap-1.5 sm:col-span-2">
                 <label htmlFor="notes" className={labelClass}>
-                  ملاحظات
+                  {t("income.notesLabel")}
                 </label>
                 <textarea
                   id="notes"
@@ -380,14 +363,14 @@ function IncomePage() {
                   disabled={updateStatus === "loading"}
                   className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65"
                 >
-                  {updateStatus === "loading" ? "جارٍ الحفظ..." : "حفظ التعديلات"}
+                  {updateStatus === "loading" ? t("income.submitting") : t("income.saveChanges")}
                 </button>
                 <button
                   type="button"
                   onClick={closeEditModal}
                   className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-brand-300 hover:text-brand-700"
                 >
-                  إلغاء
+                  {t("income.cancel")}
                 </button>
               </div>
             </form>

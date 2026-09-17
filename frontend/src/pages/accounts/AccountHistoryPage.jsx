@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAccountTransactions } from "../../api/accountsApi";
-import { extractError } from "../../utils/errorHandler";
+import { extractError } from "../../api/error";
 import TransactionFilters from "./components/TransactionFilters";
 import TransactionList from "./components/TransactionList";
 

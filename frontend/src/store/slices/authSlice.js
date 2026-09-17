@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { TOKEN_KEY } from "../../api/axiosClient";
 import * as authApi from "../../api/authApi";
 import * as settingsApi from "../../api/settingsApi";
+import { extractError } from "../../api/error";
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
@@ -10,9 +11,7 @@ export const registerUser = createAsyncThunk(
       const res = await authApi.register({ name, email, password });
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "حدث خطأ أثناء إنشاء الحساب"
-      );
+      return rejectWithValue(extractError(err, "حدث خطأ أثناء إنشاء الحساب"));
     }
   }
 );
@@ -24,11 +23,7 @@ export const loginUser = createAsyncThunk(
       const res = await authApi.login({ email, password, rememberMe });
       return res.data.data;
     } catch (err) {
-      const message = err.response?.data?.message;
-      if (err.response?.status === 403 && message === "ACCOUNT_SUSPENDED") {
-        return rejectWithValue("تم إيقاف حسابك، تواصل مع الدعم");
-      }
-      return rejectWithValue(message || "حدث خطأ أثناء تسجيل الدخول");
+      return rejectWithValue(extractError(err, "حدث خطأ أثناء تسجيل الدخول"));
     }
   }
 );
@@ -40,9 +35,7 @@ export const forgotPassword = createAsyncThunk(
       const res = await authApi.forgotPassword({ email });
       return res.data.message;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "حدث خطأ أثناء إرسال رابط الاستعادة"
-      );
+      return rejectWithValue(extractError(err, "حدث خطأ أثناء إرسال رابط الاستعادة"));
     }
   }
 );
@@ -54,9 +47,7 @@ export const resetPassword = createAsyncThunk(
       const res = await authApi.resetPassword({ token, password });
       return res.data.message;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "الرابط غير صالح أو منتهي الصلاحية"
-      );
+      return rejectWithValue(extractError(err, "الرابط غير صالح أو منتهي الصلاحية"));
     }
   }
 );
@@ -68,7 +59,7 @@ export const fetchCurrentUser = createAsyncThunk(
       const res = await authApi.fetchMe();
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Unauthorized");
+      return rejectWithValue(extractError(err, "Unauthorized"));
     }
   }
 );
@@ -80,7 +71,7 @@ export const updateProfile = createAsyncThunk(
       const res = await settingsApi.updateProfile({ name, phone });
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "تعذّر تحديث البيانات");
+      return rejectWithValue(extractError(err, "تعذّر تحديث البيانات"));
     }
   }
 );
@@ -92,7 +83,7 @@ export const uploadAvatar = createAsyncThunk(
       const res = await settingsApi.uploadPhoto(avatar);
       return res.data.data.avatar;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "تعذّر رفع الصورة");
+      return rejectWithValue(extractError(err, "تعذّر رفع الصورة"));
     }
   }
 );
@@ -104,7 +95,7 @@ export const deleteAvatar = createAsyncThunk(
       await settingsApi.deletePhoto();
       return true;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "تعذّر حذف الصورة");
+      return rejectWithValue(extractError(err, "تعذّر حذف الصورة"));
     }
   }
 );
