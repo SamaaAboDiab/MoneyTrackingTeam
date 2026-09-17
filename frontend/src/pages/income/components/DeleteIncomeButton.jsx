@@ -1,11 +1,8 @@
 import { useState } from "react";
-import axiosClient from "../../../api/axiosClient";
+import { useTranslation } from "react-i18next";
 
-function getErrorMessage(err, fallback) {
-  return err.response?.data?.message || err.message || fallback;
-}
-
-export default function DeleteIncomeButton({ incomeId, incomeName, onDeleted }) {
+export default function DeleteIncomeButton({ incomeId, incomeName, onConfirmDelete }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -14,11 +11,10 @@ export default function DeleteIncomeButton({ incomeId, incomeName, onDeleted }) 
     setDeleting(true);
     setError("");
     try {
-      await axiosClient.delete(`/income/${incomeId}`);
-      onDeleted?.(incomeId);
+      await onConfirmDelete?.(incomeId);
       setOpen(false);
     } catch (err) {
-      setError(getErrorMessage(err, "تعذر حذف الدخل."));
+      setError(typeof err === "string" ? err : err?.message || t("income.delete.error"));
     } finally {
       setDeleting(false);
     }
@@ -38,7 +34,7 @@ export default function DeleteIncomeButton({ incomeId, incomeName, onDeleted }) 
             clipRule="evenodd"
           />
         </svg>
-        Delete
+        {t("income.delete.trigger")}
       </button>
 
       {open && (
@@ -48,14 +44,11 @@ export default function DeleteIncomeButton({ incomeId, incomeName, onDeleted }) 
         >
           <div
             className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl"
-            dir="rtl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-base font-semibold text-slate-900">هل أنت متأكد؟</h2>
+            <h2 className="text-base font-semibold text-slate-900">{t("income.delete.confirmTitle")}</h2>
             <p className="mt-2 text-sm text-slate-600">
-              هيتم حذف{" "}
-              <span className="font-medium text-slate-800">"{incomeName}"</span> نهائيًا.
-              {" "}لو الدخل ده متكرر، هيتوقف من كل الفترات الجاية.
+              {t("income.delete.confirmMessage", { name: incomeName })}
             </p>
 
             {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
@@ -67,7 +60,7 @@ export default function DeleteIncomeButton({ incomeId, incomeName, onDeleted }) 
                 disabled={deleting}
                 className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50"
               >
-                إلغاء
+                {t("income.delete.cancel")}
               </button>
               <button
                 type="button"
@@ -75,7 +68,7 @@ export default function DeleteIncomeButton({ incomeId, incomeName, onDeleted }) 
                 disabled={deleting}
                 className="rounded-lg bg-rose-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-60"
               >
-                {deleting ? "جاري الحذف..." : "تأكيد الحذف"}
+                {deleting ? t("income.delete.deleting") : t("income.delete.confirm")}
               </button>
             </div>
           </div>

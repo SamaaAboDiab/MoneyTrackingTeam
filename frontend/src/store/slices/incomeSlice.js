@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as incomeApi from "../../api/incomeApi";
-import { extractError } from "../../utils/errorHandler";
+import { extractError } from "../../api/error";
 
 export const fetchIncomes = createAsyncThunk(
   "incomes/fetchIncomes",

@@ -35,6 +35,26 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Smooth language switch (AR <-> RTL / EN <-> LTR) instead of an instant jump.
+   Preferred path: native View Transitions API cross-fades the whole page. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 280ms;
+  animation-timing-function: ease-in-out;
+}
+
+/* Fallback for browsers without View Transitions support (see changeLanguageSmoothly
+   in i18n.js): a plain opacity fade around the language swap. */
+html.lang-fade-out body {
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+html.lang-fade-in body {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
 /* Financial amounts always render with Western digits, even in the Arabic UI. */
 .tabular-amount {
   font-variant-numeric: tabular-nums;

@@ -32,4 +32,25 @@ i18n.on("languageChanged", (lang) => {
   applyDirection(lang);
 });
 
+const FALLBACK_FADE_MS = 200;
+
+// Cross-fades the RTL/LTR + text swap instead of an instant jump; falls back to a manual opacity fade where View Transitions isn't supported.
+export function changeLanguageSmoothly(lang) {
+  if (lang === i18n.language) return;
+
+  if (typeof document.startViewTransition === "function") {
+    document.startViewTransition(() => i18n.changeLanguage(lang));
+    return;
+  }
+
+  const root = document.documentElement;
+  root.classList.add("lang-fade-out");
+  window.setTimeout(() => {
+    i18n.changeLanguage(lang);
+    root.classList.remove("lang-fade-out");
+    root.classList.add("lang-fade-in");
+    window.setTimeout(() => root.classList.remove("lang-fade-in"), FALLBACK_FADE_MS);
+  }, FALLBACK_FADE_MS);
+}
+
 export default i18n;
