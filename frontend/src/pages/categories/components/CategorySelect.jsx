@@ -30,65 +30,71 @@ export default function CategorySelect({ value, onChange }) {
   }
 
   async function handleCreate(e) {
-    e.preventDefault();
-    if (!newName.trim()) {
-      setError("اسم التصنيف مطلوب.");
-      return;
-    }
-    setSaving(true);
-    setError("");
-    try {
-      const created = await createCategory({ name: newName.trim(), color: newColor });
-      setCategories((prev) => [...prev, created]);
-      onChange?.(created._id); // auto-select the new category
-      setAdding(false);
-      setNewName("");
-      setNewColor(DEFAULT_COLOR);
-    } catch (err) {
-      setError(err.message || "تعذر إضافة التصنيف.");
-    } finally {
-      setSaving(false);
-    }
+  e.preventDefault();
+  if (!newName.trim()) {
+    setError("اسم التصنيف مطلوب.");
+    return;
   }
+  setSaving(true);
+  setError("");
+  try {
+    await createCategory({ name: newName.trim(), color: newColor });
+    setAdding(false);
+    setNewName("");
+    setNewColor(DEFAULT_COLOR);
+  } catch (err) {
+    setError(err.message || "تعذر إضافة التصنيف.");
+  } finally {
+    setSaving(false);
+  }
+}
 
   if (adding) {
-    return (
-      <form onSubmit={handleCreate} className="rounded-lg border border-slate-200 p-3" dir="rtl">
-        <label className="block text-sm font-medium text-slate-700">اسم التصنيف الجديد</label>
-        <div className="mt-1 flex items-center gap-2">
-          <input
-            type="text"
-            autoFocus
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600"
-          />
-          <input
-            type="color"
-            value={newColor}
-            onChange={(e) => setNewColor(e.target.value)}
-            className="h-9 w-10 rounded-lg border border-slate-300"
-          />
-        </div>
-        {error && <p className="mt-1 text-sm text-rose-600">{error}</p>}
-        <div className="mt-2 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => setAdding(false)}
-            className="rounded-lg px-3 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100"
-          >
-            إلغاء
-          </button>
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded-lg bg-teal-700 px-3 py-1 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60"
-          >
-            {saving ? "جاري الإضافة..." : "إضافة"}
-          </button>
-        </div>
-      </form>
-    );
+  return (
+    <div className="rounded-lg border border-slate-200 p-3" dir="rtl">
+      <label className="block text-sm font-medium text-slate-700">اسم التصنيف الجديد</label>
+      <div className="mt-1 flex items-center gap-2">
+        <input
+          type="text"
+          autoFocus
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleCreate(e);
+            }
+          }}
+          className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600"
+        />
+        <input
+          type="color"
+          value={newColor}
+          onChange={(e) => setNewColor(e.target.value)}
+          className="h-9 w-10 rounded-lg border border-slate-300"
+        />
+      </div>
+      {error && <p className="mt-1 text-sm text-rose-600">{error}</p>}
+      <div className="mt-2 flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => setAdding(false)}
+          className="rounded-lg px-3 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100"
+        >
+          إلغاء
+        </button>
+        <button
+          type="button"
+          onClick={handleCreate}
+          disabled={saving}
+          className="rounded-lg bg-teal-700 px-3 py-1 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60"
+        >
+          {saving ? "جاري الإضافة..." : "إضافة"}
+        </button>
+      </div>
+    </div>
+  );
+
   }
 
   return (
@@ -106,7 +112,8 @@ export default function CategorySelect({ value, onChange }) {
           {cat.name}
         </option>
       ))}
-      <option value={ADD_NEW_VALUE}>+ إضافة تصنيف جديد</option>
+
+      <option value={ADD_NEW_VALUE}>نوع آخر</option>
     </select>
   );
 }
