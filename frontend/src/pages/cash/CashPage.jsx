@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Banknote } from "lucide-react";
-  import CashWithdrawalForm from "./CashWithdrawalForm";
+  import CashWithdrawal from "./CashWithdrawal";
+  import CashWithdrawalFlow from "./CashWithdrawalFlow";
 function CashPage() {
   const { t } = useTranslation();
 
@@ -16,8 +17,8 @@ function CashPage() {
         {t("common.backToDashboard")}
       </Link>
       
-      <CashWithdrawalForm />
-    
+      <CashWithdrawal />
+    <CashWithdrawalFlow />
     </div>
   );
 }

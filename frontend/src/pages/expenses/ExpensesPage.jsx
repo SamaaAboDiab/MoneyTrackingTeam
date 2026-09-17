@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { TrendingDown } from "lucide-react";
 import { createExpenseEntry, fetchExpenses, resetExpenseCreateStatus } from "../../store/slices/expensesSlice";
-
+import CategorySelect from "../categories/components/CategorySelect";
 const EMPTY_FORM = {
   description: "",
   amount: "",
@@ -20,16 +19,6 @@ const TYPE_STYLES = {
   emergency: { label: "طارئ", color: "#9ca3af", pill: "bg-slate-200 text-slate-700" },
 };
 
-const CATEGORY_OPTIONS = [
-  "أكل",
-  "مواصلات",
-  "إيجار",
-  "فواتير",
-  "صحة",
-  "تعليم",
-  "تسلية",
-  "غيره",
-];
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500";
@@ -190,19 +179,12 @@ function ExpensesPage() {
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="category" className={labelClass}>التصنيف</label>
-            <select
-              id="category"
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-              required
-              className={inputClass}
-            >
-              <option value="">اختر التصنيف</option>
-              {CATEGORY_OPTIONS.map((category) => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
+            <CategorySelect
+  value={form.category}
+  onChange={(value) =>
+    setForm((prev) => ({ ...prev, category: value }))
+  }
+/>
           </div>
 
           <div className="flex flex-col gap-1.5 sm:col-span-2">

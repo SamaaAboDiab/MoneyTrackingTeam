@@ -38,7 +38,9 @@ export default function CategorySelect({ value, onChange }) {
   setSaving(true);
   setError("");
   try {
-    await createCategory({ name: newName.trim(), color: newColor });
+    const created = await createCategory({ name: newName.trim(), color: newColor });
+    setCategories((prev) => [...prev, created]);
+    onChange?.(created._id);
     setAdding(false);
     setNewName("");
     setNewColor(DEFAULT_COLOR);
