@@ -31,6 +31,10 @@ const expenseCategorySchema = new mongoose.Schema(
         return palette[this.type] || "#6b7280";
       },
     },
+    isDefault: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

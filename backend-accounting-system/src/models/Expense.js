@@ -18,7 +18,7 @@ const expenseSchema = new mongoose.Schema(
     },
     expenseType: {
       type: String,
-      enum: ["daily", "weekly", "monthly", "yearly", "fixed", "emergency"],
+      enum: ["daily", "fixed", "emergency"],
       required: true,
     },
     category: { type: String, required: true, trim: true },

@@ -1,13 +1,89 @@
-const Expense  = require("../models/Expense");
-const Income   = require("../models/Income");
-const User     = require("../models/User");
+const Expense         = require("../models/Expense");
+const Income          = require("../models/Income");
+const User            = require("../models/User");
+const ExpenseCategory = require("../models/ExpenseCategory");
+const Account         = require("../models/Account");
 const { recordTxn, reverseTxn } = require("./accountController");
 
 // GET /api/expenses
+// Supported query filters (can be combined):
+// - period: "day" | "today", "week", "month", "custom"
+// - startDate, endDate: ISO date strings
+// - expenseType / type: "daily" | "fixed" | "emergency" | "monthly"
+// - category: category name
+// - account / accountId: Account ObjectId
 exports.list = async (req, res, next) => {
   try {
-    const expenses = await Expense.find({ user: req.userId }).sort({ date: -1 });
-    res.json({ success: true, data: expenses });
+    const {
+      period,
+      startDate,
+      endDate,
+      expenseType,
+      type,
+      category,
+      account,
+      accountId,
+    } = req.query;
+
+    const filter = { user: req.userId };
+
+    // 1. الفلترة بالفترة الزمنية (يوم / أسبوع / شهر / مخصص)
+    const now = new Date();
+    if (period === "day" || period === "today") {
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+      const end   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+      filter.date = { $gte: start, $lte: end };
+    } else if (period === "week") {
+      const start = new Date(now);
+      start.setDate(now.getDate() - 6);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(now);
+      end.setHours(23, 59, 59, 999);
+      filter.date = { $gte: start, $lte: end };
+    } else if (period === "month") {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+      const end   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      filter.date = { $gte: start, $lte: end };
+    } else if (period === "custom" || startDate || endDate) {
+      const dateFilter = {};
+      if (startDate) {
+        const s = new Date(startDate);
+        s.setHours(0, 0, 0, 0);
+        dateFilter.$gte = s;
+      }
+      if (endDate) {
+        const e = new Date(endDate);
+        e.setHours(23, 59, 59, 999);
+        dateFilter.$lte = e;
+      }
+      if (Object.keys(dateFilter).length > 0) {
+        filter.date = dateFilter;
+      }
+    }
+
+    // 2. الفلترة بالنوع (يومي / شهري / طارئ)
+    const targetType = expenseType || type;
+    if (targetType && targetType !== "all") {
+      const normalizedType = targetType === "monthly" ? "fixed" : targetType;
+      filter.expenseType = normalizedType;
+    }
+
+    // 3. الفلترة بالـ category
+    if (category && category !== "all") {
+      filter.category = category.trim();
+    }
+
+    // 4. الفلترة بالحساب
+    const targetAccount = account || accountId;
+    if (targetAccount && targetAccount !== "all") {
+      filter.account = targetAccount;
+    }
+
+    const expenses = await Expense.find(filter)
+      .populate("account", "name type currency")
+      .sort({ date: -1 });
+
+    res.json({ success: true, count: expenses.length, data: expenses });
   } catch (err) { next(err); }
 };
 
@@ -15,6 +91,15 @@ exports.list = async (req, res, next) => {
 exports.create = async (req, res, next) => {
   try {
     const { amount, description, date, paymentMethod, expenseType, category, currency, notes, status, accountId } = req.body;
+
+    // Fix #2 — validate category belongs to this user
+    if (!category || !category.trim()) {
+      return res.status(400).json({ success: false, message: "Category is required" });
+    }
+    const categoryExists = await ExpenseCategory.findOne({ user: req.userId, name: category.trim() });
+    if (!categoryExists) {
+      return res.status(400).json({ success: false, message: "Invalid category: not found in your categories list" });
+    }
 
     const user = await User.findById(req.userId).lean();
     if (user?.subscriptionType === "trial") {
@@ -31,7 +116,7 @@ exports.create = async (req, res, next) => {
       user: req.userId,
       amount: parseFloat(amount), description,
       date:   date ? new Date(date) : new Date(),
-      paymentMethod, expenseType, category,
+      paymentMethod, expenseType, category: category.trim(),
       currency: currency || "EGP",
       notes, status: status || "confirmed",
       account: accountId || null,
@@ -51,29 +136,48 @@ exports.update = async (req, res, next) => {
     const old = await Expense.findOne({ _id: req.params.id, user: req.userId });
     if (!old) return res.status(404).json({ success: false, message: "Expense not found" });
 
+    const { amount, description, date, paymentMethod, expenseType, category, currency, notes, status, accountId, account } = req.body;
+
+    // Fix #2 — validate category belongs to this user when category is being updated
+    if (category !== undefined) {
+      if (!category || !category.trim()) {
+        return res.status(400).json({ success: false, message: "Category is required" });
+      }
+      const categoryExists = await ExpenseCategory.findOne({ user: req.userId, name: category.trim() });
+      if (!categoryExists) {
+        return res.status(400).json({ success: false, message: "Invalid category: not found in your categories list" });
+      }
+    }
+
     // Reverse previous account debit if it existed
     if (old.account) {
       await reverseTxn(req.userId, "Expense", old._id);
     }
 
-    const { amount, description, date, paymentMethod, expenseType, category, currency, notes, status, accountId } = req.body;
+    const targetAccountId = accountId !== undefined ? (accountId || null) : (account !== undefined ? (account || null) : old.account);
 
     const expense = await Expense.findOneAndUpdate(
       { _id: req.params.id, user: req.userId },
       {
-        amount: parseFloat(amount), description,
+        amount: parseFloat(amount),
+        description,
         date:   date ? new Date(date) : old.date,
-        paymentMethod, expenseType, category,
+        paymentMethod,
+        expenseType,
+        category: category ? category.trim() : old.category,
         currency: currency || old.currency,
-        notes, status,
-        account: accountId || null,
+        notes,
+        status: status || old.status,
+        account: targetAccountId,
       },
       { new: true, runValidators: true }
     );
 
-    if (accountId) {
-      await recordTxn(req.userId, accountId, "debit", parseFloat(amount), description, expense.date, "Expense", expense._id);
+    if (targetAccountId) {
+      await recordTxn(req.userId, targetAccountId, "debit", parseFloat(amount), description, expense.date, "Expense", expense._id);
     }
+
+    await expense.populate("account", "name type currency");
 
     res.json({ success: true, data: expense });
   } catch (err) { next(err); }
