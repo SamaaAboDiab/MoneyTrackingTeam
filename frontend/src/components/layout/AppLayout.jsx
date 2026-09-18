@@ -8,6 +8,7 @@ import Breadcrumb from "./appLayout/Breadcrumb";
 import DateBadge from "./appLayout/DateBadge";
 import NotificationsButton from "./appLayout/NotificationsButton";
 import UserAvatarLink from "./appLayout/UserAvatarLink";
+import QuickAddButton from "./QuickAddButton";
 
 function AppLayout() {
   const { t, i18n } = useTranslation();
@@ -27,6 +28,7 @@ function AppLayout() {
               <DateBadge language={i18n.language} />
               <LanguageSwitcher />
               <NotificationsButton t={t} />
+              <QuickAddButton />
 
               <Link
                 to="/accounts/transfer"
