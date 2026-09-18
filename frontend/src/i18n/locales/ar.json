@@ -5,7 +5,10 @@
     "backToDashboard": "الرجوع للوحة التحكم",
     "comingSoon": "الصفحة دي قيد الإنشاء.",
     "showAmount": "إظهار المبلغ",
-    "hideAmount": "إخفاء المبلغ"
+    "hideAmount": "إخفاء المبلغ",
+     "cancel": "إلغاء",
+     "processing": "جارٍ التنفيذ...",
+     "currency": "ج.م"
   },
   "nav": {
     "income": "الدخل",
@@ -154,6 +157,7 @@
       "sameBalance": "الرصيد الجديد مطابق للرصيد الحالي.",
       "genericError": "حصل خطأ أثناء حفظ التعديل."
     },
+    
     "transactions": {
       "back": "الرجوع للحسابات",
       "startDate": "من تاريخ",
@@ -209,5 +213,25 @@
     "save": "حفظ التعديلات",
     "saving": "جارٍ الحفظ...",
     "saveSuccess": "تم تحديث بياناتك بنجاح."
+  },
+  "cash": {
+    "withdrawButton": "سحب كاش",
+    "withdrawTitle": "سحب كاش من البنك",
+    "withdrawSubtitle": "حوّل فلوس من حساب بنكي لرصيد الكاش بتاعك",
+    "withdrawDescription": "سحب كاش من البنك",
+    "bankAccount": "الحساب البنكي",
+    "amount": "المبلغ",
+    "willAddTo": "المبلغ ده هيتضاف لـ \"{{name}}\"",
+    "confirmWithdraw": "تأكيد السحب",
+    "withdrawSuccess": "تم سحب الكاش بنجاح",
+    "errors": {
+      "invalidAmount": "من فضلك أدخلي مبلغ صحيح أكبر من صفر",
+      "selectAccount": "من فضلك اختاري الحساب البنكي",
+      "insufficientBalance": "المبلغ أكبر من رصيد الحساب المختار",
+      "loadAccountsFailed": "تعذّر تحميل الحسابات",
+      "noCashAccount": "مفيش حساب كاش موجود. من فضلك أضيفي واحد الأول.",
+      "generic": "حصل خطأ، من فضلك حاولي تاني."
+    }
   }
 }
+

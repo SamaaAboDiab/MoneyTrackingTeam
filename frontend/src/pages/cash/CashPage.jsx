@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Banknote } from "lucide-react";
-  import CashWithdrawal from "./CashWithdrawal";
-  import CashWithdrawalFlow from "./CashWithdrawalFlow";
+import CashWithdrawalForm from "./CashWithdrawalForm"; 
+
 function CashPage() {
   const { t } = useTranslation();
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
   return (
     <div className="mx-auto max-w-lg rounded-3xl bg-white p-10 text-center shadow-sm shadow-slate-200 ring-1 ring-slate-100">
@@ -13,12 +15,32 @@ function CashPage() {
       </span>
       <h1 className="mt-4 text-2xl font-extrabold text-slate-900">{t("nav.cash")}</h1>
       <p className="mt-2 text-slate-500">{t("common.comingSoon")}</p>
-      <Link to="/dashboard" className="mt-6 inline-block font-semibold text-brand-700 hover:underline">
-        {t("common.backToDashboard")}
-      </Link>
-      
-      <CashWithdrawal />
-    <CashWithdrawalFlow />
+
+      <button
+        onClick={() => setShowWithdrawModal(true)}
+        className="mt-6 rounded-xl bg-brand-600 px-6 py-2.5 font-semibold text-white transition hover:bg-brand-700"
+      >
+        {t("cash.withdrawButton")}
+      </button>
+
+      <div>
+        <Link to="/dashboard" className="mt-6 inline-block font-semibold text-brand-700 hover:underline">
+          {t("common.backToDashboard")}
+        </Link>
+      </div>
+
+   
+      {showWithdrawModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <CashWithdrawalForm
+  onSuccess={() => {
+   
+    setTimeout(() => setShowWithdrawModal(false), 1500);
+  }}
+  onClose={() => setShowWithdrawModal(false)}
+/>
+        </div>
+      )}
     </div>
   );
 }
