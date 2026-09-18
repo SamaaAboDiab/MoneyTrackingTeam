@@ -1,7 +1,20 @@
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const User = require("../models/User");
+const ExpenseCategory = require("../models/ExpenseCategory");
 const { sendPasswordResetEmail } = require("../services/mailer");
+
+// Default categories seeded for every new user (isDefault = true — cannot be deleted)
+const DEFAULT_CATEGORIES = [
+  { name: "أكل",       type: "daily",     color: "#ef4444" },
+  { name: "مواصلات",   type: "daily",     color: "#ef4444" },
+  { name: "إيجار",     type: "fixed",     color: "#facc15" },
+  { name: "فواتير",    type: "fixed",     color: "#facc15" },
+  { name: "صحة",       type: "emergency", color: "#9ca3af" },
+  { name: "تعليم",     type: "fixed",     color: "#facc15" },
+  { name: "تسلية",     type: "daily",     color: "#ef4444" },
+  { name: "غيره",      type: "daily",     color: "#ef4444" },
+];
 
 // In-memory brute-force tracking: email → { count, blockedUntil }
 const loginAttempts = new Map();
@@ -46,8 +59,14 @@ exports.register = async (req, res, next) => {
       return res.status(409).json({ success: false, message: "Email already in use" });
     }
     const created = await User.create({ name, email, password });
-    const token   = signToken(created._id);
-    const user    = await User.findById(created._id);
+
+    // Seed default expense categories for the new user
+    await ExpenseCategory.insertMany(
+      DEFAULT_CATEGORIES.map((cat) => ({ ...cat, user: created._id, isDefault: true }))
+    );
+
+    const token = signToken(created._id);
+    const user  = await User.findById(created._id);
     res.status(201).json({
       success: true,
       data: { token, user },

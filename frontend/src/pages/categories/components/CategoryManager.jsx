@@ -1,49 +1,64 @@
 import { useEffect, useState } from "react";
 import { listCategories, createCategory, updateCategory, deleteCategory } from "../../../api/categoryApi";
+import { MANDATORY_CATEGORIES } from "./CategorySelect";
 
 const DEFAULT_COLOR = "#6b7280";
+
+const TYPE_OPTIONS = [
+  { value: "daily",     label: "يومي",        pill: "bg-red-100 text-red-700" },
+  { value: "fixed",     label: "شهري ثابت",   pill: "bg-yellow-100 text-yellow-700" },
+  { value: "emergency", label: "طارئ",         pill: "bg-slate-200 text-slate-600" },
+];
+
+// استخراج رسالة الخطأ من الـ axios response
+function extractErrMsg(err, fallback = "حصل خطأ.") {
+  return err?.response?.data?.message || err?.message || fallback;
+}
+
 export default function CategoryManager() {
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loading,    setLoading]    = useState(true);
+  const [error,      setError]      = useState("");
 
-  // add/edit form state
-  const [formOpen, setFormOpen] = useState(false);
-  const [editingId, setEditingId] = useState(null); // null = adding new
-  const [name, setName] = useState("");
-  const [color, setColor] = useState(DEFAULT_COLOR);
-  const [saving, setSaving] = useState(false);
-  const [formError, setFormError] = useState("");
+  // form state
+  const [formOpen,   setFormOpen]   = useState(false);
+  const [editingId,  setEditingId]  = useState(null);
+  const [editingCat, setEditingCat] = useState(null); // الـ object الكامل
+  const [name,       setName]       = useState("");
+  const [type,       setType]       = useState("daily");
+  const [color,      setColor]      = useState(DEFAULT_COLOR);
+  const [saving,     setSaving]     = useState(false);
+  const [formError,  setFormError]  = useState("");
 
-  // delete confirmation state
-  const [deleteTarget, setDeleteTarget] = useState(null); // category object
-  const [deleting, setDeleting] = useState(false);
+  // delete
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting,     setDeleting]     = useState(false);
 
-  // success toast
+  // toast
   const [successMsg, setSuccessMsg] = useState("");
 
   async function loadCategories() {
-  setLoading(true);
-  setError("");
-  try {
-    const data = await listCategories();
-    setCategories(data);
-  } catch (err) {
-    setError(err.message || "تعذر تحميل التصنيفات.");
-  } finally {
-    setLoading(false);
+    setLoading(true);
+    setError("");
+    try {
+      const data = await listCategories();
+      setCategories(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setError(extractErrMsg(err, "تعذر تحميل التصنيفات."));
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
-useEffect(() => {
-  (async () => {
-    await loadCategories();
-  })();
-}, []);
+  useEffect(() => {
+    loadCategories();
+  }, []);
 
   function openAddForm() {
     setEditingId(null);
+    setEditingCat(null);
     setName("");
+    setType("daily");
     setColor(DEFAULT_COLOR);
     setFormError("");
     setFormOpen(true);
@@ -51,7 +66,9 @@ useEffect(() => {
 
   function openEditForm(cat) {
     setEditingId(cat._id);
+    setEditingCat(cat);
     setName(cat.name);
+    setType(cat.type || "daily");
     setColor(cat.color || DEFAULT_COLOR);
     setFormError("");
     setFormOpen(true);
@@ -60,6 +77,7 @@ useEffect(() => {
   function closeForm() {
     setFormOpen(false);
     setEditingId(null);
+    setEditingCat(null);
     setFormError("");
   }
 
@@ -78,17 +96,24 @@ useEffect(() => {
     setFormError("");
     try {
       if (editingId) {
-        const updated = await updateCategory(editingId, { name: name.trim(), color });
+        // Fix #3 — بنبعت type في الـ update
+        const updated = await updateCategory(editingId, {
+          name:  name.trim(),
+          type,
+          color,
+        });
         setCategories((prev) => prev.map((c) => (c._id === editingId ? updated : c)));
         flashSuccess("تم التعديل بنجاح");
       } else {
-        const created = await createCategory({ name: name.trim(), color });
+        // Fix #2 — بنبعت type في الـ create
+        const created = await createCategory({ name: name.trim(), type, color });
         setCategories((prev) => [...prev, created]);
         flashSuccess("تم إضافة التصنيف بنجاح");
       }
       closeForm();
     } catch (err) {
-      setFormError(err.message || "حصل خطأ أثناء الحفظ.");
+      // Fix #8 — رسالة الخطأ الصح من الـ backend
+      setFormError(extractErrMsg(err, "حصل خطأ أثناء الحفظ."));
     } finally {
       setSaving(false);
     }
@@ -103,12 +128,15 @@ useEffect(() => {
       setDeleteTarget(null);
       flashSuccess("تم حذف التصنيف");
     } catch (err) {
-      setError(err.message || "تعذر حذف التصنيف.");
+      // Fix #8 — رسالة الخطأ الصح
+      setError(extractErrMsg(err, "تعذر حذف التصنيف."));
       setDeleteTarget(null);
     } finally {
       setDeleting(false);
     }
   }
+
+  const typeInfo = (t) => TYPE_OPTIONS.find((o) => o.value === t) || TYPE_OPTIONS[0];
 
   return (
     <div className="mx-auto max-w-lg p-4" dir="rtl">
@@ -140,19 +168,16 @@ useEffect(() => {
         ) : (
           categories.map((cat) => (
             <div key={cat._id} className="flex items-center justify-between p-3">
-              <div className="flex items-center gap-2">
-                <span
-                  className="h-3.5 w-3.5 rounded-full"
-                  style={{ backgroundColor: cat.color || DEFAULT_COLOR }}
-                />
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-sm font-medium text-slate-800">{cat.name}</span>
-                {cat.isDefault && (
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">
-                    افتراضي
-                  </span>
-                )}
+                {/* نوع التصنيف */}
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${typeInfo(cat.type).pill}`}>
+                  {typeInfo(cat.type).label}
+                </span>
               </div>
-              <div className="flex items-center gap-2">
+
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Fix #7 — زرار التعديل متاح للكل لكن الـ backend هيمنع تغيير الاسم/النوع للـ defaults */}
                 <button
                   type="button"
                   onClick={() => openEditForm(cat)}
@@ -160,7 +185,8 @@ useEffect(() => {
                 >
                   تعديل
                 </button>
-                {!cat.isDefault && (
+                {/* زرار الحذف مخفي تماماً للتصنيفات الإلزامية */}
+                {!cat.isDefault && !MANDATORY_CATEGORIES.includes(cat.name) && (
                   <button
                     type="button"
                     onClick={() => setDeleteTarget(cat)}
@@ -190,15 +216,38 @@ useEffect(() => {
               {editingId ? "تعديل التصنيف" : "تصنيف جديد"}
             </h2>
 
+            {/* اسم التصنيف — معطّل للـ defaults */}
             <label className="mt-4 block text-sm font-medium text-slate-700">الاسم</label>
             <input
               type="text"
               autoFocus
+              placeholder="مثال: صيانة، اشتراكات شهرية، هدايا..."
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600"
+              disabled={editingCat?.isDefault}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600 disabled:bg-slate-50 disabled:text-slate-400"
             />
+            {editingCat?.isDefault && (
+              <p className="mt-1 text-xs text-slate-400">اسم التصنيف الافتراضي لا يمكن تغييره</p>
+            )}
 
+            {/* نوع التصنيف — Fix #2 & #3 — معطّل للـ defaults */}
+            <label className="mt-3 block text-sm font-medium text-slate-700">النوع</label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              disabled={editingCat?.isDefault}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600 disabled:bg-slate-50 disabled:text-slate-400"
+            >
+              {TYPE_OPTIONS.map((t) => (
+                <option key={t.value} value={t.value}>{t.label}</option>
+              ))}
+            </select>
+            {editingCat?.isDefault && (
+              <p className="mt-1 text-xs text-slate-400">نوع التصنيف الافتراضي لا يمكن تغييره</p>
+            )}
+
+            {/* اللون — متاح للكل حتى الـ defaults */}
             <label className="mt-3 block text-sm font-medium text-slate-700">اللون</label>
             <input
               type="color"
@@ -241,7 +290,7 @@ useEffect(() => {
           >
             <h2 className="text-base font-semibold text-slate-900">هل أنت متأكد؟</h2>
             <p className="mt-2 text-sm text-slate-600">
-              هيتم حذف تصنيف "{deleteTarget.name}" نهائيًا.
+              هيتم حذف تصنيف &quot;{deleteTarget.name}&quot; نهائيًا.
             </p>
             <div className="mt-5 flex justify-end gap-2">
               <button

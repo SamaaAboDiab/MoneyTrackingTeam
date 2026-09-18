@@ -1,6 +1,21 @@
 import IncomeItem from "./IncomeItem";
 
-function IncomeList({ items, status, error, onEdit, onDeleted, t }) {
+function IncomeList({
+  items,
+  status,
+  error,
+  displayCurrency,
+  totalAmount,
+  onEdit,
+  onDeleted,
+  t,
+}) {
+  const calculatedTotal = items.reduce(
+    (sum, income) => sum + Number(income.convertedAmount ?? income.amount ?? 0),
+    0
+  );
+  const total = totalAmount ?? calculatedTotal;
+
   return (
     <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
       <div className="flex items-center justify-between gap-2">
@@ -25,10 +40,22 @@ function IncomeList({ items, status, error, onEdit, onDeleted, t }) {
           <IncomeItem
             key={income._id}
             income={income}
+            displayAmount={income.convertedAmount ?? income.amount}
+            displayCurrency={income.convertedAmount !== undefined ? displayCurrency : income.currency}
             onEdit={onEdit}
             onDeleted={onDeleted}
           />
         ))}
+      </div>
+
+      <div className="mt-5 flex items-center justify-between border-t border-slate-200 pt-4">
+        <span className="font-bold text-slate-700">الإجمالي بالعملة المختارة</span>
+        <strong className="tabular-amount text-xl font-extrabold text-income">
+          {Number(total).toLocaleString("ar-EG", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })} {displayCurrency}
+        </strong>
       </div>
     </section>
   );
