@@ -5,7 +5,10 @@
     "backToDashboard": "Back to dashboard",
     "comingSoon": "This page is under construction.",
     "showAmount": "Show amount",
-    "hideAmount": "Hide amount"
+    "hideAmount": "Hide amount",
+    "cancel": "Cancel",
+  "processing": "Processing...",
+  "currency": "EGP"
   },
   "nav": {
     "income": "Income",
@@ -209,5 +212,26 @@
     "save": "Save changes",
     "saving": "Saving...",
     "saveSuccess": "Your information has been updated."
+  
+},
+"cash": {
+    "withdrawButton": "Withdraw cash",
+    "withdrawTitle": "Withdraw cash from bank",
+    "withdrawSubtitle": "Move money from a bank account into your cash balance",
+    "withdrawDescription": "Cash withdrawal from bank",
+    "bankAccount": "Bank account",
+    "amount": "Amount",
+    "willAddTo": "This amount will be added to \"{{name}}\"",
+    "confirmWithdraw": "Confirm withdrawal",
+    "withdrawSuccess": "Cash withdrawal completed successfully",
+    "errors": {
+      "invalidAmount": "Please enter a valid amount greater than zero",
+      "selectAccount": "Please select a bank account",
+      "insufficientBalance": "The amount exceeds the selected account's balance",
+      "loadAccountsFailed": "Unable to load accounts",
+      "noCashAccount": "No cash account found. Please add one first.",
+      "generic": "Something went wrong. Please try again."
+    }
   }
 }
+
