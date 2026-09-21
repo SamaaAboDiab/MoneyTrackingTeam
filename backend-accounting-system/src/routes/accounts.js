@@ -9,6 +9,7 @@ router.use(subCheck);
 router.get("/",                     c.list);
 router.post("/",                    c.create);
 router.get("/activity",             c.recentActivity);   // before /:id
+router.get("/cash/expenses",         c.cashExpenses);     // before /:id
 router.put("/:id",                  c.update);
 router.delete("/:id",               c.remove);
 router.post("/transfer",            c.transfer);

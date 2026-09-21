@@ -537,6 +537,47 @@
           "response": []
         },
         {
+          "name": "Cash Expenses — مصاريف الكاش خلال فترة",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/cash/expenses?startDate=2026-09-01&endDate=2026-09-30&category=all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "accounts",
+                "cash",
+                "expenses"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-09-01",
+                  "description": "بداية الفترة (اختياري)",
+                  "disabled": false
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-09-30",
+                  "description": "نهاية الفترة شاملة اليوم بالكامل (اختياري)",
+                  "disabled": false
+                },
+                {
+                  "key": "category",
+                  "value": "all",
+                  "description": "اسم التصنيف أو all (اختياري)",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "## كل مصاريف الكاش في فترة\n\n`GET /api/accounts/cash/expenses`\n\nيرجع المصاريف التي طريقة دفعها `cash` فقط، مع فلترة اختيارية بالتاريخ والتصنيف.\n\n### 📤 Response — 200 OK\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"expenses\": [\n      {\n        \"_id\": \"65f3...\",\n        \"amount\": 250,\n        \"description\": \"مشاوير تاكسي\",\n        \"date\": \"2026-09-02T00:00:00.000Z\",\n        \"paymentMethod\": \"cash\",\n        \"category\": \"مواصلات\",\n        \"account\": { \"_id\": \"65f2...\", \"name\": \"كاش في الجيب\", \"type\": \"cash\", \"currency\": \"EGP\" }\n      }\n    ],\n    \"totalExpenses\": 250,\n    \"count\": 1\n  }\n}\n```\n\n> إجمالي `totalExpenses` محسوب من نفس المصاريف المعروضة. أي مصروف كاش مربوط بـ `accountId` سيظهر أيضًا في `GET /api/accounts/{{accountId}}/transactions`.\n\n### 🔐 التوثيق\nالطلب محمي بـ `Bearer {{token}}`."
+          },
+          "response": []
+        },
+        {
           "name": "Create — إضافة مصروف",
           "request": {
             "method": "POST",

@@ -1,6 +1,7 @@
 const Account = require("../models/Account");
 const AccountTransaction = require("../models/AccountTransaction");
 const User = require("../models/User");
+const Expense = require("../models/Expense");
 
 /* ── helpers ─────────────────────────────────────── */
 async function recordTxn(userId, accountId, type, amount, description, date, relatedModel, relatedId, notes) {
@@ -37,6 +38,44 @@ exports.list = async (req, res, next) => {
   try {
     const accounts = await Account.find({ user: req.userId }).sort({ createdAt: 1 });
     res.json({ success: true, data: accounts });
+  } catch (err) { next(err); }
+};
+
+// GET /api/accounts/cash/expenses
+exports.cashExpenses = async (req, res, next) => {
+  try {
+    const { startDate, endDate, category } = req.query;
+    const filter = { user: req.userId, paymentMethod: "cash" };
+
+    if (startDate || endDate) {
+      filter.date = {};
+      if (startDate) filter.date.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        filter.date.$lte = end;
+      }
+    }
+    if (category && category !== "all") filter.category = category.trim();
+
+    const [expenses, summary] = await Promise.all([
+      Expense.find(filter)
+        .populate("account", "name type currency")
+        .sort({ date: -1 }),
+      Expense.aggregate([
+        { $match: filter },
+        { $group: { _id: null, total: { $sum: "$amount" }, count: { $sum: 1 } } },
+      ]),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        expenses,
+        totalExpenses: summary[0]?.total || 0,
+        count: summary[0]?.count || 0,
+      },
+    });
   } catch (err) { next(err); }
 };
 
@@ -179,7 +218,11 @@ exports.getTransactions = async (req, res, next) => {
     if (start || end) {
       filter.date = {};
       if (start) filter.date.$gte = new Date(start);
-      if (end) filter.date.$lte = new Date(end);
+      if (end) {
+        const endDate = new Date(end);
+        endDate.setHours(23, 59, 59, 999);
+        filter.date.$lte = endDate;
+      }
     }
     const txns = await AccountTransaction.find(filter)
       .populate("account", "name currency")
