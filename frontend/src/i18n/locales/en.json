@@ -13,6 +13,27 @@
     "cash": "Cash",
     "debts": "Debts"
   },
+  "cash": {
+    "title": "Cash",
+    "description": "Track your cash balance and log any withdrawal from your accounts.",
+    "balanceLabel": "Cash balance",
+    "emptyAlert": "Cash balance is empty",
+    "noAccountTitle": "No cash account yet",
+    "noAccountMessage": "Create a cash account first so you can track and withdraw into it.",
+    "createAccount": "Create cash account",
+    "creating": "Creating...",
+    "withdrawTitle": "Withdraw cash",
+    "withdrawSubtitle": "Transfer an amount from any bank or wallet account into your cash balance.",
+    "fromLabel": "Withdraw from",
+    "fromPlaceholder": "Select account",
+    "amountLabel": "Amount",
+    "submit": "Withdraw",
+    "submitting": "Withdrawing...",
+    "success": "{{amount}} withdrawn into your cash balance successfully",
+    "noOtherAccounts": "You need another account (bank/wallet) to withdraw cash from.",
+    "amountPositiveError": "The amount must be greater than zero",
+    "insufficientBalance": "The selected account's balance is less than this amount"
+  },
   "auth": {
     "showPassword": "Show password",
     "hidePassword": "Hide password",
