@@ -6,6 +6,7 @@ import DashboardGreeting from "./components/DashboardGreeting";
 import TotalWealthSection from "./components/TotalWealthSection";
 import QuickLinks from "./components/QuickLinks";
 import AccountsPreview from "./components/AccountsPreview";
+import CashBalanceWidget from "./components/CashBalanceWidget";
 
 function DashboardPage() {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ function DashboardPage() {
   }, [dispatch]);
 
   const activeAccounts = items.filter((account) => !account.isArchived);
+  const cashAccount = activeAccounts.find((account) => account.type === "cash");
   const totalsByCurrency = activeAccounts.reduce((totals, account) => {
     const currency = account.currency || "EGP";
     totals[currency] = (totals[currency] || 0) + (Number(account.balance) || 0);
@@ -29,6 +31,7 @@ function DashboardPage() {
     <div>
       <DashboardGreeting user={user} t={t} />
       <TotalWealthSection status={status} totalCurrencies={totalCurrencies} t={t} />
+      {status !== "loading" && <CashBalanceWidget cashAccount={cashAccount} t={t} />}
       <QuickLinks t={t} />
       <AccountsPreview status={status} accounts={activeAccounts} t={t} />
     </div>

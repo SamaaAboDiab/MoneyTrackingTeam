@@ -119,8 +119,16 @@ const accountsSlice = createSlice({
         state.transferStatus = "loading";
         state.transferError = null;
       })
-      .addCase(transferFunds.fulfilled, (state) => {
+      .addCase(transferFunds.fulfilled, (state, action) => {
         state.transferStatus = "succeeded";
+        const { from, to } = action.payload || {};
+        [from, to].forEach((updated) => {
+          if (!updated) return;
+          const index = state.items.findIndex((account) => account._id === updated._id);
+          if (index !== -1) {
+            state.items[index] = updated;
+          }
+        });
       })
       .addCase(transferFunds.rejected, (state, action) => {
         state.transferStatus = "failed";

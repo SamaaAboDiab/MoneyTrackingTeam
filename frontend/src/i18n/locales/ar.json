@@ -13,6 +13,27 @@
     "cash": "الكاش",
     "debts": "الديون"
   },
+  "cash": {
+    "title": "الكاش",
+    "description": "تابع رصيد الكاش اللي معاك وسجّل أي سحب منه من حساباتك.",
+    "balanceLabel": "رصيد الكاش",
+    "emptyAlert": "رصيد الكاش فاضي",
+    "noAccountTitle": "مفيش حساب كاش لسه",
+    "noAccountMessage": "اعمل حساب كاش الأول عشان تقدر تتابع وتسحب فلوس فيه.",
+    "createAccount": "إنشاء حساب كاش",
+    "creating": "جارٍ الإنشاء...",
+    "withdrawTitle": "سحب كاش",
+    "withdrawSubtitle": "حوّل مبلغ من أي حساب بنكي أو محفظة لرصيد الكاش.",
+    "fromLabel": "اسحب من",
+    "fromPlaceholder": "اختر الحساب",
+    "amountLabel": "المبلغ",
+    "submit": "تنفيذ السحب",
+    "submitting": "جارٍ السحب...",
+    "success": "تم سحب {{amount}} إلى رصيد الكاش بنجاح",
+    "noOtherAccounts": "محتاج حساب تاني (بنك/محفظة) عشان تقدر تسحب منه كاش.",
+    "amountPositiveError": "المبلغ لازم يكون أكبر من صفر",
+    "insufficientBalance": "الرصيد في الحساب المختار أقل من المبلغ ده"
+  },
   "auth": {
     "showPassword": "إظهار كلمة السر",
     "hidePassword": "إخفاء كلمة السر",
