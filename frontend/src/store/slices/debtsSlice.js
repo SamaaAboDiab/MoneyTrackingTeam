@@ -26,6 +26,18 @@ export const createDebtEntry = createAsyncThunk(
   }
 );
 
+export const addDebtPaymentEntry = createAsyncThunk(
+  "debts/addDebtPaymentEntry",
+  async ({ id, payload }, { rejectWithValue }) => {
+    try {
+      const res = await debtApi.addDebtPayment(id, payload);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "تعذّر تسجيل دفعة الدين"));
+    }
+  }
+);
+
 export const deleteDebtEntry = createAsyncThunk(
   "debts/deleteDebtEntry",
   async (id, { rejectWithValue }) => {
@@ -44,6 +56,8 @@ const initialState = {
   error: null,
   createStatus: "idle",
   createError: null,
+  paymentStatus: "idle",
+  paymentError: null,
   deleteStatus: "idle",
   deleteError: null,
 };
@@ -55,6 +69,10 @@ const debtsSlice = createSlice({
     clearDebtCreateState(state) {
       state.createStatus = "idle";
       state.createError = null;
+    },
+    clearDebtPaymentState(state) {
+      state.paymentStatus = "idle";
+      state.paymentError = null;
     },
     resetDebtDeleteStatus(state) {
       state.deleteStatus = "idle";
@@ -87,6 +105,22 @@ const debtsSlice = createSlice({
         state.createStatus = "failed";
         state.createError = action.payload;
       })
+      .addCase(addDebtPaymentEntry.pending, (state) => {
+        state.paymentStatus = "loading";
+        state.paymentError = null;
+      })
+      .addCase(addDebtPaymentEntry.fulfilled, (state, action) => {
+        state.paymentStatus = "succeeded";
+        const updatedDebt = action.payload?.debt || action.payload;
+        if (updatedDebt) {
+          const index = state.items.findIndex((item) => item._id === updatedDebt._id);
+          if (index !== -1) state.items[index] = updatedDebt;
+        }
+      })
+      .addCase(addDebtPaymentEntry.rejected, (state, action) => {
+        state.paymentStatus = "failed";
+        state.paymentError = action.payload;
+      })
       .addCase(deleteDebtEntry.pending, (state) => {
         state.deleteStatus = "loading";
         state.deleteError = null;
@@ -102,5 +136,5 @@ const debtsSlice = createSlice({
   },
 });
 
-export const { clearDebtCreateState, resetDebtDeleteStatus } = debtsSlice.actions;
+export const { clearDebtCreateState, clearDebtPaymentState, resetDebtDeleteStatus } = debtsSlice.actions;
 export default debtsSlice.reducer;
