@@ -38,6 +38,18 @@ const TYPE_STYLES = {
   emergency: { label: "طارئ",       pill: "bg-slate-200 text-slate-700" },
 };
 
+// Fallback color map for default categories (used when API hasn't loaded yet)
+const FALLBACK_CATEGORY_COLORS = {
+  "أكل": "#f97316",
+  "مواصلات": "#3b82f6",
+  "إيجار": "#f59e0b",
+  "فواتير": "#8b5cf6",
+  "صحة": "#10b981",
+  "تعليم": "#0ea5e9",
+  "تسلية": "#ec4899",
+  "غيره": "#6b7280",
+};
+
 const inputClass =
   "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500 bg-white";
 const labelClass = "text-sm font-semibold text-slate-700";
@@ -52,7 +64,7 @@ function formatMoney(value) {
 
 function ExpensesPage() {
   const dispatch = useDispatch();
-  const { items, status, error, createStatus, createError } = useSelector((state) => state.expenses);
+  const { items, status, createStatus, createError } = useSelector((state) => state.expenses);
   const [form, setForm] = useState(EMPTY_FORM);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [filterCatOpen, setFilterCatOpen] = useState(false);
@@ -136,18 +148,6 @@ function ExpensesPage() {
     },
     [availableCategories]
   );
-
-  // Fallback color map for default categories (used when API hasn't loaded yet)
-  const FALLBACK_CATEGORY_COLORS = {
-    "أكل": "#f97316",
-    "مواصلات": "#3b82f6",
-    "إيجار": "#f59e0b",
-    "فواتير": "#8b5cf6",
-    "صحة": "#10b981",
-    "تعليم": "#0ea5e9",
-    "تسلية": "#ec4899",
-    "غيره": "#6b7280",
-  };
 
   // دالة تحويل أي قيمة فئة إلى لونها المخصص
   const getCategoryColor = useCallback(

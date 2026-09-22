@@ -151,6 +151,7 @@ exports.addPayment = async (req, res, next) => {
 exports.getPayments = async (req, res, next) => {
   try {
     const payments = await DebtPayment.find({ debt: req.params.id, userId: req.userId })
+      .populate("accountId", "name type currency")
       .sort({ date: -1 });
     res.json({ success: true, data: payments });
   } catch (err) { next(err); }

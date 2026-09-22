@@ -1,11 +1,13 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Wallet, ArrowLeftRight, TrendingUp, TrendingDown } from "lucide-react";
+import { LayoutDashboard, Wallet, ArrowLeftRight, TrendingUp, TrendingDown, CreditCard, Banknote } from "lucide-react";
 
 const NAV_ITEMS = [
   { to: "/dashboard", key: "dashboard.title", icon: LayoutDashboard },
   { to: "/accounts", key: "accounts.title", icon: Wallet },
   { to: "/income", key: "nav.income", icon: TrendingUp },
   { to: "/expenses", key: "nav.expenses", icon: TrendingDown },
+  { to: "/debts", key: "nav.debts", icon: CreditCard },
+  { to: "/cash", key: "nav.cash", icon: Banknote },
   { to: "/accounts/transfer", key: "transfer.title", icon: ArrowLeftRight },
 ];
 

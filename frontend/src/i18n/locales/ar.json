@@ -11,7 +11,8 @@
     "income": "الدخل",
     "expenses": "المصروفات",
     "cash": "الكاش",
-    "debts": "الديون"
+    "debts": "الديون",
+    "categories": "التصنيفات"
   },
   "auth": {
     "showPassword": "إظهار كلمة السر",

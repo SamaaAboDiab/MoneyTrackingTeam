@@ -9,17 +9,7 @@ const TYPE_OPTIONS = [
   { value: "emergency", label: "طارئ" },
 ];
 
-// التصنيفات الإلزامية التي لا يمكن حذفها أبداً
-export const MANDATORY_CATEGORIES = [
-  "أكل",
-  "مواصلات",
-  "إيجار",
-  "فواتير",
-  "صحة",
-  "تعليم",
-  "تسلية",
-  "غيره",
-];
+import { MANDATORY_CATEGORIES } from "./mandatoryCategories";
 
 export default function CategorySelect({
   id = "category",

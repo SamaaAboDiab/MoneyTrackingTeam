@@ -267,7 +267,10 @@ function BottomSheet({ open, onClose, children }) {
   const [mounted, setMounted] = useState(open);
 
   useEffect(() => {
-    if (open) setMounted(true);
+    if (open) {
+      const id = setTimeout(() => setMounted(true), 0);
+      return () => clearTimeout(id);
+    }
   }, [open]);
 
   if (!mounted) return null;
@@ -381,9 +384,12 @@ function CashWithdrawalSheet({ open, onClose, accounts, onWithdraw }) {
 
   useEffect(() => {
     if (open) {
-      setAmount("");
-      setConfirmed(null);
-      setAccountId(accounts[0]?.id);
+      const id = setTimeout(() => {
+        setAmount("");
+        setConfirmed(null);
+        setAccountId(accounts[0]?.id);
+      }, 0);
+      return () => clearTimeout(id);
     }
   }, [open, accounts]);
 

@@ -11,7 +11,8 @@
     "income": "Income",
     "expenses": "Expenses",
     "cash": "Cash",
-    "debts": "Debts"
+    "debts": "Debts",
+    "categories": "Categories"
   },
   "auth": {
     "showPassword": "Show password",
