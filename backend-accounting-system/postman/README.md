@@ -8,7 +8,7 @@
 
 | الملف | المحتوى |
 |---|---|
-| `MoneyTracker-01-User.postman_collection.json` | **71 طلب** في 12 فولدر — كل endpoints المستخدم |
+| `MoneyTracker-01-User.postman_collection.json` | **72 طلب** في 12 فولدر — كل endpoints المستخدم |
 | `MoneyTracker-02-Admin.postman_collection.json` | **11 طلب** في 3 فولدرات — لوحة تحكم الأدمن |
 | `MoneyTracker-Local.postman_environment.json` | متغيرات البيئة المحلية |
 
@@ -208,7 +208,7 @@ node scripts/createAdmin.js
 | Dashboard | `/api/dashboard` | 1 | ✅ | ❌ |
 | Settings | `/api/settings` | 8 | ✅ | ❌ |
 | Admin | `/api/admin` | 11 | أدمن | ❌ |
-| **الإجمالي** | | **80** | | |
+| **الإجمالي** | | **81** | | |
 
 ---
 

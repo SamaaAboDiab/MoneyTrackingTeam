@@ -1398,6 +1398,27 @@
           "response": []
         },
         {
+          "name": "Forecast — توقع تاريخ السداد (US-504)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/debts/{{debtId}}/forecast",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "debts",
+                "{{debtId}}",
+                "forecast"
+              ]
+            },
+            "description": "## توقع وقت السداد — US-504\n\n`GET /api/debts/:id/forecast`\n\nيحسب متوسط الدفعات الشهرية من سجل الدفعات ويقدّر تاريخ سداد المبلغ المتبقي. يتحدث تلقائياً بعد تسجيل أي دفعة جديدة.\n\n### 📤 Response — توجد دفعات كافية\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"status\": \"available\",\n    \"averageMonthlyPayment\": 5000,\n    \"estimatedPayoffDate\": \"2027-04-01T00:00:00.000Z\",\n    \"message\": \"بناءً على معدل دفعك الحالي، ستسدد الدين في ١ أبريل ٢٠٢٧\"\n  }\n}\n```\n\n### 📤 Response — دفعات غير كافية\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"status\": \"insufficient_data\",\n    \"averageMonthlyPayment\": 0,\n    \"estimatedPayoffDate\": null,\n    \"message\": \"أضف دفعات أكثر لحساب التوقع\"\n  }\n}\n```\n\n### ❌ الأخطاء\n| الكود | الحالة | الرسالة |\n|---|---|---|\n| `404` | الدين غير موجود أو يخص مستخدماً آخر | `Debt not found` |"
+          },
+          "response": []
+        },
+        {
           "name": "Update — تعديل دين",
           "request": {
             "method": "PUT",

@@ -24,6 +24,7 @@ import { fetchAccounts } from "../../store/slices/accountsSlice";
 import {
   fetchDebts,
   createDebtThunk,
+  updateDebtThunk,
   deleteDebtThunk,
   markDebtPaidThunk,
   addDebtPaymentThunk,
@@ -65,6 +66,10 @@ function formatDate(dateString) {
   }
 }
 
+function formatAmount(amount, currency) {
+  return `${Number(amount || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 })} ${currency}`;
+}
+
 function isOverdue(debt) {
   if (debt.status === "paid") return false;
   if (debt.status === "overdue") return true;
@@ -72,6 +77,27 @@ function isOverdue(debt) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return new Date(debt.dueDate) < today;
+}
+
+function isDueSoon(debt) {
+  if (debt.status === "paid" || isOverdue(debt) || !debt.dueDate) return false;
+  const daysUntilDue = getDaysUntilDue(debt.dueDate);
+  return daysUntilDue >= 0 && daysUntilDue <= 7;
+}
+
+function getDaysUntilDue(dateString) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dueDate = new Date(dateString);
+  dueDate.setHours(0, 0, 0, 0);
+  return Math.ceil((dueDate - today) / 86400000);
+}
+
+function getDueSoonMessage(dateString) {
+  const daysUntilDue = getDaysUntilDue(dateString);
+  if (daysUntilDue === 0) return "تنبيه: موعد السداد اليوم";
+  if (daysUntilDue === 1) return "تنبيه: موعد السداد غداً";
+  return `تنبيه: موعد السداد بعد ${daysUntilDue} أيام`;
 }
 
 function DebtsPage() {
@@ -90,6 +116,9 @@ function DebtsPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [debtForm, setDebtForm] = useState(EMPTY_DEBT_FORM);
   const [savingDebt, setSavingDebt] = useState(false);
+  const [editingDueDateId, setEditingDueDateId] = useState(null);
+  const [editingDueDate, setEditingDueDate] = useState("");
+  const [savingDueDate, setSavingDueDate] = useState(false);
 
   // Payment Modal state
   const [paymentModalDebt, setPaymentModalDebt] = useState(null);
@@ -188,6 +217,24 @@ function DebtsPage() {
       setError(getErrorMessage(requestError, "تعذر إضافة الدين."));
     } finally {
       setSavingDebt(false);
+    }
+  }
+
+  async function handleUpdateDueDate(debt, event) {
+    event.preventDefault();
+    if (!editingDueDate) return;
+    setSavingDueDate(true);
+    setError("");
+    try {
+      await dispatch(
+        updateDebtThunk({ id: debt._id, payload: { dueDate: editingDueDate } })
+      ).unwrap();
+      setEditingDueDateId(null);
+      setSuccessMessage("تم تعديل تاريخ السداد بنجاح");
+    } catch (requestError) {
+      setError(getErrorMessage(requestError, "تعذر تعديل تاريخ السداد."));
+    } finally {
+      setSavingDueDate(false);
     }
   }
 
@@ -628,6 +675,7 @@ function DebtsPage() {
                   )
                 );
             const overdue = isOverdue(debt);
+            const dueSoon = isDueSoon(debt);
             const isExpanded = expandedHistoryDebtId === debt._id;
             const history = paymentHistory[debt._id] || [];
 
@@ -684,8 +732,10 @@ function DebtsPage() {
                             <AlertCircle size={12} /> متأخر
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-700">
-                            <Clock size={12} /> نشط
+                          <span className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                            dueSoon ? "bg-orange-100 text-orange-700" : "bg-amber-100 text-amber-700"
+                          }`}>
+                            <Clock size={12} /> {dueSoon ? "قريب الموعد" : "نشط"}
                           </span>
                         )}
                       </div>
@@ -781,6 +831,13 @@ function DebtsPage() {
                       <strong className="text-slate-700">{formatDate(debt.startDate)}</strong>
                     </div>
 
+                    {dueSoon && (
+                      <div className="flex items-center gap-1.5 font-bold text-orange-600">
+                        <AlertCircle size={14} />
+                        <span>{getDueSoonMessage(debt.dueDate)}</span>
+                      </div>
+                    )}
+
                     <div className="flex items-center gap-1.5">
                       <Calendar
                         size={14}
@@ -792,6 +849,56 @@ function DebtsPage() {
                       </strong>
                     </div>
                   </div>
+
+                  <div className="mt-3 border-t border-slate-100 pt-3">
+                    {editingDueDateId === debt._id ? (
+                      <form onSubmit={(event) => handleUpdateDueDate(debt, event)} className="flex flex-wrap items-end gap-2">
+                        <div>
+                          <label className={labelClass}>تعديل تاريخ السداد</label>
+                          <input
+                            required
+                            type="date"
+                            value={editingDueDate}
+                            onChange={(event) => setEditingDueDate(event.target.value)}
+                            className={inputClass}
+                          />
+                        </div>
+                        <button type="submit" disabled={savingDueDate} className="rounded-xl bg-brand-600 px-3.5 py-2.5 text-xs font-semibold text-white disabled:opacity-60">
+                          {savingDueDate ? "جار الحفظ..." : "حفظ التاريخ"}
+                        </button>
+                        <button type="button" onClick={() => setEditingDueDateId(null)} className="rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs font-semibold text-slate-600">
+                          إلغاء
+                        </button>
+                      </form>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingDueDateId(debt._id);
+                          setEditingDueDate(debt.dueDate ? new Date(debt.dueDate).toISOString().split("T")[0] : "");
+                        }}
+                        className="text-xs font-semibold text-brand-600 hover:underline"
+                      >
+                        تعديل تاريخ السداد
+                      </button>
+                    )}
+                  </div>
+
+                  {/* US-504: Payment-rate forecast */}
+                  {!isPaid && (
+                    <div className="mt-3 rounded-xl bg-brand-50 px-3.5 py-3 text-sm text-brand-800">
+                      {debt.paymentForecast?.status === "available" ? (
+                        <>
+                          <p className="font-semibold">{debt.paymentForecast.message}</p>
+                          <p className="mt-1 text-xs text-brand-700">
+                            متوسط دفعاتك الشهرية: {formatAmount(debt.paymentForecast.averageMonthlyPayment, debt.currency)}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="font-semibold">أضف دفعات أكثر لحساب التوقع</p>
+                      )}
+                    </div>
+                  )}
 
                   {/* US-502 & US-506 Actions: زرار "تم السداد" على كل دين نشط */}
                   <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">

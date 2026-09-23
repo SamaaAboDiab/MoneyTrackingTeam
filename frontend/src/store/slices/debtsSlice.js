@@ -26,6 +26,18 @@ export const createDebtThunk = createAsyncThunk(
   }
 );
 
+export const updateDebtThunk = createAsyncThunk(
+  "debts/updateDebt",
+  async ({ id, payload }, { rejectWithValue }) => {
+    try {
+      const res = await debtsApi.updateDebt(id, payload);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "تعذّر تعديل الدين"));
+    }
+  }
+);
+
 export const deleteDebtThunk = createAsyncThunk(
   "debts/deleteDebt",
   async (id, { rejectWithValue }) => {
@@ -99,6 +111,12 @@ const debtsSlice = createSlice({
       // createDebt
       .addCase(createDebtThunk.fulfilled, (state, action) => {
         state.items.unshift(action.payload);
+      })
+
+      // updateDebt
+      .addCase(updateDebtThunk.fulfilled, (state, action) => {
+        const index = state.items.findIndex((d) => d._id === action.payload._id);
+        if (index !== -1) state.items[index] = action.payload;
       })
 
       // deleteDebt

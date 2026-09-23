@@ -2,6 +2,20 @@ import { Link } from "react-router-dom";
 import { CreditCard, AlertCircle, CheckCircle2, ChevronLeft } from "lucide-react";
 import { formatAmount } from "../../../utils/formatAmount";
 
+function getDaysUntilDue(dateString) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dueDate = new Date(dateString);
+  dueDate.setHours(0, 0, 0, 0);
+  return Math.ceil((dueDate - today) / 86400000);
+}
+
+function getDueSoonMessage(days) {
+  if (days === 0) return "موعد السداد اليوم";
+  if (days === 1) return "موعد السداد غداً";
+  return `موعد السداد بعد ${days} أيام`;
+}
+
 function DashboardDebtsCard({ debts = [], status = "idle" }) {
   const activeDebts = debts.filter(
     (d) => d.status === "active" || d.status === "overdue"
@@ -19,6 +33,12 @@ function DashboardDebtsCard({ debts = [], status = "idle" }) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return new Date(d.dueDate) < today;
+  });
+
+  const dueSoonDebts = debts.filter((d) => {
+    if (d.status === "paid" || overdueDebts.includes(d) || !d.dueDate) return false;
+    const daysUntilDue = getDaysUntilDue(d.dueDate);
+    return daysUntilDue >= 0 && daysUntilDue <= 7;
   });
 
   const currency = debts[0]?.currency || "EGP";
@@ -72,6 +92,13 @@ function DashboardDebtsCard({ debts = [], status = "idle" }) {
             </span>
           )}
 
+          {dueSoonDebts.length > 0 && (
+            <span className="flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
+              <AlertCircle size={14} />
+              {dueSoonDebts.length} ديون موعدها قريب
+            </span>
+          )}
+
           {activeDebts.length === 0 ? (
             <span className="flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
               <CheckCircle2 size={14} />
@@ -84,6 +111,16 @@ function DashboardDebtsCard({ debts = [], status = "idle" }) {
           )}
         </div>
       </div>
+
+      {dueSoonDebts.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {dueSoonDebts.map((debt) => (
+            <span key={debt._id} className="rounded-lg bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700">
+              {debt.creditor}: {getDueSoonMessage(getDaysUntilDue(debt.dueDate))}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -10,6 +10,72 @@ function autoStatus(debt) {
   return "active";
 }
 
+function addMonths(date, months) {
+  const result = new Date(date);
+  const wholeMonths = Math.floor(months);
+  const fraction = months - wholeMonths;
+  result.setMonth(result.getMonth() + wholeMonths);
+  result.setDate(result.getDate() + Math.round(fraction * 30.4375));
+  return result;
+}
+
+function calculatePaymentForecast(debt, payments) {
+  const validPayments = payments
+    .filter((payment) => Number(payment.amount) > 0 && payment.date && !Number.isNaN(new Date(payment.date).getTime()))
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const insufficient = {
+    status: "insufficient_data",
+    averageMonthlyPayment: 0,
+    estimatedPayoffDate: null,
+    message: "أضف دفعات أكثر لحساب التوقع",
+  };
+
+  if (validPayments.length < 2 || debt.totalAmount <= debt.paidAmount) {
+    return debt.totalAmount <= debt.paidAmount
+      ? { ...insufficient, status: "paid", message: "تم سداد الدين بالكامل" }
+      : insufficient;
+  }
+
+  const firstPayment = new Date(validPayments[0].date);
+  const lastPayment = new Date(validPayments[validPayments.length - 1].date);
+  const months = Math.max(
+    1,
+    (lastPayment.getFullYear() - firstPayment.getFullYear()) * 12 +
+      lastPayment.getMonth() - firstPayment.getMonth() +
+      1
+  );
+  const totalPaid = validPayments.reduce((sum, payment) => sum + Number(payment.amount), 0);
+  const averageMonthlyPayment = totalPaid / months;
+  const remainingAmount = Math.max(0, debt.totalAmount - debt.paidAmount);
+  const estimatedPayoffDate = addMonths(new Date(), remainingAmount / averageMonthlyPayment);
+
+  return {
+    status: "available",
+    averageMonthlyPayment,
+    estimatedPayoffDate,
+    message: `بناءً على معدل دفعك الحالي، ستسدد الدين في ${estimatedPayoffDate.toLocaleDateString("ar-EG")}`,
+  };
+}
+
+async function attachForecast(debts) {
+  if (!debts.length) return [];
+  const debtIds = debts.map((debt) => debt._id);
+  const payments = await DebtPayment.find({ userId: debts[0]?.userId, debt: { $in: debtIds } })
+    .select("debt amount date")
+    .lean();
+  const paymentsByDebt = payments.reduce((groups, payment) => {
+    const key = payment.debt.toString();
+    (groups[key] ||= []).push(payment);
+    return groups;
+  }, {});
+
+  return debts.map((debt) => ({
+    ...debt.toObject(),
+    paymentForecast: calculatePaymentForecast(debt, paymentsByDebt[debt._id.toString()] || []),
+  }));
+}
+
 // GET /api/debts
 exports.getAll = async (req, res, next) => {
   try {
@@ -24,7 +90,7 @@ exports.getAll = async (req, res, next) => {
       }
     }
     if (updates.length) await Promise.all(updates);
-    res.json({ success: true, data: debts });
+    res.json({ success: true, data: await attachForecast(debts) });
   } catch (err) { next(err); }
 };
 
@@ -33,7 +99,23 @@ exports.getOne = async (req, res, next) => {
   try {
     const debt = await Debt.findOne({ _id: req.params.id, userId: req.userId });
     if (!debt) return res.status(404).json({ success: false, message: "Debt not found" });
-    res.json({ success: true, data: debt });
+    const payments = await DebtPayment.find({ debt: debt._id, userId: req.userId }).select("amount date").lean();
+    res.json({
+      success: true,
+      data: { ...debt.toObject(), paymentForecast: calculatePaymentForecast(debt, payments) },
+    });
+  } catch (err) { next(err); }
+};
+
+// GET /api/debts/:id/forecast
+exports.getForecast = async (req, res, next) => {
+  try {
+    const debt = await Debt.findOne({ _id: req.params.id, userId: req.userId });
+    if (!debt) return res.status(404).json({ success: false, message: "Debt not found" });
+    const payments = await DebtPayment.find({ debt: debt._id, userId: req.userId })
+      .select("amount date")
+      .lean();
+    res.json({ success: true, data: calculatePaymentForecast(debt, payments) });
   } catch (err) { next(err); }
 };
 
@@ -73,6 +155,13 @@ exports.update = async (req, res, next) => {
       { _id: req.params.id, userId: req.userId }, update, { new: true, runValidators: true }
     );
     if (!debt) return res.status(404).json({ success: false, message: "Debt not found" });
+    if (debt.status !== "paid") {
+      const recalculatedStatus = autoStatus(debt);
+      if (debt.status !== recalculatedStatus) {
+        debt.status = recalculatedStatus;
+        await debt.save();
+      }
+    }
     res.json({ success: true, data: debt });
   } catch (err) { next(err); }
 };
@@ -143,7 +232,17 @@ exports.addPayment = async (req, res, next) => {
     }
     await debt.save();
 
-    res.status(201).json({ success: true, data: { debt, payment } });
+    const payments = await DebtPayment.find({ debt: debt._id, userId: req.userId }).select("amount date").lean();
+    res.status(201).json({
+      success: true,
+      data: {
+        debt: {
+          ...debt.toObject(),
+          paymentForecast: calculatePaymentForecast(debt, payments),
+        },
+        payment,
+      },
+    });
   } catch (err) { next(err); }
 };
 
