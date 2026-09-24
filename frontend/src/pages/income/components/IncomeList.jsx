@@ -1,3 +1,4 @@
+import { formatAmount } from "../../../utils/formatAmount";
 import IncomeItem from "./IncomeItem";
 
 function IncomeList({
@@ -49,12 +50,9 @@ function IncomeList({
       </div>
 
       <div className="mt-5 flex items-center justify-between border-t border-slate-200 pt-4">
-        <span className="font-bold text-slate-700">الإجمالي بالعملة المختارة</span>
+        <span className="font-bold text-slate-700">{t("income.totalConvertedLabel")}</span>
         <strong className="tabular-amount text-xl font-extrabold text-income">
-          {Number(total).toLocaleString("ar-EG", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })} {displayCurrency}
+          {formatAmount(total, { minimumFractionDigits: 2 })} {displayCurrency}
         </strong>
       </div>
     </section>

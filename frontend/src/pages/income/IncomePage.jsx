@@ -1,5 +1,5 @@
-
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
@@ -13,6 +13,7 @@ import {
 } from "../../store/slices/incomeSlice";
 import IncomeForm from "./components/IncomeForm";
 import IncomeList from "./components/IncomeList";
+import { formatAmount } from "../../utils/formatAmount";
 
 const EMPTY_FORM = {
   name: "",
@@ -33,15 +34,6 @@ const labelClass = "text-sm font-semibold text-slate-700";
 const errorClass =
   "rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense";
 
-function formatMoney(value) {
-  const num = Number(value || 0);
-
-  return new Intl.NumberFormat("ar-EG", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(num);
-}
-
 function getCurrentMonth() {
   const now = new Date();
 
@@ -52,6 +44,7 @@ function getCurrentMonth() {
 }
 
 function IncomePage() {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const {
@@ -249,7 +242,7 @@ function IncomePage() {
     );
 
     if (updateIncomeEntry.fulfilled.match(result)) {
-      setSuccessMessage("تم التعديل بنجاح");
+      setSuccessMessage(t("income.updateSuccess"));
 
       closeEditModal();
 
@@ -272,11 +265,11 @@ function IncomePage() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900">
-            مصادر الدخل
+            {t("income.title")}
           </h1>
 
           <p className="mt-1 text-slate-500">
-            إدارة مصادر الدخل وتحديثها بسهولة
+            {t("income.description")}
           </p>
         </div>
 
@@ -284,7 +277,7 @@ function IncomePage() {
           to="/dashboard"
           className="font-semibold text-brand-700 hover:underline"
         >
-          العودة للوحة التحكم
+          {t("common.backToDashboard")}
         </Link>
       </div>
 
@@ -293,12 +286,12 @@ function IncomePage() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-slate-500">
-              إجمالي الدخل
+              {t("income.totalLabel")}
             </p>
 
             <div className="mt-1 flex items-baseline gap-2">
               <strong className="tabular-amount text-3xl font-extrabold text-slate-900">
-                {formatMoney(displayedTotal)}
+                {formatAmount(displayedTotal)}
               </strong>
 
               <span className="text-sm font-medium text-slate-500">
@@ -310,7 +303,7 @@ function IncomePage() {
 
         {summaryStatus === "loading" && (
           <p className="mt-3 text-sm text-slate-500">
-            جارٍ تحديث ملخص الدخل...
+            {t("income.summaryUpdating")}
           </p>
         )}
 
@@ -347,35 +340,18 @@ function IncomePage() {
         createError={createError}
         onChange={handleCreateChange}
         onSubmit={handleCreateSubmit}
-        t={(key) =>
-          ({
-            "income.formTitle": "إضافة مصدر دخل",
-            "income.nameLabel": "اسم مصدر الدخل",
-            "income.namePlaceholder": "مثال: راتب شهر سبتمبر",
-            "income.categoryLabel": "نوع الدخل",
-            "income.categoryPlaceholder": "اختار نوع الدخل",
-            "income.amountLabel": "المبلغ",
-            "income.currencyLabel": "العملة",
-            "income.receivedDateLabel": "تاريخ الاستلام",
-            "income.notesLabel": "ملاحظات (اختياري)",
-            "income.notesPlaceholder":
-              "أضف أي تفاصيل تساعدك لاحقاً",
-            "income.submit": "إضافة مصدر الدخل",
-            "income.submitting": "جارٍ الحفظ...",
-            "income.success": "تم إضافة مصدر الدخل بنجاح",
-          }[key] || key)
-        }
+        t={t}
       />
 
       {/* Summary Filter */}
       <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
         <h2 className="text-lg font-bold text-slate-900">
-          فلترة ملخص الدخل
+          {t("income.filter.title")}
         </h2>
 
         <div className="mt-4 flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
-            الشهر والسنة
+            {t("income.filter.monthYearLabel")}
 
             <input
               type="month"
@@ -388,7 +364,7 @@ function IncomePage() {
           </label>
 
           <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
-            العملة الأساسية
+            {t("income.filter.baseCurrencyLabel")}
 
             <select
               value={summaryCurrency}
@@ -415,13 +391,7 @@ function IncomePage() {
         totalAmount={displayedTotal}
         onEdit={openEditModal}
         onDeleted={handleDeleteIncome}
-        t={(key) =>
-          ({
-            "income.listTitle": "مصادر الدخل المضافة",
-            "income.loading": "جارٍ تحميل مصادر الدخل...",
-            "income.empty": "لسه مفيش مصادر دخل مضافة.",
-          }[key] || key)
-        }
+        t={t}
       />
 
       {/* Edit Modal */}
@@ -435,7 +405,7 @@ function IncomePage() {
             onClick={(event) => event.stopPropagation()}
           >
             <h2 className="text-lg font-bold text-slate-900">
-              تعديل مصدر الدخل
+              {t("income.editTitle")}
             </h2>
 
             <form
@@ -448,7 +418,7 @@ function IncomePage() {
                   htmlFor="name"
                   className={labelClass}
                 >
-                  اسم المصدر
+                  {t("income.fields.name")}
                 </label>
 
                 <input
@@ -467,7 +437,7 @@ function IncomePage() {
                   htmlFor="category"
                   className={labelClass}
                 >
-                  الفئة
+                  {t("income.fields.category")}
                 </label>
 
                 <select
@@ -477,11 +447,11 @@ function IncomePage() {
                   onChange={handleFormChange}
                   className={inputClass}
                 >
-                  <option value="salary">راتب</option>
-                  <option value="freelance">عمل حر</option>
-                  <option value="rental">إيجار</option>
-                  <option value="investment">استثمار</option>
-                  <option value="other">أخرى</option>
+                  {["salary", "freelance", "rental", "investment", "other"].map((category) => (
+                    <option key={category} value={category}>
+                      {t(`income.categories.${category}`)}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -491,7 +461,7 @@ function IncomePage() {
                   htmlFor="amount"
                   className={labelClass}
                 >
-                  المبلغ
+                  {t("income.amountLabel")}
                 </label>
 
                 <input
@@ -513,7 +483,7 @@ function IncomePage() {
                   htmlFor="currency"
                   className={labelClass}
                 >
-                  العملة
+                  {t("income.currencyLabel")}
                 </label>
 
                 <select
@@ -536,7 +506,7 @@ function IncomePage() {
                   htmlFor="receivedDate"
                   className={labelClass}
                 >
-                  تاريخ الاستلام
+                  {t("income.receivedDateLabel")}
                 </label>
 
                 <input
@@ -556,7 +526,7 @@ function IncomePage() {
                   htmlFor="recurrence"
                   className={labelClass}
                 >
-                  التكرار
+                  {t("income.recurrenceLabel")}
                 </label>
 
                 <select
@@ -566,10 +536,11 @@ function IncomePage() {
                   onChange={handleFormChange}
                   className={inputClass}
                 >
-                  <option value="once">مرة واحدة</option>
-                  <option value="weekly">أسبوعي</option>
-                  <option value="monthly">شهري</option>
-                  <option value="yearly">سنوي</option>
+                  {["once", "weekly", "monthly", "yearly"].map((recurrence) => (
+                    <option key={recurrence} value={recurrence}>
+                      {t(`income.recurrence.${recurrence}`)}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -579,7 +550,7 @@ function IncomePage() {
                   htmlFor="status"
                   className={labelClass}
                 >
-                  الحالة
+                  {t("income.statusLabel")}
                 </label>
 
                 <select
@@ -589,8 +560,8 @@ function IncomePage() {
                   onChange={handleFormChange}
                   className={inputClass}
                 >
-                  <option value="cleared">مستلمة</option>
-                  <option value="pending">قيد الانتظار</option>
+                  <option value="cleared">{t("income.status.cleared")}</option>
+                  <option value="pending">{t("income.status.pending")}</option>
                 </select>
               </div>
 
@@ -600,7 +571,7 @@ function IncomePage() {
                   htmlFor="notes"
                   className={labelClass}
                 >
-                  ملاحظات
+                  {t("income.notesLabel")}
                 </label>
 
                 <textarea
@@ -621,8 +592,8 @@ function IncomePage() {
                   className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65"
                 >
                   {updateStatus === "loading"
-                    ? "جارٍ الحفظ..."
-                    : "حفظ التعديلات"}
+                    ? t("income.submitting")
+                    : t("income.saveChanges")}
                 </button>
 
                 <button
@@ -630,7 +601,7 @@ function IncomePage() {
                   onClick={closeEditModal}
                   className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-brand-300 hover:text-brand-700"
                 >
-                  إلغاء
+                  {t("income.cancel")}
                 </button>
               </div>
             </form>
@@ -642,4 +613,3 @@ function IncomePage() {
 }
 
 export default IncomePage;
-

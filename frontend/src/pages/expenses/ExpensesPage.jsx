@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createExpenseEntry,
@@ -11,6 +12,7 @@ import {
 import CategorySelect from "../categories/components/CategorySelect";
 import { getAccounts } from "../../api/accountsApi";
 import { listCategories } from "../../api/categoryApi";
+import { formatAmount } from "../../utils/formatAmount";
 
 const EMPTY_FORM = {
   description: "",
@@ -32,41 +34,26 @@ const EMPTY_FILTERS = {
   account: "all",
 };
 
-const TYPE_STYLES = {
-  daily:     { label: "يومي",       pill: "bg-red-100 text-red-700" },
-  fixed:     { label: "شهري ثابت",  pill: "bg-yellow-100 text-yellow-700" },
-  emergency: { label: "طارئ",       pill: "bg-slate-200 text-slate-700" },
-};
-
-// Fallback color map for default categories (used when API hasn't loaded yet)
-const FALLBACK_CATEGORY_COLORS = {
-  "أكل": "#f97316",
-  "مواصلات": "#3b82f6",
-  "إيجار": "#f59e0b",
-  "فواتير": "#8b5cf6",
-  "صحة": "#10b981",
-  "تعليم": "#0ea5e9",
-  "تسلية": "#ec4899",
-  "غيره": "#6b7280",
+const TYPE_PILL_STYLES = {
+  daily: "bg-red-100 text-red-700",
+  fixed: "bg-yellow-100 text-yellow-700",
+  emergency: "bg-slate-200 text-slate-700",
 };
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500 bg-white";
 const labelClass = "text-sm font-semibold text-slate-700";
 
-function formatMoney(value) {
-  const num = Number(value || 0);
-  return new Intl.NumberFormat("ar-EG", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(num);
-}
-
 function ExpensesPage() {
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const { items, status, createStatus, createError } = useSelector((state) => state.expenses);
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState(EMPTY_FORM);
-  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const [filters, setFilters] = useState(() => {
+    const categoryFromUrl = searchParams.get("category");
+    return categoryFromUrl ? { ...EMPTY_FILTERS, category: categoryFromUrl } : EMPTY_FILTERS;
+  });
   const [filterCatOpen, setFilterCatOpen] = useState(false);
   const filterCatRef = useRef(null);
 
@@ -148,6 +135,18 @@ function ExpensesPage() {
     },
     [availableCategories]
   );
+
+  // Fallback color map for default categories (used when API hasn't loaded yet)
+  const FALLBACK_CATEGORY_COLORS = {
+    "أكل": "#f97316",
+    "مواصلات": "#3b82f6",
+    "إيجار": "#f59e0b",
+    "فواتير": "#8b5cf6",
+    "صحة": "#10b981",
+    "تعليم": "#0ea5e9",
+    "تسلية": "#ec4899",
+    "غيره": "#6b7280",
+  };
 
   // دالة تحويل أي قيمة فئة إلى لونها المخصص
   const getCategoryColor = useCallback(
@@ -255,7 +254,7 @@ function ExpensesPage() {
 
     if (createExpenseEntry.fulfilled.match(result)) {
       setForm({ ...EMPTY_FORM, date: new Date().toISOString().slice(0, 10) });
-      showToast("تمت إضافة المصروف وخصمه من الحساب بنجاح");
+      showToast(t("expenses.toast.added"));
       loadAccounts();
       loadCategories();
       refetchExpenses();
@@ -284,7 +283,7 @@ function ExpensesPage() {
     event.preventDefault();
 
     if (!editForm.expenseType || !editForm.category) {
-      setEditError("يرجى اختيار نوع المصروف والتصنيف.");
+      setEditError(t("expenses.validation.typeAndCategoryRequired"));
       return;
     }
 
@@ -312,12 +311,12 @@ function ExpensesPage() {
 
     if (updateExpenseEntry.fulfilled.match(result)) {
       setEditingExpense(null);
-      showToast("تم تحديث المصروف وتحديث رصيد الحساب بنجاح");
+      showToast(t("expenses.toast.updated"));
       loadAccounts();
       loadCategories();
       refetchExpenses();
     } else {
-      setEditError(result.payload || "تعذر تعديل المصروف.");
+      setEditError(result.payload || t("expenses.errors.updateFailed"));
     }
     setEditSaving(false);
   };
@@ -333,17 +332,17 @@ function ExpensesPage() {
 
     if (deleteExpenseEntry.fulfilled.match(result)) {
       setDeletingExpense(null);
-      showToast("تم حذف المصروف واسترجاع الرصيد للحساب بنجاح");
+      showToast(t("expenses.toast.deleted"));
       loadAccounts();
       refetchExpenses();
     } else {
-      setDeleteError(result.payload || "تعذر حذف المصروف.");
+      setDeleteError(result.payload || t("expenses.errors.deleteFailed"));
     }
     setDeleteLoading(false);
   };
 
   return (
-    <div className="mx-auto max-w-5xl" dir="rtl">
+    <div className="mx-auto max-w-5xl">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-5 left-5 z-50 flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-2xl transition">
@@ -356,20 +355,22 @@ function ExpensesPage() {
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">المصروفات</h1>
-          <p className="mt-1 text-slate-500">إدارة وتعديل وحذف كل مصروف، ومتابعة التأثير على الحسابات.</p>
+          <h1 className="text-2xl font-extrabold text-slate-900">{t("nav.expenses")}</h1>
+          <p className="mt-1 text-slate-500">{t("expenses.subtitle")}</p>
         </div>
 
         <Link to="/dashboard" className="font-semibold text-brand-700 hover:underline">
-          الرجوع للوحة التحكم
+          {t("common.backToDashboard")}
         </Link>
       </div>
 
       <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-        <p className="text-sm font-medium text-slate-500">إجمالي المصروفات {isFiltered && "(المفلترة)"}</p>
+        <p className="text-sm font-medium text-slate-500">
+          {t("expenses.totalLabel")} {isFiltered && t("expenses.totalFilteredSuffix")}
+        </p>
         <div className="mt-1 flex items-baseline gap-2">
           <strong className="tabular-amount text-3xl font-extrabold text-slate-900">
-            {formatMoney(totalExpenses)}
+            {formatAmount(totalExpenses)}
           </strong>
           <span className="text-sm font-medium text-slate-500">EGP</span>
         </div>
@@ -377,24 +378,24 @@ function ExpensesPage() {
 
       {/* نموذج إضافة مصروف جديد */}
       <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-        <h2 className="text-lg font-bold text-slate-900">إضافة مصروف جديد</h2>
+        <h2 className="text-lg font-bold text-slate-900">{t("expenses.addFormTitle")}</h2>
 
         <form onSubmit={handleSubmit} className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <label htmlFor="description" className={labelClass}>الوصف</label>
+            <label htmlFor="description" className={labelClass}>{t("expenses.fields.description")}</label>
             <input
               id="description"
               name="description"
               value={form.description}
               onChange={handleChange}
-              placeholder="مثال: مشتريات السوبرماركت، فاتورة إنترنت، صيانة السيارة..."
+              placeholder={t("expenses.descriptionPlaceholder")}
               required
               className={inputClass}
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="amount" className={labelClass}>المبلغ</label>
+            <label htmlFor="amount" className={labelClass}>{t("expenses.fields.amount")}</label>
             <input
               id="amount"
               name="amount"
@@ -410,7 +411,7 @@ function ExpensesPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="date" className={labelClass}>التاريخ</label>
+            <label htmlFor="date" className={labelClass}>{t("expenses.fields.date")}</label>
             <input
               id="date"
               name="date"
@@ -425,7 +426,7 @@ function ExpensesPage() {
                 <svg className="h-3.5 w-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clipRule="evenodd" />
                 </svg>
-                {new Date(form.date).toLocaleDateString("ar-EG", {
+                {new Date(form.date).toLocaleDateString(i18n.language, {
                   weekday: "long",
                   year: "numeric",
                   month: "long",
@@ -436,7 +437,7 @@ function ExpensesPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="paymentMethod" className={labelClass}>طريقة الدفع</label>
+            <label htmlFor="paymentMethod" className={labelClass}>{t("expenses.fields.paymentMethod")}</label>
             <select
               id="paymentMethod"
               name="paymentMethod"
@@ -445,14 +446,14 @@ function ExpensesPage() {
               required
               className={inputClass}
             >
-              <option value="cash">كاش</option>
-              <option value="card">بطاقة</option>
-              <option value="wallet">محفظة</option>
+              <option value="cash">{t("expenses.paymentMethod.cash")}</option>
+              <option value="card">{t("expenses.paymentMethod.card")}</option>
+              <option value="wallet">{t("expenses.paymentMethod.wallet")}</option>
             </select>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="expenseType" className={labelClass}>نوع المصروف</label>
+            <label htmlFor="expenseType" className={labelClass}>{t("expenses.fields.expenseType")}</label>
             <select
               id="expenseType"
               name="expenseType"
@@ -461,15 +462,15 @@ function ExpensesPage() {
               required
               className={inputClass}
             >
-              <option value="">اختر النوع</option>
-              <option value="daily">يومي</option>
-              <option value="fixed">شهري ثابت</option>
-              <option value="emergency">طارئ</option>
+              <option value="">{t("expenses.selectType")}</option>
+              <option value="daily">{t("expenses.expenseType.daily")}</option>
+              <option value="fixed">{t("expenses.expenseType.fixed")}</option>
+              <option value="emergency">{t("expenses.expenseType.emergency")}</option>
             </select>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="category" className={labelClass}>التصنيف</label>
+            <label htmlFor="category" className={labelClass}>{t("expenses.fields.category")}</label>
             <CategorySelect
               value={form.category}
               expenseType={form.expenseType}
@@ -480,7 +481,7 @@ function ExpensesPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="accountId" className={labelClass}>الحساب المخصوم منه (اختياري)</label>
+            <label htmlFor="accountId" className={labelClass}>{t("expenses.fields.account")}</label>
             <select
               id="accountId"
               name="accountId"
@@ -488,23 +489,23 @@ function ExpensesPage() {
               onChange={handleChange}
               className={inputClass}
             >
-              <option value="">بدون حساب محدد</option>
+              <option value="">{t("expenses.noAccountOption")}</option>
               {availableAccounts.map((acc) => (
                 <option key={acc._id} value={acc._id}>
-                  {acc.name} ({formatMoney(acc.balance)} {acc.currency || "EGP"})
+                  {acc.name} ({formatAmount(acc.balance)} {acc.currency || "EGP"})
                 </option>
               ))}
             </select>
           </div>
 
           <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <label htmlFor="notes" className={labelClass}>ملاحظات (اختياري)</label>
+            <label htmlFor="notes" className={labelClass}>{t("expenses.fields.notes")}</label>
             <textarea
               id="notes"
               name="notes"
               value={form.notes}
               onChange={handleChange}
-              placeholder="أضف أي تفاصيل أو ملاحظات إضافية هنا (اختياري)..."
+              placeholder={t("expenses.notesPlaceholder")}
               rows="3"
               className={`${inputClass} resize-none`}
             />
@@ -518,7 +519,7 @@ function ExpensesPage() {
             )}
             {createStatus === "succeeded" && (
               <p className="rounded-xl bg-income-soft px-4 py-2.5 text-sm font-medium text-income">
-                تم إضافة المصروف بنجاح
+                {t("expenses.success")}
               </p>
             )}
             <button
@@ -526,7 +527,7 @@ function ExpensesPage() {
               disabled={createStatus === "loading"}
               className="ms-auto rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65"
             >
-              {createStatus === "loading" ? "جارٍ الحفظ..." : "إضافة المصروف"}
+              {createStatus === "loading" ? t("expenses.submitting") : t("expenses.submit")}
             </button>
           </div>
         </form>
@@ -536,8 +537,8 @@ function ExpensesPage() {
       <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
-            <h3 className="text-lg font-bold text-slate-900">قائمة المصروفات</h3>
-            <p className="text-xs text-slate-500">فلترة المصروفات، وتعديلها أو حذفها مع تحديث الأرصدة تلقائياً.</p>
+            <h3 className="text-lg font-bold text-slate-900">{t("expenses.listTitle")}</h3>
+            <p className="text-xs text-slate-500">{t("expenses.listSubtitle")}</p>
           </div>
 
           {isFiltered && (
@@ -549,7 +550,7 @@ function ExpensesPage() {
               <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
               </svg>
-              <span>مسح الفلاتر</span>
+              <span>{t("expenses.clearFilters")}</span>
             </button>
           )}
         </div>
@@ -558,7 +559,7 @@ function ExpensesPage() {
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {/* فلتر الفترة الزمنية */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="filter-period" className="text-xs font-semibold text-slate-600">الفترة الزمنية</label>
+            <label htmlFor="filter-period" className="text-xs font-semibold text-slate-600">{t("expenses.filters.periodLabel")}</label>
             <select
               id="filter-period"
               name="period"
@@ -566,17 +567,17 @@ function ExpensesPage() {
               onChange={handleFilterChange}
               className="rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500"
             >
-              <option value="all">كل الفترات</option>
-              <option value="day">اليوم</option>
-              <option value="week">آخر 7 أيام</option>
-              <option value="month">هذا الشهر</option>
-              <option value="custom">مخصص (تحديد تاريخين)</option>
+              <option value="all">{t("expenses.filters.period.all")}</option>
+              <option value="day">{t("expenses.filters.period.day")}</option>
+              <option value="week">{t("expenses.filters.period.week")}</option>
+              <option value="month">{t("expenses.filters.period.month")}</option>
+              <option value="custom">{t("expenses.filters.period.custom")}</option>
             </select>
           </div>
 
           {/* فلتر النوع */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="filter-type" className="text-xs font-semibold text-slate-600">نوع المصروف</label>
+            <label htmlFor="filter-type" className="text-xs font-semibold text-slate-600">{t("expenses.filters.typeLabel")}</label>
             <select
               id="filter-type"
               name="type"
@@ -584,16 +585,16 @@ function ExpensesPage() {
               onChange={handleFilterChange}
               className="rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500"
             >
-              <option value="all">كل الأنواع</option>
-              <option value="daily">يومي</option>
-              <option value="fixed">شهري ثابت</option>
-              <option value="emergency">طارئ</option>
+              <option value="all">{t("expenses.filters.typeAll")}</option>
+              <option value="daily">{t("expenses.expenseType.daily")}</option>
+              <option value="fixed">{t("expenses.expenseType.fixed")}</option>
+              <option value="emergency">{t("expenses.expenseType.emergency")}</option>
             </select>
           </div>
 
           {/* فلتر التصنيف مع نقاط ملونة */}
           <div className="flex flex-col gap-1 relative" ref={filterCatRef}>
-            <label htmlFor="filter-category" className="text-xs font-semibold text-slate-600">التصنيف</label>
+            <label htmlFor="filter-category" className="text-xs font-semibold text-slate-600">{t("expenses.filters.categoryLabel")}</label>
             <button
               type="button"
               onClick={() => setFilterCatOpen((prev) => !prev)}
@@ -608,7 +609,7 @@ function ExpensesPage() {
                 )}
                 <span>
                   {filters.category === "all"
-                    ? "كل التصنيفات"
+                    ? t("expenses.filters.categoryAll")
                     : getCategoryName(filters.category)}
                 </span>
               </span>
@@ -635,7 +636,7 @@ function ExpensesPage() {
                     filters.category === "all" ? "bg-brand-50 font-bold text-brand-700" : "text-slate-700"
                   }`}
                 >
-                  كل التصنيفات
+                  {t("expenses.filters.categoryAll")}
                 </div>
                 {availableCategories.map((cat) => (
                   <div
@@ -661,7 +662,7 @@ function ExpensesPage() {
 
           {/* فلتر الحساب */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="filter-account" className="text-xs font-semibold text-slate-600">الحساب</label>
+            <label htmlFor="filter-account" className="text-xs font-semibold text-slate-600">{t("expenses.filters.accountLabel")}</label>
             <select
               id="filter-account"
               name="account"
@@ -669,7 +670,7 @@ function ExpensesPage() {
               onChange={handleFilterChange}
               className="rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500"
             >
-              <option value="all">كل الحسابات</option>
+              <option value="all">{t("expenses.filters.accountAll")}</option>
               {availableAccounts.map((acc) => (
                 <option key={acc._id} value={acc._id}>
                   {acc.name}
@@ -683,7 +684,7 @@ function ExpensesPage() {
         {filters.period === "custom" && (
           <div className="mt-3 grid grid-cols-1 gap-3 rounded-xl bg-slate-50 p-3 sm:grid-cols-2">
             <div className="flex flex-col gap-1">
-              <label htmlFor="filter-startDate" className="text-xs font-semibold text-slate-600">من تاريخ</label>
+              <label htmlFor="filter-startDate" className="text-xs font-semibold text-slate-600">{t("expenses.filters.startDate")}</label>
               <input
                 id="filter-startDate"
                 name="startDate"
@@ -694,7 +695,7 @@ function ExpensesPage() {
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label htmlFor="filter-endDate" className="text-xs font-semibold text-slate-600">إلى تاريخ</label>
+              <label htmlFor="filter-endDate" className="text-xs font-semibold text-slate-600">{t("expenses.filters.endDate")}</label>
               <input
                 id="filter-endDate"
                 name="endDate"
@@ -709,11 +710,11 @@ function ExpensesPage() {
 
         {/* عرض المصروفات */}
         {status === "loading" ? (
-          <p className="mt-6 text-center text-sm text-slate-500">جارٍ تحميل المصروفات...</p>
+          <p className="mt-6 text-center text-sm text-slate-500">{t("expenses.loading")}</p>
         ) : items.length === 0 ? (
           <div className="mt-6 rounded-xl border border-dashed border-slate-200 p-8 text-center">
             <p className="text-sm font-medium text-slate-600">
-              {isFiltered ? "لا توجد مصروفات تطابق معايير الفلترة المحددة." : "لا توجد مصروفات مسجلة حاليًا."}
+              {isFiltered ? t("expenses.emptyFiltered") : t("expenses.emptyAll")}
             </p>
             {isFiltered && (
               <button
@@ -721,14 +722,14 @@ function ExpensesPage() {
                 onClick={resetFilters}
                 className="mt-2 text-xs font-semibold text-brand-600 hover:underline"
               >
-                إعادة ضبط الفلاتر لعرض كل المصروفات
+                {t("expenses.resetFiltersCta")}
               </button>
             )}
           </div>
         ) : (
           <div className="mt-4 flex flex-col divide-y divide-slate-100">
             {items.map((expense) => {
-              const typeInfo = TYPE_STYLES[expense.expenseType] || TYPE_STYLES.fixed;
+              const pillClass = TYPE_PILL_STYLES[expense.expenseType] || TYPE_PILL_STYLES.fixed;
               const displayCategoryName = getCategoryName(expense.category);
               const displayCategoryColor = getCategoryColor(expense.category);
 
@@ -738,7 +739,7 @@ function ExpensesPage() {
                   className="grid grid-cols-1 items-center gap-3 py-4 md:grid-cols-12 hover:bg-slate-50/50 rounded-xl px-2 transition"
                 >
                   <div className="md:col-span-3">
-                    <span className="block text-xs font-medium text-slate-400">الوصف</span>
+                    <span className="block text-xs font-medium text-slate-400">{t("expenses.fields.description")}</span>
                     <strong className="text-sm text-slate-900">{expense.description}</strong>
                     {expense.notes && (
                       <p className="text-xs text-slate-500 truncate">{expense.notes}</p>
@@ -747,7 +748,7 @@ function ExpensesPage() {
 
                   {/* اسم الفئة مع نقطة ملونة بلون التصنيف */}
                   <div className="md:col-span-2">
-                    <span className="block text-xs font-medium text-slate-400">الفئة</span>
+                    <span className="block text-xs font-medium text-slate-400">{t("expenses.fields.category")}</span>
                     <span className="flex items-center gap-1.5 text-sm font-medium text-slate-700">
                       <span
                         className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full"
@@ -758,31 +759,31 @@ function ExpensesPage() {
                   </div>
 
                   <div className="md:col-span-2">
-                    <span className="block text-xs font-medium text-slate-400">النوع والحساب</span>
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${typeInfo.pill}`}>
-                      {typeInfo.label}
+                    <span className="block text-xs font-medium text-slate-400">{t("expenses.fields.expenseType")}</span>
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${pillClass}`}>
+                      {t(`expenses.expenseType.${expense.expenseType}`, expense.expenseType)}
                     </span>
                     {expense.account && (
                       <span className="mt-1 flex items-center gap-1 text-[11px] font-medium text-slate-600 truncate">
                         <svg className="h-3 w-3 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M10 1l7 4v1H3V5l7-4zm-5 7h2v6H5V8zm4 0h2v6H9V8zm4 0h2v6h-2V8zM2 16h16v2H2v-2z" clipRule="evenodd" />
                         </svg>
-                        <span>{expense.account.name || "حساب"}</span>
+                        <span>{expense.account.name || t("expenses.unknownAccount")}</span>
                       </span>
                     )}
                   </div>
 
                   <div className="md:col-span-2">
-                    <span className="block text-xs font-medium text-slate-400">المبلغ</span>
+                    <span className="block text-xs font-medium text-slate-400">{t("expenses.fields.amount")}</span>
                     <span className="tabular-amount text-sm font-bold text-expense">
-                      {formatMoney(expense.amount)} {expense.currency || "EGP"}
+                      {formatAmount(expense.amount)} {expense.currency || "EGP"}
                     </span>
                   </div>
 
                   <div className="md:col-span-1">
-                    <span className="block text-xs font-medium text-slate-400">التاريخ</span>
+                    <span className="block text-xs font-medium text-slate-400">{t("expenses.fields.date")}</span>
                     <span className="text-xs text-slate-600">
-                      {new Date(expense.date).toLocaleDateString("ar-EG")}
+                      {new Date(expense.date).toLocaleDateString(i18n.language)}
                     </span>
                   </div>
 
@@ -792,12 +793,12 @@ function ExpensesPage() {
                       type="button"
                       onClick={() => openEditModal(expense)}
                       className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 transition"
-                      title="تعديل هذا المصروف"
+                      title={t("expenses.editTitleAttr")}
                     >
                       <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                         <path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" />
                       </svg>
-                      <span>تعديل</span>
+                      <span>{t("expenses.editAction")}</span>
                     </button>
                     <button
                       type="button"
@@ -806,12 +807,12 @@ function ExpensesPage() {
                         setDeleteError("");
                       }}
                       className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition"
-                      title="حذف هذا المصروف"
+                      title={t("expenses.deleteTitleAttr")}
                     >
                       <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M8.75 1A1.75 1.75 0 0 0 7 2.75V3H4a.75.75 0 0 0 0 1.5h.5v10.75A2.75 2.75 0 0 0 7.25 18h5.5a2.75 2.75 0 0 0 2.75-2.75V4.5h.5a.75.75 0 0 0 0-1.5h-3v-.25A1.75 1.75 0 0 0 11.25 1h-2.5ZM8.5 2.75a.25.25 0 0 1 .25-.25h2.5a.25.25 0 0 1 .25.25V3h-3v-.25ZM6 4.5h8v10.75c0 .69-.56 1.25-1.25 1.25h-5.5c-.69 0-1.25-.56-1.25-1.25V4.5Z" clipRule="evenodd" />
                       </svg>
-                      <span>حذف</span>
+                      <span>{t("expenses.deleteAction")}</span>
                     </button>
                   </div>
                 </div>
@@ -830,10 +831,9 @@ function ExpensesPage() {
           <div
             className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
-            dir="rtl"
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-lg font-bold text-slate-900">تعديل المصروف</h3>
+              <h3 className="text-lg font-bold text-slate-900">{t("expenses.editModal.title")}</h3>
               <button
                 type="button"
                 disabled={editSaving}
@@ -848,7 +848,7 @@ function ExpensesPage() {
 
             <form onSubmit={handleEditSubmit} className="mt-4 space-y-3.5">
               <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>الوصف</label>
+                <label className={labelClass}>{t("expenses.fields.description")}</label>
                 <input
                   name="description"
                   value={editForm.description}
@@ -860,7 +860,7 @@ function ExpensesPage() {
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
-                  <label className={labelClass}>المبلغ</label>
+                  <label className={labelClass}>{t("expenses.fields.amount")}</label>
                   <input
                     name="amount"
                     type="number"
@@ -874,7 +874,7 @@ function ExpensesPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className={labelClass}>التاريخ</label>
+                  <label className={labelClass}>{t("expenses.fields.date")}</label>
                   <input
                     name="date"
                     type="date"
@@ -888,7 +888,7 @@ function ExpensesPage() {
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
-                  <label className={labelClass}>طريقة الدفع</label>
+                  <label className={labelClass}>{t("expenses.fields.paymentMethod")}</label>
                   <select
                     name="paymentMethod"
                     value={editForm.paymentMethod}
@@ -896,14 +896,14 @@ function ExpensesPage() {
                     required
                     className={inputClass}
                   >
-                    <option value="cash">كاش</option>
-                    <option value="card">بطاقة</option>
-                    <option value="wallet">محفظة</option>
+                    <option value="cash">{t("expenses.paymentMethod.cash")}</option>
+                    <option value="card">{t("expenses.paymentMethod.card")}</option>
+                    <option value="wallet">{t("expenses.paymentMethod.wallet")}</option>
                   </select>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className={labelClass}>نوع المصروف</label>
+                  <label className={labelClass}>{t("expenses.fields.expenseType")}</label>
                   <select
                     name="expenseType"
                     value={editForm.expenseType}
@@ -911,16 +911,16 @@ function ExpensesPage() {
                     required
                     className={inputClass}
                   >
-                    <option value="daily">يومي</option>
-                    <option value="fixed">شهري ثابت</option>
-                    <option value="emergency">طارئ</option>
+                    <option value="daily">{t("expenses.expenseType.daily")}</option>
+                    <option value="fixed">{t("expenses.expenseType.fixed")}</option>
+                    <option value="emergency">{t("expenses.expenseType.emergency")}</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
-                  <label className={labelClass}>التصنيف</label>
+                  <label className={labelClass}>{t("expenses.fields.category")}</label>
                   <CategorySelect
                     value={editForm.category}
                     expenseType={editForm.expenseType}
@@ -931,17 +931,17 @@ function ExpensesPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className={labelClass}>الحساب المخصوم منه</label>
+                  <label className={labelClass}>{t("expenses.editModal.accountLabel")}</label>
                   <select
                     name="accountId"
                     value={editForm.accountId}
                     onChange={handleEditChange}
                     className={inputClass}
                   >
-                    <option value="">بدون حساب محدد</option>
+                    <option value="">{t("expenses.noAccountOption")}</option>
                     {availableAccounts.map((acc) => (
                       <option key={acc._id} value={acc._id}>
-                        {acc.name} ({formatMoney(acc.balance)} {acc.currency || "EGP"})
+                        {acc.name} ({formatAmount(acc.balance)} {acc.currency || "EGP"})
                       </option>
                     ))}
                   </select>
@@ -949,7 +949,7 @@ function ExpensesPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>ملاحظات (اختياري)</label>
+                <label className={labelClass}>{t("expenses.fields.notes")}</label>
                 <textarea
                   name="notes"
                   value={editForm.notes}
@@ -972,14 +972,14 @@ function ExpensesPage() {
                   onClick={() => setEditingExpense(null)}
                   className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100"
                 >
-                  إلغاء
+                  {t("expenses.editModal.cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={editSaving}
                   className="rounded-xl bg-brand-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60"
                 >
-                  {editSaving ? "جارٍ الحفظ..." : "حفظ التعديلات"}
+                  {editSaving ? t("expenses.editModal.saving") : t("expenses.editModal.save")}
                 </button>
               </div>
             </form>
@@ -996,7 +996,6 @@ function ExpensesPage() {
           <div
             className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
-            dir="rtl"
           >
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-100 text-rose-600">
@@ -1004,13 +1003,15 @@ function ExpensesPage() {
                   <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clipRule="evenodd" />
                 </svg>
               </span>
-              <h3 className="text-lg font-bold text-slate-900">تأكيد حذف المصروف</h3>
+              <h3 className="text-lg font-bold text-slate-900">{t("expenses.deleteModal.title")}</h3>
             </div>
 
             <p className="mt-3 text-sm text-slate-600">
-              هل أنت متأكد من حذف مصروف <strong className="text-slate-900">"{deletingExpense.description}"</strong> بمبلغ{" "}
-              <strong className="text-rose-600">{formatMoney(deletingExpense.amount)} EGP</strong> التابع لفئة{" "}
-              <strong className="text-slate-800">"{getCategoryName(deletingExpense.category)}"</strong>؟
+              {t("expenses.deleteModal.confirmQuestion", {
+                description: deletingExpense.description,
+                amount: `${formatAmount(deletingExpense.amount)} EGP`,
+                category: getCategoryName(deletingExpense.category),
+              })}
             </p>
 
             {deletingExpense.account && (
@@ -1019,9 +1020,10 @@ function ExpensesPage() {
                   <path d="M10 2a6 6 0 0 0-6 6c0 1.887.87 3.57 2.235 4.675A2 2 0 0 1 7 14.25v.75a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-.75a2 2 0 0 1 .765-1.575A6.002 6.002 0 0 0 16 8a6 6 0 0 0-6-6Zm-2 16a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.5H8V18Z" />
                 </svg>
                 <span>
-                  <strong>استرجاع الرصيد تلقائياً:</strong> سيتم إضافة مبلغ{" "}
-                  <strong>{formatMoney(deletingExpense.amount)} EGP</strong> تلقائياً إلى حساب{" "}
-                  <strong>"{deletingExpense.account.name || "المرتبط"}"</strong>.
+                  {t("expenses.deleteModal.refundNote", {
+                    amount: `${formatAmount(deletingExpense.amount)} EGP`,
+                    account: deletingExpense.account.name,
+                  })}
                 </span>
               </div>
             )}
@@ -1039,7 +1041,7 @@ function ExpensesPage() {
                 onClick={() => setDeletingExpense(null)}
                 className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-50"
               >
-                إلغاء
+                {t("expenses.deleteModal.cancel")}
               </button>
               <button
                 type="button"
@@ -1047,7 +1049,7 @@ function ExpensesPage() {
                 onClick={handleConfirmDelete}
                 className="rounded-xl bg-rose-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-rose-700 disabled:opacity-60"
               >
-                {deleteLoading ? "جارٍ الحذف..." : "تأكيد الحذف"}
+                {deleteLoading ? t("expenses.deleteModal.deleting") : t("expenses.deleteModal.confirm")}
               </button>
             </div>
           </div>

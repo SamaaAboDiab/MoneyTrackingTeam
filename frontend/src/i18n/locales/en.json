@@ -5,7 +5,10 @@
     "backToDashboard": "Back to dashboard",
     "comingSoon": "This page is under construction.",
     "showAmount": "Show amount",
-    "hideAmount": "Hide amount"
+    "hideAmount": "Hide amount",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel"
   },
   "nav": {
     "income": "Income",
@@ -77,7 +80,43 @@
     "title": "Dashboard",
     "greeting": "Welcome, {{name}}",
     "accountsLink": "Manage accounts and wallets",
-    "transferLink": "Transfer between accounts"
+    "transferLink": "Transfer between accounts",
+    "periodLabel": "Period",
+    "period": {
+      "month": "This month",
+      "last_month": "Last month",
+      "3months": "Last 3 months"
+    },
+    "summary": {
+      "title": "Current month summary",
+      "loading": "Loading summary...",
+      "income": "Total income",
+      "expenses": "Total expenses",
+      "net": "Remaining",
+      "deficit": "Deficit"
+    },
+    "chart": {
+      "title": "Expenses by category",
+      "empty": "No expenses in this period.",
+      "topCategories": "Top 3 categories",
+      "viewInExpenses": "View in expenses",
+      "otherCount": "{{count}} transactions"
+    },
+    "debtsCard": {
+      "title": "Total outstanding debts",
+      "activeCount": "{{count}} active debt(s) awaiting payment",
+      "noneDue": "You have no outstanding debts right now",
+      "manage": "Manage debts",
+      "remaining": "Remaining amount to pay",
+      "calculating": "Calculating...",
+      "overdueBadge": "{{count}} overdue debt(s)!",
+      "dueSoonBadge": "{{count}} debt(s) due soon",
+      "allPaid": "All debts fully paid",
+      "activeBadge": "{{count}} active debt(s)",
+      "dueToday": "Due today",
+      "dueTomorrow": "Due tomorrow",
+      "dueInDays": "Due in {{count}} days"
+    }
   },
   "layout": {
     "brand": "Money Tracker",
@@ -172,7 +211,10 @@
   "income": {
     "title": "Income sources",
     "description": "Record every income source and keep it organized in one list.",
+    "totalLabel": "Total income",
+    "summaryUpdating": "Updating income summary...",
     "formTitle": "Add income source",
+    "editTitle": "Edit income source",
     "nameLabel": "Income source name",
     "namePlaceholder": "e.g. September salary",
     "categoryLabel": "Income type",
@@ -180,20 +222,289 @@
     "amountLabel": "Amount",
     "currencyLabel": "Currency",
     "receivedDateLabel": "Received date",
+    "recurrenceLabel": "Recurrence",
+    "recurrence": {
+      "once": "Once",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "statusLabel": "Status",
+    "status": {
+      "cleared": "Cleared",
+      "pending": "Pending"
+    },
     "notesLabel": "Notes (optional)",
     "notesPlaceholder": "Add any useful details",
     "submit": "Add income source",
     "submitting": "Saving...",
     "success": "Income source added successfully",
+    "saveChanges": "Save changes",
+    "updateSuccess": "Updated successfully",
+    "cancel": "Cancel",
     "listTitle": "Added income sources",
     "loading": "Loading income sources...",
     "empty": "No income sources added yet.",
+    "totalConvertedLabel": "Total in selected currency",
+    "filter": {
+      "title": "Filter income summary",
+      "monthYearLabel": "Month and year",
+      "baseCurrencyLabel": "Base currency"
+    },
+    "fields": {
+      "name": "Source name",
+      "category": "Category",
+      "amountConverted": "Amount in selected currency",
+      "originalPrefix": "Original:",
+      "date": "Date"
+    },
     "categories": {
       "salary": "Salary",
       "freelance": "Freelance",
       "rental": "Rental",
       "investment": "Profit",
       "other": "Other"
+    },
+    "delete": {
+      "trigger": "Delete",
+      "confirmTitle": "Are you sure?",
+      "confirmMessage": "\"{{name}}\" will be permanently deleted. If this income is recurring, it will stop for all future periods.",
+      "cancel": "Cancel",
+      "confirm": "Confirm delete",
+      "deleting": "Deleting...",
+      "error": "Unable to delete this income."
+    }
+  },
+  "expenses": {
+    "subtitle": "Manage, edit and delete every expense, and track its effect on your accounts.",
+    "totalLabel": "Total expenses",
+    "totalFilteredSuffix": "(filtered)",
+    "addFormTitle": "Add new expense",
+    "fields": {
+      "description": "Description",
+      "amount": "Amount",
+      "date": "Date",
+      "paymentMethod": "Payment method",
+      "expenseType": "Expense type",
+      "category": "Category",
+      "account": "Account to deduct from (optional)",
+      "notes": "Notes (optional)"
+    },
+    "descriptionPlaceholder": "e.g. Groceries, internet bill, car maintenance...",
+    "noAccountOption": "No account selected",
+    "unknownAccount": "Account",
+    "notesPlaceholder": "Add any extra details or notes here (optional)...",
+    "paymentMethod": {
+      "cash": "Cash",
+      "card": "Card",
+      "wallet": "Wallet"
+    },
+    "selectType": "Select type",
+    "expenseType": {
+      "daily": "Daily",
+      "fixed": "Fixed monthly",
+      "emergency": "Emergency"
+    },
+    "submit": "Add expense",
+    "submitting": "Saving...",
+    "success": "Expense added successfully",
+    "listTitle": "Expenses list",
+    "listSubtitle": "Filter expenses, edit or delete them while balances update automatically.",
+    "clearFilters": "Clear filters",
+    "filters": {
+      "periodLabel": "Time period",
+      "period": {
+        "all": "All periods",
+        "day": "Today",
+        "week": "Last 7 days",
+        "month": "This month",
+        "custom": "Custom (pick two dates)"
+      },
+      "typeLabel": "Expense type",
+      "typeAll": "All types",
+      "categoryLabel": "Category",
+      "categoryAll": "All categories",
+      "accountLabel": "Account",
+      "accountAll": "All accounts",
+      "startDate": "From date",
+      "endDate": "To date"
+    },
+    "emptyFiltered": "No expenses match the selected filters.",
+    "emptyAll": "No expenses recorded yet.",
+    "resetFiltersCta": "Reset filters to show all expenses",
+    "loading": "Loading expenses...",
+    "editAction": "Edit",
+    "editTitleAttr": "Edit this expense",
+    "deleteAction": "Delete",
+    "deleteTitleAttr": "Delete this expense",
+    "editModal": {
+      "title": "Edit expense",
+      "accountLabel": "Account to deduct from",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "deleteModal": {
+      "title": "Confirm expense deletion",
+      "confirmQuestion": "Are you sure you want to delete the expense \"{{description}}\" of {{amount}} in category \"{{category}}\"?",
+      "refundNote": "Automatic balance refund: {{amount}} will be added back to \"{{account}}\" automatically.",
+      "cancel": "Cancel",
+      "confirm": "Confirm delete",
+      "deleting": "Deleting..."
+    },
+    "toast": {
+      "added": "Expense added and deducted from the account successfully",
+      "updated": "Expense updated and account balance adjusted successfully",
+      "deleted": "Expense deleted and balance refunded to the account successfully"
+    },
+    "validation": {
+      "typeAndCategoryRequired": "Please select the expense type and category."
+    },
+    "errors": {
+      "updateFailed": "Unable to update the expense.",
+      "deleteFailed": "Unable to delete the expense."
+    }
+  },
+  "cash": {
+    "subtitle": "Transfer from your accounts into your actual cash balance.",
+    "totalBalance": "Total cash balance",
+    "noAccount": "No cash account yet.",
+    "createAccount": "Create cash account",
+    "createAccountError": "Unable to create the cash account.",
+    "withdrawTitle": "Record a withdrawal",
+    "sourceAccount": "Source account",
+    "cashAccount": "Cash account",
+    "selectAccount": "Select account",
+    "selectCashAccount": "Select cash account",
+    "amount": "Amount",
+    "accountOption": "{{name}} - {{balance}} {{currency}}",
+    "selectAccountsError": "Select the source account and the cash account.",
+    "amountPositiveError": "Enter an amount greater than zero.",
+    "submitting": "Processing...",
+    "confirmWithdraw": "Confirm withdrawal"
+  },
+  "debts": {
+    "subtitle": "Track your debts, due dates, and payments made to each creditor.",
+    "addNew": "Add new debt",
+    "cancel": "Cancel",
+    "createValidationError": "Please fill in all required fields (creditor, amount, currency, start date, due date).",
+    "createSuccess": "Debt added successfully",
+    "createError": "Unable to add the debt.",
+    "dueDateUpdateSuccess": "Due date updated successfully",
+    "dueDateUpdateError": "Unable to update the due date.",
+    "deleteConfirm": "Are you sure you want to delete this debt?",
+    "deleteSuccess": "Debt deleted successfully",
+    "deleteError": "Unable to delete the debt.",
+    "markPaidConfirm": "Are you sure you want to mark the debt to \"{{creditor}}\" as fully paid?",
+    "markPaidSuccess": "Debt to \"{{creditor}}\" paid off successfully and moved to completed debts! ✅",
+    "markPaidError": "Unable to update the debt status.",
+    "paymentAmountPositiveError": "Enter an amount greater than zero.",
+    "paymentExceedsRemainingError": "The entered amount is greater than the remaining balance ({{remaining}} {{currency}}).",
+    "paymentAccountRequiredError": "Select the account to pay from.",
+    "paymentDateRequiredError": "Set the payment date.",
+    "paymentSuccess": "Payment recorded successfully",
+    "paymentError": "Unable to record the payment.",
+    "historyFetchError": "Unable to fetch the payment history from the server.",
+    "form": {
+      "title": "Register a new debt",
+      "requiredNote": "All fields marked (*) are required",
+      "creditorLabel": "Creditor name",
+      "creditorPlaceholder": "e.g. National Bank, Mohamed Ahmed",
+      "totalAmountLabel": "Total amount",
+      "currencyLabel": "Currency",
+      "categoryLabel": "Category",
+      "startDateLabel": "Debt start date",
+      "dueDateLabel": "Expected due date",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Add any other details or payment terms...",
+      "save": "Save debt",
+      "saving": "Saving..."
+    },
+    "currencyOptions": {
+      "EGP": "Egyptian pound (EGP)",
+      "USD": "US dollar (USD)",
+      "EUR": "Euro (EUR)",
+      "SAR": "Saudi riyal (SAR)",
+      "AED": "UAE dirham (AED)"
+    },
+    "category": {
+      "other": "Other",
+      "personal": "Personal",
+      "credit_card": "Credit card",
+      "auto_loan": "Auto loan",
+      "mortgage": "Mortgage",
+      "student": "Student loan"
+    },
+    "tabs": {
+      "active": "Active debts",
+      "completed": "Completed",
+      "all": "All"
+    },
+    "loading": "Loading debts...",
+    "empty": {
+      "activeTitle": "No active debts right now! Well done",
+      "completedTitle": "No fully paid debts yet.",
+      "allTitle": "No debts recorded.",
+      "activeSubtitle": "All your financial commitments are fully paid.",
+      "otherSubtitle": "Tap \"Add new debt\" to register a new one."
+    },
+    "overdueBanner": "Alert: this debt is past its due date!",
+    "status": {
+      "paid": "Paid off ✅",
+      "overdue": "Overdue",
+      "dueSoon": "Due soon",
+      "active": "Active"
+    },
+    "clickForHistory": "Tap to view payment history",
+    "amounts": {
+      "original": "Original amount",
+      "paid": "Total paid",
+      "remaining": "Remaining"
+    },
+    "progressLabel": "Repayment progress",
+    "progressComplete": "100% (complete)",
+    "startDatePrefix": "Start date:",
+    "dueDatePrefix": "Expected due date:",
+    "dueSoonMessage": {
+      "today": "Alert: payment due today",
+      "tomorrow": "Alert: payment due tomorrow",
+      "inDays": "Alert: payment due in {{count}} days"
+    },
+    "editDueDate": "Edit due date",
+    "saveDate": "Save date",
+    "forecast": {
+      "averageMonthly": "Your average monthly payment: {{amount}}",
+      "notEnoughData": "Add more payments to calculate a forecast"
+    },
+    "actions": {
+      "addPayment": "Add payment",
+      "markPaid": "Mark as paid",
+      "showHistory": "Payment history",
+      "hideHistory": "Hide history",
+      "delete": "Delete"
+    },
+    "history": {
+      "title": "Recorded payments ({{count}})",
+      "addNew": "+ Add new payment",
+      "loading": "Loading payment history from the server...",
+      "empty": "No payments recorded yet for this debt.",
+      "unknownAccount": "Selected account"
+    },
+    "paymentModal": {
+      "title": "Record a new payment",
+      "payingFor": "Paying creditor:",
+      "remainingLabel": "Remaining balance on this debt:",
+      "amountLabel": "Amount",
+      "dateLabel": "Date",
+      "accountLabel": "Account to pay from",
+      "selectAccount": "Select account",
+      "accountOption": "{{name}} (balance: {{balance}} {{currency}})",
+      "accountHint": "The payment amount will be deducted automatically from the selected account's balance.",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "e.g. October installment, bank transfer",
+      "cancel": "Cancel",
+      "confirm": "Confirm payment",
+      "saving": "Saving..."
     }
   },
   "profile": {

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { CreditCard, AlertCircle, CheckCircle2, ChevronLeft } from "lucide-react";
 import { formatAmount } from "../../../utils/formatAmount";
 
@@ -10,13 +11,15 @@ function getDaysUntilDue(dateString) {
   return Math.ceil((dueDate - today) / 86400000);
 }
 
-function getDueSoonMessage(days) {
-  if (days === 0) return "موعد السداد اليوم";
-  if (days === 1) return "موعد السداد غداً";
-  return `موعد السداد بعد ${days} أيام`;
-}
-
 function DashboardDebtsCard({ debts = [], status = "idle" }) {
+  const { t } = useTranslation();
+
+  const getDueSoonMessage = (days) => {
+    if (days === 0) return t("dashboard.debtsCard.dueToday");
+    if (days === 1) return t("dashboard.debtsCard.dueTomorrow");
+    return t("dashboard.debtsCard.dueInDays", { count: days });
+  };
+
   const activeDebts = debts.filter(
     (d) => d.status === "active" || d.status === "overdue"
   );
@@ -51,11 +54,11 @@ function DashboardDebtsCard({ debts = [], status = "idle" }) {
             <CreditCard size={20} />
           </span>
           <div>
-            <h2 className="text-base font-bold text-slate-900">إجمالي الديون المستحقة</h2>
+            <h2 className="text-base font-bold text-slate-900">{t("dashboard.debtsCard.title")}</h2>
             <p className="text-xs text-slate-500">
               {activeDebts.length > 0
-                ? `${activeDebts.length} دين نشط يتطلب السداد`
-                : "لا توجد ديون مستحقة عليك حالياً 🎉"}
+                ? t("dashboard.debtsCard.activeCount", { count: activeDebts.length })
+                : t("dashboard.debtsCard.noneDue")}
             </p>
           </div>
         </div>
@@ -64,17 +67,17 @@ function DashboardDebtsCard({ debts = [], status = "idle" }) {
           to="/debts"
           className="flex items-center gap-1 text-sm font-semibold text-brand-600 transition hover:text-brand-700 hover:underline"
         >
-          <span>إدارة الديون</span>
-          <ChevronLeft size={16} className="rtl:rotate-180" />
+          <span>{t("dashboard.debtsCard.manage")}</span>
+          <ChevronLeft size={16} className="ltr:rotate-180" />
         </Link>
       </div>
 
       <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-medium text-slate-500">المبلغ المتبقي للسداد</p>
+          <p className="text-xs font-medium text-slate-500">{t("dashboard.debtsCard.remaining")}</p>
           <p className="mt-1 text-2xl font-extrabold text-slate-900 sm:text-3xl">
             {status === "loading" ? (
-              <span className="text-slate-400 text-lg">جارٍ الحساب...</span>
+              <span className="text-slate-400 text-lg">{t("dashboard.debtsCard.calculating")}</span>
             ) : (
               <>
                 {formatAmount(totalRemaining)}{" "}
@@ -88,25 +91,25 @@ function DashboardDebtsCard({ debts = [], status = "idle" }) {
           {overdueDebts.length > 0 && (
             <span className="flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">
               <AlertCircle size={14} />
-              {overdueDebts.length} ديون متأخرة!
+              {t("dashboard.debtsCard.overdueBadge", { count: overdueDebts.length })}
             </span>
           )}
 
           {dueSoonDebts.length > 0 && (
             <span className="flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
               <AlertCircle size={14} />
-              {dueSoonDebts.length} ديون موعدها قريب
+              {t("dashboard.debtsCard.dueSoonBadge", { count: dueSoonDebts.length })}
             </span>
           )}
 
           {activeDebts.length === 0 ? (
             <span className="flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
               <CheckCircle2 size={14} />
-              كل الديون مسددة بالكامل
+              {t("dashboard.debtsCard.allPaid")}
             </span>
           ) : (
             <span className="flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
-              {activeDebts.length} ديون نشطة
+              {t("dashboard.debtsCard.activeBadge", { count: activeDebts.length })}
             </span>
           )}
         </div>

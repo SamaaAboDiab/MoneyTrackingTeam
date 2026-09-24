@@ -29,7 +29,7 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted 
       {/* اسم المصدر */}
       <div className="min-w-0">
         <span className="text-xs font-semibold text-slate-400">
-          اسم المصدر
+          {t("income.fields.name")}
         </span>
 
         <h3 className="mt-1 truncate font-semibold text-slate-900">
@@ -46,7 +46,7 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted 
       {/* الفئة */}
       <div>
         <span className="text-xs font-semibold text-slate-400">
-          الفئة
+          {t("income.fields.category")}
         </span>
 
         <p className="mt-1 font-semibold text-slate-700">
@@ -57,7 +57,7 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted 
       {/* المبلغ */}
       <div className="flex flex-col items-start">
         <span className="text-xs font-semibold text-slate-400">
-          المبلغ بالعملة المختارة
+          {t("income.fields.amountConverted")}
         </span>
 
         <strong className="mt-1 block tabular-amount text-lg font-bold text-income">
@@ -65,14 +65,14 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted 
         </strong>
 
         <small className="mt-1 block text-xs text-slate-400">
-          الأصل: {originalAmount} {income.currency}
+          {t("income.fields.originalPrefix")} {originalAmount} {income.currency}
         </small>
       </div>
 
       {/* التاريخ */}
       <div>
         <span className="text-xs font-semibold text-slate-400">
-          التاريخ
+          {t("income.fields.date")}
         </span>
 
         <p className="mt-1 font-semibold text-slate-700">
@@ -88,7 +88,7 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted 
             onClick={() => onEdit(income)}
             className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-brand-700"
           >
-            تعديل
+            {t("common.edit")}
           </button>
         )}
 

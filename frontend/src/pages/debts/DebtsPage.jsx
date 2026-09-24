@@ -29,6 +29,7 @@ import {
   markDebtPaidThunk,
   addDebtPaymentThunk,
 } from "../../store/slices/debtsSlice";
+import { formatAmount } from "../../utils/formatAmount";
 
 const getTodayString = () => new Date().toISOString().split("T")[0];
 
@@ -42,32 +43,15 @@ const EMPTY_DEBT_FORM = {
   description: "",
 };
 
+const CATEGORY_KEYS = ["other", "personal", "credit_card", "auto_loan", "mortgage", "student"];
+const CURRENCY_KEYS = ["EGP", "USD", "EUR", "SAR", "AED"];
+
 const inputClass =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500";
 const labelClass = "block text-sm font-semibold text-slate-700 mb-1";
 
 function getErrorMessage(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
-}
-
-function formatDate(dateString) {
-  if (!dateString) return "—";
-  try {
-    const d = new Date(dateString);
-    return Number.isNaN(d.getTime())
-      ? dateString
-      : d.toLocaleDateString("ar-EG", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        });
-  } catch {
-    return dateString;
-  }
-}
-
-function formatAmount(amount, currency) {
-  return `${Number(amount || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 })} ${currency}`;
 }
 
 function isOverdue(debt) {
@@ -93,15 +77,8 @@ function getDaysUntilDue(dateString) {
   return Math.ceil((dueDate - today) / 86400000);
 }
 
-function getDueSoonMessage(dateString) {
-  const daysUntilDue = getDaysUntilDue(dateString);
-  if (daysUntilDue === 0) return "تنبيه: موعد السداد اليوم";
-  if (daysUntilDue === 1) return "تنبيه: موعد السداد غداً";
-  return `تنبيه: موعد السداد بعد ${daysUntilDue} أيام`;
-}
-
 function DebtsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const { items: accounts } = useSelector((state) => state.accounts);
   const { items: debts, status: debtsLoadingStatus } = useSelector((state) => state.debts);
@@ -134,6 +111,31 @@ function DebtsPage() {
   const [expandedHistoryDebtId, setExpandedHistoryDebtId] = useState(null);
   const [paymentHistory, setPaymentHistory] = useState({});
   const [loadingHistoryDebtId, setLoadingHistoryDebtId] = useState(null);
+
+  function formatDate(dateString) {
+    if (!dateString) return "—";
+    try {
+      const d = new Date(dateString);
+      return Number.isNaN(d.getTime())
+        ? dateString
+        : d.toLocaleDateString(i18n.language, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+    } catch {
+      return dateString;
+    }
+  }
+
+  function getDueSoonMessage(dateString) {
+    const daysUntilDue = getDaysUntilDue(dateString);
+    if (daysUntilDue === 0) return t("debts.dueSoonMessage.today");
+    if (daysUntilDue === 1) return t("debts.dueSoonMessage.tomorrow");
+    return t("debts.dueSoonMessage.inDays", { count: daysUntilDue });
+  }
+
+  const categoryLabel = (category) => t(`debts.category.${category || "other"}`);
 
   // Active accounts for paying debts
   const activeAccounts = useMemo(
@@ -195,7 +197,7 @@ function DebtsPage() {
       !debtForm.startDate ||
       !debtForm.dueDate
     ) {
-      setError("يرجى ملء جميع الحقول الإلزامية (اسم الدائن، المبلغ، العملة، تاريخ النشأة، تاريخ السداد).");
+      setError(t("debts.createValidationError"));
       return;
     }
 
@@ -211,10 +213,10 @@ function DebtsPage() {
 
       setDebtForm({ ...EMPTY_DEBT_FORM, startDate: getTodayString() });
       setShowAddForm(false);
-      setSuccessMessage("تم إضافة الدين بنجاح");
+      setSuccessMessage(t("debts.createSuccess"));
       setActiveTab("active");
     } catch (requestError) {
-      setError(getErrorMessage(requestError, "تعذر إضافة الدين."));
+      setError(getErrorMessage(requestError, t("debts.createError")));
     } finally {
       setSavingDebt(false);
     }
@@ -230,9 +232,9 @@ function DebtsPage() {
         updateDebtThunk({ id: debt._id, payload: { dueDate: editingDueDate } })
       ).unwrap();
       setEditingDueDateId(null);
-      setSuccessMessage("تم تعديل تاريخ السداد بنجاح");
+      setSuccessMessage(t("debts.dueDateUpdateSuccess"));
     } catch (requestError) {
-      setError(getErrorMessage(requestError, "تعذر تعديل تاريخ السداد."));
+      setError(getErrorMessage(requestError, t("debts.dueDateUpdateError")));
     } finally {
       setSavingDueDate(false);
     }
@@ -241,29 +243,27 @@ function DebtsPage() {
   // Delete debt
   async function handleDeleteDebt(id, e) {
     if (e) e.stopPropagation();
-    if (!window.confirm("هل أنت متأكد من رغبتك في حذف هذا الدين؟")) return;
+    if (!window.confirm(t("debts.deleteConfirm"))) return;
     try {
       await dispatch(deleteDebtThunk(id)).unwrap();
       if (expandedHistoryDebtId === id) setExpandedHistoryDebtId(null);
-      setSuccessMessage("تم حذف الدين بنجاح");
+      setSuccessMessage(t("debts.deleteSuccess"));
     } catch (requestError) {
-      setError(getErrorMessage(requestError, "تعذر حذف الدين."));
+      setError(getErrorMessage(requestError, t("debts.deleteError")));
     }
   }
 
   // US-506: Mark debt as fully paid with confirmation
   async function handleMarkPaid(debt, e) {
     if (e) e.stopPropagation();
-    const confirmed = window.confirm(
-      `هل أنت متأكد من تحديد دين "${debt.creditor}" كمسدد بالكامل؟`
-    );
+    const confirmed = window.confirm(t("debts.markPaidConfirm", { creditor: debt.creditor }));
     if (!confirmed) return;
 
     try {
       await dispatch(markDebtPaidThunk(debt._id)).unwrap();
-      setSuccessMessage(`تم سداد دين "${debt.creditor}" بنجاح وانتقل إلى قائمة الديون المكتملة! ✅`);
+      setSuccessMessage(t("debts.markPaidSuccess", { creditor: debt.creditor }));
     } catch (requestError) {
-      setError(getErrorMessage(requestError, "تعذر تحديث حالة الدين."));
+      setError(getErrorMessage(requestError, t("debts.markPaidError")));
     }
   }
 
@@ -292,19 +292,24 @@ function DebtsPage() {
     const amountNum = Number(paymentForm.amount);
 
     if (!amountNum || amountNum <= 0) {
-      setError("اكتب مبلغًا أكبر من صفر.");
+      setError(t("debts.paymentAmountPositiveError"));
       return;
     }
     if (amountNum > remaining) {
-      setError(`المبلغ المدخل أكبر من المبلغ المتبقي (${remaining.toLocaleString("ar-EG")} ${paymentModalDebt.currency}).`);
+      setError(
+        t("debts.paymentExceedsRemainingError", {
+          remaining: formatAmount(remaining),
+          currency: paymentModalDebt.currency,
+        })
+      );
       return;
     }
     if (!paymentForm.accountId) {
-      setError("اختر الحساب الذي سيتم الدفع منه.");
+      setError(t("debts.paymentAccountRequiredError"));
       return;
     }
     if (!paymentForm.date) {
-      setError("حدد تاريخ الدفعة.");
+      setError(t("debts.paymentDateRequiredError"));
       return;
     }
 
@@ -330,10 +335,10 @@ function DebtsPage() {
       // Update account balance in Redux
       dispatch(fetchAccounts());
 
-      setSuccessMessage("تم تسجيل الدفعة بنجاح");
+      setSuccessMessage(t("debts.paymentSuccess"));
       setPaymentModalDebt(null);
     } catch (requestError) {
-      setError(getErrorMessage(requestError, "تعذر تسجيل الدفعة."));
+      setError(getErrorMessage(requestError, t("debts.paymentError")));
     } finally {
       setSavingPayment(false);
     }
@@ -346,7 +351,7 @@ function DebtsPage() {
       const res = await getDebtPayments(debtId);
       setPaymentHistory((prev) => ({ ...prev, [debtId]: res.data.data || [] }));
     } catch (requestError) {
-      setError(getErrorMessage(requestError, "تعذر جلب سجل الدفعات من الخادم."));
+      setError(getErrorMessage(requestError, t("debts.historyFetchError")));
     } finally {
       setLoadingHistoryDebtId(null);
     }
@@ -372,7 +377,7 @@ function DebtsPage() {
             {t("nav.debts")}
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            سجّل ديونك، تابع مواعيد السداد والدفعات المسددة لكل دائن.
+            {t("debts.subtitle")}
           </p>
         </div>
         <button
@@ -385,7 +390,7 @@ function DebtsPage() {
           className="flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
         >
           <Plus size={18} />
-          {showAddForm ? "إلغاء" : "إضافة دين جديد"}
+          {showAddForm ? t("debts.cancel") : t("debts.addNew")}
         </button>
       </div>
 
@@ -429,19 +434,19 @@ function DebtsPage() {
           className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80"
         >
           <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
-            <h2 className="text-lg font-bold text-slate-900">تسجيل دين جديد</h2>
-            <span className="text-xs text-slate-400">جميع الحقول بعلامة (*) إلزامية</span>
+            <h2 className="text-lg font-bold text-slate-900">{t("debts.form.title")}</h2>
+            <span className="text-xs text-slate-400">{t("debts.form.requiredNote")}</span>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className={labelClass}>
-                اسم الدائن <span className="text-red-500">*</span>
+                {t("debts.form.creditorLabel")} <span className="text-red-500">*</span>
               </label>
               <input
                 required
                 name="creditor"
-                placeholder="مثال: البنك الأهلي، محمد أحمد"
+                placeholder={t("debts.form.creditorPlaceholder")}
                 value={debtForm.creditor}
                 onChange={handleDebtFormChange}
                 className={inputClass}
@@ -450,7 +455,7 @@ function DebtsPage() {
 
             <div>
               <label className={labelClass}>
-                المبلغ الكلي <span className="text-red-500">*</span>
+                {t("debts.form.totalAmountLabel")} <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -467,7 +472,7 @@ function DebtsPage() {
 
             <div>
               <label className={labelClass}>
-                العملة <span className="text-red-500">*</span>
+                {t("debts.form.currencyLabel")} <span className="text-red-500">*</span>
               </label>
               <select
                 required
@@ -476,17 +481,15 @@ function DebtsPage() {
                 onChange={handleDebtFormChange}
                 className={inputClass}
               >
-                <option value="EGP">جنيه مصري (EGP)</option>
-                <option value="USD">دولار أمريكي (USD)</option>
-                <option value="EUR">يورو (EUR)</option>
-                <option value="SAR">ريال سعودي (SAR)</option>
-                <option value="AED">درهم إماراتي (AED)</option>
+                {CURRENCY_KEYS.map((code) => (
+                  <option key={code} value={code}>{t(`debts.currencyOptions.${code}`)}</option>
+                ))}
               </select>
             </div>
 
             <div>
               <label className={labelClass}>
-                التصنيف
+                {t("debts.form.categoryLabel")}
               </label>
               <select
                 name="category"
@@ -494,18 +497,15 @@ function DebtsPage() {
                 onChange={handleDebtFormChange}
                 className={inputClass}
               >
-                <option value="other">أخرى</option>
-                <option value="personal">شخصي</option>
-                <option value="credit_card">بطاقة ائتمان</option>
-                <option value="auto_loan">قرض سيارة</option>
-                <option value="mortgage">تمويل عقاري</option>
-                <option value="student">تعليمي</option>
+                {CATEGORY_KEYS.map((key) => (
+                  <option key={key} value={key}>{categoryLabel(key)}</option>
+                ))}
               </select>
             </div>
 
             <div>
               <label className={labelClass}>
-                تاريخ نشأة الدين <span className="text-red-500">*</span>
+                {t("debts.form.startDateLabel")} <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -519,7 +519,7 @@ function DebtsPage() {
 
             <div>
               <label className={labelClass}>
-                تاريخ السداد المتوقع <span className="text-red-500">*</span>
+                {t("debts.form.dueDateLabel")} <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -532,11 +532,11 @@ function DebtsPage() {
             </div>
 
             <div className="sm:col-span-2">
-              <label className={labelClass}>ملاحظات (اختياري)</label>
+              <label className={labelClass}>{t("debts.form.notesLabel")}</label>
               <textarea
                 name="description"
                 rows={2}
-                placeholder="أضف أي تفاصيل أخرى أو شروط السداد..."
+                placeholder={t("debts.form.notesPlaceholder")}
                 value={debtForm.description}
                 onChange={handleDebtFormChange}
                 className={inputClass}
@@ -550,14 +550,14 @@ function DebtsPage() {
               onClick={() => setShowAddForm(false)}
               className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
             >
-              إلغاء
+              {t("debts.cancel")}
             </button>
             <button
               type="submit"
               disabled={savingDebt}
               className="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60"
             >
-              {savingDebt ? "جار الحفظ..." : "حفظ الدين"}
+              {savingDebt ? t("debts.form.saving") : t("debts.form.save")}
             </button>
           </div>
         </form>
@@ -574,7 +574,7 @@ function DebtsPage() {
               : "border-transparent text-slate-500 hover:text-slate-700"
           }`}
         >
-          <span>الديون النشطة</span>
+          <span>{t("debts.tabs.active")}</span>
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-bold ${
               activeTab === "active"
@@ -595,7 +595,7 @@ function DebtsPage() {
               : "border-transparent text-slate-500 hover:text-slate-700"
           }`}
         >
-          <span>مكتمل</span>
+          <span>{t("debts.tabs.completed")}</span>
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-bold ${
               activeTab === "completed"
@@ -616,7 +616,7 @@ function DebtsPage() {
               : "border-transparent text-slate-500 hover:text-slate-700"
           }`}
         >
-          <span>الكل</span>
+          <span>{t("debts.tabs.all")}</span>
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-bold ${
               activeTab === "all"
@@ -632,22 +632,22 @@ function DebtsPage() {
       {/* Debts List */}
       {debtsLoadingStatus === "loading" && debts.length === 0 ? (
         <div className="rounded-2xl bg-white p-12 text-center text-slate-500 shadow-sm ring-1 ring-slate-100">
-          جارٍ تحميل الديون...
+          {t("debts.loading")}
         </div>
       ) : displayedDebts.length === 0 ? (
         <div className="rounded-2xl bg-white p-12 text-center text-slate-500 shadow-sm ring-1 ring-slate-100">
           <CreditCard className="mx-auto mb-3 text-slate-300" size={42} />
           <p className="text-base font-semibold text-slate-700">
             {activeTab === "active"
-              ? "لا توجد ديون نشطة حالياً! أحسنت 🎉"
+              ? t("debts.empty.activeTitle")
               : activeTab === "completed"
-              ? "لا توجد ديون مكتملة السداد بعد."
-              : "لا توجد ديون مسجلة."}
+              ? t("debts.empty.completedTitle")
+              : t("debts.empty.allTitle")}
           </p>
           <p className="mt-1 text-sm text-slate-400">
             {activeTab === "active"
-              ? "جميع التزاماتك المالية مسددة بالكامل."
-              : "اضغط على \"إضافة دين جديد\" لتسجيل دين جديد."}
+              ? t("debts.empty.activeSubtitle")
+              : t("debts.empty.otherSubtitle")}
           </p>
         </div>
       ) : (
@@ -694,7 +694,7 @@ function DebtsPage() {
                 {overdue && (
                   <div className="flex items-center gap-1.5 bg-red-600 px-5 py-1.5 text-xs font-bold text-white">
                     <AlertCircle size={14} />
-                    <span>تنبيه: هذا الدين متأخر عن موعد السداد المحدد!</span>
+                    <span>{t("debts.overdueBanner")}</span>
                   </div>
                 )}
 
@@ -725,39 +725,29 @@ function DebtsPage() {
 
                         {isPaid ? (
                           <span className="flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-700">
-                            <CheckCircle2 size={13} /> تم السداد ✅
+                            <CheckCircle2 size={13} /> {t("debts.status.paid")}
                           </span>
                         ) : overdue ? (
                           <span className="flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-700">
-                            <AlertCircle size={12} /> متأخر
+                            <AlertCircle size={12} /> {t("debts.status.overdue")}
                           </span>
                         ) : (
                           <span className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold ${
                             dueSoon ? "bg-orange-100 text-orange-700" : "bg-amber-100 text-amber-700"
                           }`}>
-                            <Clock size={12} /> {dueSoon ? "قريب الموعد" : "نشط"}
+                            <Clock size={12} /> {dueSoon ? t("debts.status.dueSoon") : t("debts.status.active")}
                           </span>
                         )}
                       </div>
 
                       <p className="mt-1 text-xs text-slate-500">
-                        {debt.category === "credit_card"
-                          ? "بطاقة ائتمان"
-                          : debt.category === "auto_loan"
-                          ? "قرض سيارة"
-                          : debt.category === "personal"
-                          ? "شخصي"
-                          : debt.category === "mortgage"
-                          ? "تمويل عقاري"
-                          : debt.category === "student"
-                          ? "تعليمي"
-                          : "أخرى"}
+                        {categoryLabel(debt.category)}
                         {debt.description ? ` • ${debt.description}` : ""}
                       </p>
                     </div>
 
                     <div className="flex items-center gap-2 text-slate-400">
-                      <span className="text-xs text-slate-500">اضغط لعرض سجل الدفعات</span>
+                      <span className="text-xs text-slate-500">{t("debts.clickForHistory")}</span>
                       {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                     </div>
                   </div>
@@ -768,25 +758,25 @@ function DebtsPage() {
                     className="mt-4 grid cursor-pointer grid-cols-3 gap-2 rounded-xl bg-slate-50 p-3.5 text-center transition hover:bg-slate-100 sm:gap-4"
                   >
                     <div>
-                      <p className="text-xs text-slate-500">المبلغ الأصلي</p>
+                      <p className="text-xs text-slate-500">{t("debts.amounts.original")}</p>
                       <p
                         className={`mt-0.5 text-sm font-bold sm:text-base ${
                           isPaid ? "text-slate-400 line-through" : "text-slate-900"
                         }`}
                       >
-                        {Number(debt.totalAmount).toLocaleString("ar-EG")} {debt.currency}
+                        {formatAmount(debt.totalAmount)} {debt.currency}
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-xs text-slate-500">إجمالي المدفوع</p>
+                      <p className="text-xs text-slate-500">{t("debts.amounts.paid")}</p>
                       <p className="mt-0.5 text-sm font-bold text-emerald-600 sm:text-base">
-                        {Number(debt.paidAmount || (isPaid ? debt.totalAmount : 0)).toLocaleString("ar-EG")} {debt.currency}
+                        {formatAmount(debt.paidAmount || (isPaid ? debt.totalAmount : 0))} {debt.currency}
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-xs text-slate-500">المتبقي</p>
+                      <p className="text-xs text-slate-500">{t("debts.amounts.remaining")}</p>
                       <p
                         className={`mt-0.5 text-sm font-bold sm:text-base ${
                           isPaid
@@ -796,7 +786,7 @@ function DebtsPage() {
                             : "text-amber-600"
                         }`}
                       >
-                        {remaining.toLocaleString("ar-EG")} {debt.currency}
+                        {formatAmount(remaining)} {debt.currency}
                       </p>
                     </div>
                   </div>
@@ -804,9 +794,9 @@ function DebtsPage() {
                   {/* Progress Bar */}
                   <div className="mt-4">
                     <div className="mb-1.5 flex justify-between text-xs font-semibold text-slate-600">
-                      <span>نسبة الإنجاز في السداد</span>
+                      <span>{t("debts.progressLabel")}</span>
                       <span className={isPaid ? "text-emerald-700 font-bold" : ""}>
-                        {isPaid ? "100% (مكتمل)" : `${Math.round(progress)}%`}
+                        {isPaid ? t("debts.progressComplete") : `${Math.round(progress)}%`}
                       </span>
                     </div>
                     <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
@@ -827,7 +817,7 @@ function DebtsPage() {
                   <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 text-xs text-slate-500">
                     <div className="flex items-center gap-1.5">
                       <Calendar size={14} className="text-slate-400" />
-                      <span>تاريخ النشأة:</span>
+                      <span>{t("debts.startDatePrefix")}</span>
                       <strong className="text-slate-700">{formatDate(debt.startDate)}</strong>
                     </div>
 
@@ -843,7 +833,7 @@ function DebtsPage() {
                         size={14}
                         className={overdue ? "text-red-500" : "text-slate-400"}
                       />
-                      <span>تاريخ السداد المتوقع:</span>
+                      <span>{t("debts.dueDatePrefix")}</span>
                       <strong className={overdue ? "font-bold text-red-600" : "text-slate-700"}>
                         {formatDate(debt.dueDate)}
                       </strong>
@@ -854,7 +844,7 @@ function DebtsPage() {
                     {editingDueDateId === debt._id ? (
                       <form onSubmit={(event) => handleUpdateDueDate(debt, event)} className="flex flex-wrap items-end gap-2">
                         <div>
-                          <label className={labelClass}>تعديل تاريخ السداد</label>
+                          <label className={labelClass}>{t("debts.editDueDate")}</label>
                           <input
                             required
                             type="date"
@@ -864,10 +854,10 @@ function DebtsPage() {
                           />
                         </div>
                         <button type="submit" disabled={savingDueDate} className="rounded-xl bg-brand-600 px-3.5 py-2.5 text-xs font-semibold text-white disabled:opacity-60">
-                          {savingDueDate ? "جار الحفظ..." : "حفظ التاريخ"}
+                          {savingDueDate ? t("debts.form.saving") : t("debts.saveDate")}
                         </button>
                         <button type="button" onClick={() => setEditingDueDateId(null)} className="rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs font-semibold text-slate-600">
-                          إلغاء
+                          {t("debts.cancel")}
                         </button>
                       </form>
                     ) : (
@@ -879,7 +869,7 @@ function DebtsPage() {
                         }}
                         className="text-xs font-semibold text-brand-600 hover:underline"
                       >
-                        تعديل تاريخ السداد
+                        {t("debts.editDueDate")}
                       </button>
                     )}
                   </div>
@@ -891,11 +881,13 @@ function DebtsPage() {
                         <>
                           <p className="font-semibold">{debt.paymentForecast.message}</p>
                           <p className="mt-1 text-xs text-brand-700">
-                            متوسط دفعاتك الشهرية: {formatAmount(debt.paymentForecast.averageMonthlyPayment, debt.currency)}
+                            {t("debts.forecast.averageMonthly", {
+                              amount: `${formatAmount(debt.paymentForecast.averageMonthlyPayment)} ${debt.currency}`,
+                            })}
                           </p>
                         </>
                       ) : (
-                        <p className="font-semibold">أضف دفعات أكثر لحساب التوقع</p>
+                        <p className="font-semibold">{t("debts.forecast.notEnoughData")}</p>
                       )}
                     </div>
                   )}
@@ -909,7 +901,7 @@ function DebtsPage() {
                           onClick={(e) => openPaymentModal(debt, e)}
                           className="flex items-center gap-1.5 rounded-xl bg-brand-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-700"
                         >
-                          <Plus size={15} /> إضافة دفعة
+                          <Plus size={15} /> {t("debts.actions.addPayment")}
                         </button>
                       )}
 
@@ -920,7 +912,7 @@ function DebtsPage() {
                           onClick={(e) => handleMarkPaid(debt, e)}
                           className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700"
                         >
-                          <CheckCircle2 size={15} /> تم السداد
+                          <CheckCircle2 size={15} /> {t("debts.actions.markPaid")}
                         </button>
                       )}
 
@@ -930,7 +922,7 @@ function DebtsPage() {
                         className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-3.5 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
                       >
                         <History size={15} />
-                        {isExpanded ? "إخفاء السجل" : "سجل الدفعات"}
+                        {isExpanded ? t("debts.actions.hideHistory") : t("debts.actions.showHistory")}
                       </button>
                     </div>
 
@@ -939,7 +931,7 @@ function DebtsPage() {
                       onClick={(e) => handleDeleteDebt(debt._id, e)}
                       className="flex items-center gap-1.5 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100"
                     >
-                      <Trash2 size={14} /> حذف
+                      <Trash2 size={14} /> {t("debts.actions.delete")}
                     </button>
                   </div>
                 </div>
@@ -950,7 +942,7 @@ function DebtsPage() {
                     <div className="mb-3 flex items-center justify-between">
                       <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900">
                         <History size={16} className="text-brand-600" />
-                        سجل الدفعات المسجلة ({history.length})
+                        {t("debts.history.title", { count: history.length })}
                       </h3>
                       {!isPaid && (
                         <button
@@ -958,18 +950,18 @@ function DebtsPage() {
                           onClick={(e) => openPaymentModal(debt, e)}
                           className="text-xs font-semibold text-brand-600 hover:underline"
                         >
-                          + إضافة دفعة جديدة
+                          {t("debts.history.addNew")}
                         </button>
                       )}
                     </div>
 
                     {loadingHistoryDebtId === debt._id ? (
                       <p className="py-4 text-center text-xs font-medium text-slate-500">
-                        جارٍ تحميل سجل الدفعات من الخادم...
+                        {t("debts.history.loading")}
                       </p>
                     ) : history.length === 0 ? (
                       <p className="rounded-xl border border-dashed border-slate-200 bg-white py-4 text-center text-xs text-slate-500">
-                        لا توجد دفعات مسجلة بعد لهذا الدين في قاعدة البيانات.
+                        {t("debts.history.empty")}
                       </p>
                     ) : (
                       <div className="space-y-2">
@@ -984,7 +976,7 @@ function DebtsPage() {
                               </span>
                               <div>
                                 <p className="font-bold text-slate-900">
-                                  {Number(payment.amount).toLocaleString("ar-EG")} {debt.currency}
+                                  {formatAmount(payment.amount)} {debt.currency}
                                 </p>
                                 <p className="text-xs text-slate-500">
                                   {formatDate(payment.date)}
@@ -1000,7 +992,7 @@ function DebtsPage() {
                                   {typeof payment.accountId === "object"
                                     ? payment.accountId.name
                                     : activeAccounts.find((a) => a._id === payment.accountId)
-                                        ?.name || "حساب محدد"}
+                                        ?.name || t("debts.history.unknownAccount")}
                                 </span>
                               </div>
                             )}
@@ -1022,9 +1014,9 @@ function DebtsPage() {
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl ring-1 ring-slate-200">
             <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">تسجيل دفعة جديدة</h2>
+                <h2 className="text-lg font-bold text-slate-900">{t("debts.paymentModal.title")}</h2>
                 <p className="text-xs text-slate-500">
-                  سداد للدائن: <strong>{paymentModalDebt.creditor}</strong>
+                  {t("debts.paymentModal.payingFor")} <strong>{paymentModalDebt.creditor}</strong>
                 </p>
               </div>
               <button
@@ -1037,12 +1029,12 @@ function DebtsPage() {
             </div>
 
             <div className="mb-4 rounded-xl bg-amber-50 p-3 text-xs font-medium text-amber-800">
-              المبلغ المتبقي على الدين:{" "}
+              {t("debts.paymentModal.remainingLabel")}{" "}
               <strong>
-                {Number(
+                {formatAmount(
                   paymentModalDebt.remainingAmount ??
                     paymentModalDebt.totalAmount - paymentModalDebt.paidAmount
-                ).toLocaleString("ar-EG")}{" "}
+                )}{" "}
                 {paymentModalDebt.currency}
               </strong>
             </div>
@@ -1050,7 +1042,7 @@ function DebtsPage() {
             <form onSubmit={handleSavePayment} className="space-y-4">
               <div>
                 <label className={labelClass}>
-                  المبلغ <span className="text-red-500">*</span>
+                  {t("debts.paymentModal.amountLabel")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   required
@@ -1072,7 +1064,7 @@ function DebtsPage() {
 
               <div>
                 <label className={labelClass}>
-                  التاريخ <span className="text-red-500">*</span>
+                  {t("debts.paymentModal.dateLabel")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   required
@@ -1087,7 +1079,7 @@ function DebtsPage() {
 
               <div>
                 <label className={labelClass}>
-                  الحساب الذي سيتم الدفع منه <span className="text-red-500">*</span>
+                  {t("debts.paymentModal.accountLabel")} <span className="text-red-500">*</span>
                 </label>
                 <select
                   required
@@ -1097,24 +1089,27 @@ function DebtsPage() {
                   }
                   className={inputClass}
                 >
-                  <option value="">اختر الحساب</option>
+                  <option value="">{t("debts.paymentModal.selectAccount")}</option>
                   {activeAccounts.map((account) => (
                     <option key={account._id} value={account._id}>
-                      {account.name} (رصيد: {Number(account.balance || 0).toLocaleString("ar-EG")}{" "}
-                      {account.currency})
+                      {t("debts.paymentModal.accountOption", {
+                        name: account.name,
+                        balance: formatAmount(account.balance || 0),
+                        currency: account.currency,
+                      })}
                     </option>
                   ))}
                 </select>
                 <p className="mt-1 text-[11px] text-slate-500">
-                  سيتم خصم مبلغ الدفعة تلقائياً من رصيد الحساب المختار.
+                  {t("debts.paymentModal.accountHint")}
                 </p>
               </div>
 
               <div>
-                <label className={labelClass}>ملاحظات (اختياري)</label>
+                <label className={labelClass}>{t("debts.paymentModal.notesLabel")}</label>
                 <input
                   type="text"
-                  placeholder="مثال: قسط شهر 10، تحويل بنكي"
+                  placeholder={t("debts.paymentModal.notesPlaceholder")}
                   value={paymentForm.notes}
                   onChange={(e) =>
                     setPaymentForm((prev) => ({ ...prev, notes: e.target.value }))
@@ -1129,14 +1124,14 @@ function DebtsPage() {
                   onClick={() => setPaymentModalDebt(null)}
                   className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
                 >
-                  إلغاء
+                  {t("debts.paymentModal.cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={savingPayment}
                   className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60"
                 >
-                  {savingPayment ? "جار الحفظ..." : "تأكيد الدفعة"}
+                  {savingPayment ? t("debts.paymentModal.saving") : t("debts.paymentModal.confirm")}
                 </button>
               </div>
             </form>

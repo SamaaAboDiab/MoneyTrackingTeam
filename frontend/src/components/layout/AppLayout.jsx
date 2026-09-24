@@ -20,7 +20,7 @@ function AppLayout() {
         <Sidebar />
 
         <div className="min-w-0 flex-1">
-          <header className="flex flex-wrap items-center gap-4 border-b border-slate-200 bg-white px-6 py-3.5">
+          <header className="sticky top-0 z-30 flex flex-wrap items-center gap-4 border-b border-slate-200 bg-white px-6 py-3.5">
             <Breadcrumb pathname={pathname} t={t} />
 
             <div className="ms-auto flex items-center gap-3">
