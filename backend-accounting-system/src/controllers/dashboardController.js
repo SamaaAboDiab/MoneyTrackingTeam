@@ -4,6 +4,7 @@ const Expense         = require("../models/Expense");
 const ExpenseCategory = require("../models/ExpenseCategory");
 const Account         = require("../models/Account");
 const Debt            = require("../models/Debt");
+const DebtPayment     = require("../models/DebtPayment");
 
 /* ── helpers ─────────────────────────────────────── */
 function periodBounds(period, from, to) {
@@ -36,6 +37,52 @@ function prevPeriod(start, end) {
   return { prevStart, prevEnd };
 }
 
+function addMonths(date, months) {
+  const result = new Date(date);
+  result.setMonth(result.getMonth() + Math.floor(months));
+  result.setDate(result.getDate() + Math.round((months % 1) * 30.4375));
+  return result;
+}
+
+function getDebtForecast(debts, payments) {
+  const paymentGroups = payments.reduce((groups, payment) => {
+    const key = String(payment.debt);
+    (groups[key] ||= []).push(payment);
+    return groups;
+  }, {});
+
+  const forecasts = debts.map((debt) => {
+    const validPayments = (paymentGroups[String(debt._id)] || [])
+      .filter((payment) => Number(payment.amount) > 0 && payment.date)
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+    if (validPayments.length < 2) return null;
+
+    const first = new Date(validPayments[0].date);
+    const last = new Date(validPayments[validPayments.length - 1].date);
+    const months = Math.max(1, (last.getFullYear() - first.getFullYear()) * 12 + last.getMonth() - first.getMonth() + 1);
+    const averageMonthlyPayment = validPayments.reduce((sum, payment) => sum + Number(payment.amount), 0) / months;
+    const remainingAmount = Math.max(0, debt.totalAmount - debt.paidAmount);
+    const monthsRemaining = averageMonthlyPayment > 0 ? Math.ceil(remainingAmount / averageMonthlyPayment) : null;
+
+    return monthsRemaining === null ? null : {
+      averageMonthlyPayment,
+      estimatedPayoffDate: addMonths(new Date(), monthsRemaining),
+    };
+  }).filter(Boolean);
+
+  if (!forecasts.length) return { status: "insufficient_data", averageMonthlyPayment: 0, estimatedPayoffDate: null };
+  const averageMonthlyPayment = forecasts.reduce((sum, forecast) => sum + forecast.averageMonthlyPayment, 0);
+  const monthsRemaining = Math.max(...forecasts.map((forecast) => {
+    const days = (new Date(forecast.estimatedPayoffDate) - new Date()) / 86400000;
+    return Math.ceil(days / 30.4375);
+  }));
+  return {
+    status: "available",
+    averageMonthlyPayment,
+    estimatedPayoffDate: addMonths(new Date(), monthsRemaining),
+  };
+}
+
 /* GET /api/dashboard */
 exports.getDashboard = async (req, res, next) => {
   try {
@@ -51,6 +98,7 @@ exports.getDashboard = async (req, res, next) => {
       expenseAgg, prevExpenseAgg,
       accounts,
       debts,
+      debtPayments,
       expCatAgg,
       categories,
       recentIncome,
@@ -91,6 +139,8 @@ exports.getDashboard = async (req, res, next) => {
         .sort({ dueDate: 1 })
         .lean(),
 
+      DebtPayment.find({ userId }).select("debt amount date").lean(),
+
       /* expense categories breakdown (current period, top 6) */
       Expense.aggregate([
         { $match: { user: userId, date: { $gte: start, $lte: end } } },
@@ -103,26 +153,23 @@ exports.getDashboard = async (req, res, next) => {
       ExpenseCategory.find({ user: userId }).lean(),
 
       /* recent income */
-      Income.find({ user: userId })
+      Income.find({ user: userId, receivedDate: { $gte: start, $lte: end } })
         .sort({ receivedDate: -1 })
         .limit(10)
         .lean(),
 
       /* recent expenses */
-      Expense.find({ user: userId })
+      Expense.find({ user: userId, date: { $gte: start, $lte: end } })
         .sort({ date: -1 })
         .limit(10)
         .lean(),
 
-      /* 6-month chart — income */
+      /* selected-period chart — income */
       Income.aggregate([
         {
           $match: {
             user: userId,
-            receivedDate: {
-              $gte: new Date(new Date().getFullYear(), new Date().getMonth() - 5, 1),
-              $lte: new Date(),
-            },
+            receivedDate: { $gte: start, $lte: end },
           },
         },
         {
@@ -134,15 +181,12 @@ exports.getDashboard = async (req, res, next) => {
         { $sort: { "_id.year": 1, "_id.month": 1 } },
       ]),
 
-      /* 6-month chart — expenses */
+      /* selected-period chart — expenses */
       Expense.aggregate([
         {
           $match: {
             user: userId,
-            date: {
-              $gte: new Date(new Date().getFullYear(), new Date().getMonth() - 5, 1),
-              $lte: new Date(),
-            },
+            date: { $gte: start, $lte: end },
           },
         },
         {
@@ -163,12 +207,18 @@ exports.getDashboard = async (req, res, next) => {
     const netBalance    = totalIncome - totalExpenses;
 
     /* ── accounts ────────────────────────────────── */
-    const totalAccountBalance = accounts.reduce((s, a) => s + (a.balance ?? 0), 0);
+    const accountBalancesByCurrency = accounts.reduce((totals, account) => {
+      const currency = account.currency || "EGP";
+      totals[currency] = (totals[currency] || 0) + (account.balance ?? 0);
+      return totals;
+    }, {});
+    const totalAccountBalance = accountBalancesByCurrency.EGP ?? 0;
 
     /* ── debts ───────────────────────────────────── */
     const totalDebtRemaining = debts.reduce((s, d) => s + Math.max(0, d.totalAmount - d.paidAmount), 0);
-    const overdueDebts       = debts.filter((d) => d.status === "overdue");
-    const nearestDue         = debts.find((d) => d.dueDate);
+    const overdueDebts       = debts.filter((d) => d.status === "overdue" || (d.dueDate && new Date(d.dueDate) < new Date()));
+    const nearestDue         = debts.find((d) => d.dueDate && Math.max(0, d.totalAmount - d.paidAmount) > 0);
+    const debtForecast       = getDebtForecast(debts, debtPayments);
 
     /* ── expense categories ──────────────────────── */
     const catMap = Object.fromEntries(categories.map((c) => [String(c._id), c]));
@@ -183,11 +233,11 @@ exports.getDashboard = async (req, res, next) => {
       };
     });
 
-    /* ── 6-month chart ───────────────────────────── */
-    const now = new Date();
+    /* ── selected-period chart ───────────────────── */
+    const chartStart = new Date(start.getFullYear(), start.getMonth(), 1);
+    const chartEnd = new Date(end.getFullYear(), end.getMonth(), 1);
     const chartData = [];
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    for (const d = new Date(chartStart); d <= chartEnd; d.setMonth(d.getMonth() + 1)) {
       const y = d.getFullYear(), m = d.getMonth() + 1;
       const inc = chartIncome.find((r) => r._id.year === y && r._id.month === m)?.total ?? 0;
       const exp = chartExpenses.find((r) => r._id.year === y && r._id.month === m)?.total ?? 0;
@@ -229,10 +279,12 @@ exports.getDashboard = async (req, res, next) => {
           balance: a.balance, currency: a.currency, color: a.color,
         })),
         totalAccountBalance,
+        accountBalancesByCurrency,
         debts: {
           totalRemaining: totalDebtRemaining,
           activeCount:    debts.length,
           overdueCount:   overdueDebts.length,
+          forecast:       debtForecast,
           nearestDue:     nearestDue
             ? {
                 creditor:        nearestDue.creditor,

@@ -11,7 +11,7 @@ function getDaysUntilDue(dateString) {
   return Math.ceil((dueDate - today) / 86400000);
 }
 
-function DashboardDebtsCard({ debts = [], status = "idle" }) {
+function DashboardDebtsCard({ debts = [], debtSummary, status = "idle" }) {
   const { t } = useTranslation();
 
   const getDueSoonMessage = (days) => {
@@ -24,10 +24,11 @@ function DashboardDebtsCard({ debts = [], status = "idle" }) {
     (d) => d.status === "active" || d.status === "overdue"
   );
 
-  const totalRemaining = activeDebts.reduce(
+  const calculatedTotalRemaining = activeDebts.reduce(
     (sum, d) => sum + Math.max(0, Number(d.totalAmount) - Number(d.paidAmount || 0)),
     0
   );
+  const totalRemaining = debtSummary?.totalRemaining ?? calculatedTotalRemaining;
 
   const overdueDebts = debts.filter((d) => {
     if (d.status === "paid") return false;
@@ -45,9 +46,14 @@ function DashboardDebtsCard({ debts = [], status = "idle" }) {
   });
 
   const currency = debts[0]?.currency || "EGP";
+  const nearestDue = debtSummary?.nearestDue;
+  const forecast = debtSummary?.forecast;
 
   return (
-    <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+    <Link
+      to="/debts"
+      className="mt-6 block rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 transition hover:ring-brand-200"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
         <div className="flex items-center gap-2.5">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
@@ -63,14 +69,32 @@ function DashboardDebtsCard({ debts = [], status = "idle" }) {
           </div>
         </div>
 
-        <Link
-          to="/debts"
-          className="flex items-center gap-1 text-sm font-semibold text-brand-600 transition hover:text-brand-700 hover:underline"
-        >
+        <span className="flex items-center gap-1 text-sm font-semibold text-brand-600">
           <span>{t("dashboard.debtsCard.manage")}</span>
           <ChevronLeft size={16} className="ltr:rotate-180" />
-        </Link>
+        </span>
       </div>
+
+      {activeDebts.length > 0 && (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl bg-slate-50 px-4 py-3">
+            <p className="text-xs font-medium text-slate-500">{t("dashboard.debtsCard.nearestDue")}</p>
+            <p className="mt-1 text-sm font-bold text-slate-800">
+              {nearestDue?.dueDate
+                ? new Date(nearestDue.dueDate).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" })
+                : t("dashboard.debtsCard.noDueDate")}
+            </p>
+          </div>
+          <div className="rounded-xl bg-slate-50 px-4 py-3">
+            <p className="text-xs font-medium text-slate-500">{t("dashboard.debtsCard.payoffForecast")}</p>
+            <p className="mt-1 text-sm font-bold text-slate-800">
+              {forecast?.estimatedPayoffDate
+                ? new Date(forecast.estimatedPayoffDate).toLocaleDateString("ar-EG", { year: "numeric", month: "long" })
+                : t("dashboard.debtsCard.forecastUnavailable")}
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -124,7 +148,7 @@ function DashboardDebtsCard({ debts = [], status = "idle" }) {
           ))}
         </div>
       )}
-    </div>
+    </Link>
   );
 }
 

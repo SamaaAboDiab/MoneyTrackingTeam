@@ -115,11 +115,14 @@
   period:{start,end},
   income:{total,count}, expenses:{total,count}, netBalance,
   prev:{ income:{total}|null, expenses:{total}|null, hasPrev },
-  accounts:[{_id,name,type,balance,currency,color}], totalAccountBalance,
-  debts:{ totalRemaining, activeCount, overdueCount, nearestDue:{creditor,dueDate,remainingAmount,currency,status}|null },
+  accounts:[{_id,name,type,balance,currency,color}], totalAccountBalance, accountBalancesByCurrency,
+  debts:{ totalRemaining, activeCount, overdueCount,
+    nearestDue:{creditor,dueDate,remainingAmount,currency,status}|null,
+    forecast:{status,averageMonthlyPayment,estimatedPayoffDate|null}
+  },
   expenseCategories:[{categoryId,name,color,total,count}],
-  chartData:[{month,year,income,expenses}],   // آخر 6 شهور
-  recentActivity:[{_id,type,name,category,amount,currency,date}]  // أعلى 8 عمليات دخل+مصروف
+  chartData:[{month,year,income,expenses}],   // شهور الفترة المختارة
+  recentActivity:[{_id,type,name,category,amount,currency,date}]  // أعلى 8 عمليات دخل+مصروف داخل الفترة
 }
 ```
 

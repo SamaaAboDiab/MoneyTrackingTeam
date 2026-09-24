@@ -77,6 +77,7 @@
     }
   },
   "dashboard": {
+    "accountsSummaryLink": "Total",
     "title": "Dashboard",
     "greeting": "Welcome, {{name}}",
     "accountsLink": "Manage accounts and wallets",
@@ -85,7 +86,12 @@
     "period": {
       "month": "This month",
       "last_month": "Last month",
-      "3months": "Last 3 months"
+        "3months": "Last 3 months",
+        "custom": "Custom",
+        "from": "From date",
+        "to": "To date",
+        "selected": "Selected period",
+        "invalid": "Choose an end date after the start date"
     },
     "summary": {
       "title": "Current month summary",
@@ -93,7 +99,12 @@
       "income": "Total income",
       "expenses": "Total expenses",
       "net": "Remaining",
-      "deficit": "Deficit"
+      "deficit": "Deficit",
+      "currentPeriod": "Current period",
+      "previousPeriod": "Previous period",
+      "difference": "Difference",
+      "noComparison": "No comparison data",
+      "notAvailable": "N/A"
     },
     "chart": {
       "title": "Expenses by category",
@@ -106,13 +117,17 @@
       "title": "Total outstanding debts",
       "activeCount": "{{count}} active debt(s) awaiting payment",
       "noneDue": "You have no outstanding debts right now",
-      "manage": "Manage debts",
+      "manage": "Summary",
       "remaining": "Remaining amount to pay",
       "calculating": "Calculating...",
       "overdueBadge": "{{count}} overdue debt(s)!",
       "dueSoonBadge": "{{count}} debt(s) due soon",
-      "allPaid": "All debts fully paid",
+      "allPaid": "No active debts ✅",
       "activeBadge": "{{count}} active debt(s)",
+      "nearestDue": "Nearest payment date",
+      "noDueDate": "No due date set",
+      "payoffForecast": "Estimated full payoff",
+      "forecastUnavailable": "Not enough data for a forecast",
       "dueToday": "Due today",
       "dueTomorrow": "Due tomorrow",
       "dueInDays": "Due in {{count}} days"

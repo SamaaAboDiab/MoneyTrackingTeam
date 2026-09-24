@@ -14,7 +14,7 @@ function AccountsPreview({ status, accounts, t }) {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-slate-900">{t("accounts.listTitle")}</h2>
         <Link to="/accounts" className="text-sm font-semibold text-brand-700 hover:underline">
-          {t("accounts.title")}
+          {t("dashboard.accountsSummaryLink")}
         </Link>
       </div>
 

@@ -77,6 +77,7 @@
     }
   },
   "dashboard": {
+    "accountsSummaryLink": "الإجمالي",
     "title": "لوحة التحكم",
     "greeting": "أهلاً، {{name}}",
     "accountsLink": "إدارة الحسابات والمحافظ",
@@ -85,7 +86,12 @@
     "period": {
       "month": "هذا الشهر",
       "last_month": "الشهر الماضي",
-      "3months": "آخر 3 شهور"
+        "3months": "آخر 3 شهور",
+        "custom": "مخصص",
+        "from": "من تاريخ",
+        "to": "إلى تاريخ",
+        "selected": "الفترة المختارة",
+        "invalid": "اختاري تاريخ نهاية بعد تاريخ البداية"
     },
     "summary": {
       "title": "ملخص الشهر الحالي",
@@ -93,7 +99,12 @@
       "income": "إجمالي الدخل",
       "expenses": "إجمالي المصاريف",
       "net": "المتبقي",
-      "deficit": "عجز"
+      "deficit": "عجز",
+      "currentPeriod": "الفترة الحالية",
+      "previousPeriod": "الفترة السابقة",
+      "difference": "الفرق",
+      "noComparison": "لا يوجد بيانات للمقارنة",
+      "notAvailable": "غير متاح"
     },
     "chart": {
       "title": "توزيع المصاريف حسب التصنيف",
@@ -106,13 +117,17 @@
       "title": "إجمالي الديون المستحقة",
       "activeCount": "{{count}} دين نشط يتطلب السداد",
       "noneDue": "لا توجد ديون مستحقة عليك حالياً",
-      "manage": "إدارة الديون",
+      "manage": "الملخص",
       "remaining": "المبلغ المتبقي للسداد",
       "calculating": "جارٍ الحساب...",
       "overdueBadge": "{{count}} ديون متأخرة!",
       "dueSoonBadge": "{{count}} ديون موعدها قريب",
-      "allPaid": "كل الديون مسددة بالكامل",
+      "allPaid": "لا يوجد ديون نشطة ✅",
       "activeBadge": "{{count}} ديون نشطة",
+      "nearestDue": "أقرب موعد سداد",
+      "noDueDate": "لم يُحدد موعد",
+      "payoffForecast": "التوقع الزمني للسداد الكامل",
+      "forecastUnavailable": "لا توجد بيانات كافية للتوقع",
       "dueToday": "موعد السداد اليوم",
       "dueTomorrow": "موعد السداد غداً",
       "dueInDays": "موعد السداد بعد {{count}} أيام"
