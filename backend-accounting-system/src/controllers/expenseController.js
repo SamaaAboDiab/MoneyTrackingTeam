@@ -3,7 +3,7 @@ const Income          = require("../models/Income");
 const User            = require("../models/User");
 const ExpenseCategory = require("../models/ExpenseCategory");
 const Account         = require("../models/Account");
-const { recordTxn, reverseTxn } = require("./accountController");
+const { recordTxn, reverseTxn, assertAccountsUsable } = require("./accountController");
 
 // GET /api/expenses
 // Supported query filters (can be combined):
@@ -112,6 +112,8 @@ exports.create = async (req, res, next) => {
       }
     }
 
+    await assertAccountsUsable(req.userId, accountId);
+
     const expense = await Expense.create({
       user: req.userId,
       amount: parseFloat(amount), description,
@@ -148,6 +150,8 @@ exports.update = async (req, res, next) => {
         return res.status(400).json({ success: false, message: "Invalid category: not found in your categories list" });
       }
     }
+
+    await assertAccountsUsable(req.userId, old.account, accountId !== undefined ? accountId : account);
 
     // Reverse previous account debit if it existed
     if (old.account) {
@@ -188,6 +192,8 @@ exports.remove = async (req, res, next) => {
   try {
     const expense = await Expense.findOne({ _id: req.params.id, user: req.userId });
     if (!expense) return res.status(404).json({ success: false, message: "Expense not found" });
+
+    await assertAccountsUsable(req.userId, expense.account);
 
     if (expense.account) {
       await reverseTxn(req.userId, "Expense", expense._id);

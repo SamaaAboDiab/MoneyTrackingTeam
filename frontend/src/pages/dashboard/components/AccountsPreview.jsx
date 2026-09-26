@@ -35,7 +35,7 @@ function AccountsPreview({ status, accounts, t }) {
                 <Icon size={16} />
               </span>
               <span className="min-w-0 flex-1 truncate font-medium text-slate-700">{account.name}</span>
-              <span className="tabular-amount font-bold text-slate-900">
+              <span className={`tabular-amount font-bold ${Number(account.balance) < 0 ? "text-expense" : "text-slate-900"}`}>
                 {formatAmount(account.balance)} {account.currency}
               </span>
             </Link>

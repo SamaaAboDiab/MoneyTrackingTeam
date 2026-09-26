@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { listCategories, createCategory, deleteCategory } from "../../../api/categoryApi";
 
 const DEFAULT_COLOR = "#6b7280";
 
 const TYPE_OPTIONS = [
-  { value: "daily",     label: "يومي" },
-  { value: "fixed",     label: "شهري ثابت" },
-  { value: "emergency", label: "طارئ" },
+  { value: "daily" },
+  { value: "fixed" },
+  { value: "emergency" },
 ];
 
 import { MANDATORY_CATEGORIES } from "./mandatoryCategories";
@@ -19,6 +20,7 @@ export default function CategorySelect({
   expenseType = "daily",
   className,
 }) {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [isOpen,     setIsOpen]     = useState(false);
@@ -29,6 +31,7 @@ export default function CategorySelect({
   const [saving,     setSaving]     = useState(false);
   const [error,      setError]      = useState("");
   const [deletingId, setDeletingId] = useState(null);
+  const [listError, setListError] = useState("");
 
   const containerRef = useRef(null);
 
@@ -79,7 +82,7 @@ export default function CategorySelect({
     e.preventDefault();
     const trimmed = newName.trim();
     if (!trimmed) {
-      setError("اسم التصنيف مطلوب.");
+      setError(t("categoriesPage.nameRequired"));
       return;
     }
 
@@ -109,7 +112,7 @@ export default function CategorySelect({
       setNewColor(DEFAULT_COLOR);
     } catch (err) {
       setError(
-        err.response?.data?.message || err.message || "تعذر إضافة التصنيف."
+        err.response?.data?.message || err.message || t("categoriesPage.createError")
       );
     } finally {
       setSaving(false);
@@ -122,6 +125,7 @@ export default function CategorySelect({
     if (!cat._id || cat.isDefault || MANDATORY_CATEGORIES.includes(cat.name)) return;
 
     setDeletingId(cat._id);
+    setListError("");
     try {
       await deleteCategory(cat._id);
 
@@ -131,7 +135,7 @@ export default function CategorySelect({
         onChange?.("");
       }
     } catch (err) {
-      alert(err.response?.data?.message || "تعذر حذف التصنيف.");
+      setListError(err.response?.data?.message || t("categoriesPage.deleteError"));
     } finally {
       setDeletingId(null);
     }
@@ -144,13 +148,13 @@ export default function CategorySelect({
 
   const displayLabel = selectedCategory
     ? selectedCategory.name
-    : value || "اختر التصنيف";
+    : value || t("categoriesPage.select.placeholder");
 
   const defaultButtonClass =
     "flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-right outline-none transition focus:border-brand-500";
 
   return (
-    <div ref={containerRef} className="relative w-full" dir="rtl">
+    <div ref={containerRef} className="relative w-full">
       <input type="hidden" id={id} name={name} value={value || ""} />
 
       {/* زر عرض القائمة المنسدلة */}
@@ -173,7 +177,7 @@ export default function CategorySelect({
             </span>
           ) : (
             <span className="text-slate-400">
-              {loading ? "جارٍ التحميل..." : "اختر التصنيف"}
+              {loading ? t("categoriesPage.select.loading") : t("categoriesPage.select.placeholder")}
             </span>
           )}
         </div>
@@ -198,7 +202,7 @@ export default function CategorySelect({
           {adding ? (
             <div className="rounded-lg bg-slate-50 p-2.5">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-700">تصنيف جديد</span>
+                <span className="text-xs font-semibold text-slate-700">{t("categoriesPage.select.newTitle")}</span>
                 <button
                   type="button"
                   onClick={() => { setAdding(false); setError(""); }}
@@ -213,7 +217,7 @@ export default function CategorySelect({
               <input
                 type="text"
                 autoFocus
-                placeholder="مثال: اشتراكات، صيانة، هدايا..."
+                placeholder={t("categoriesPage.select.newPlaceholder")}
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => {
@@ -222,7 +226,7 @@ export default function CategorySelect({
                     handleCreate(e);
                   }
                 }}
-                className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs focus:border-teal-600 focus:outline-none"
+                className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs focus:border-brand-500 focus:outline-none"
               />
 
               <div className="mt-2 grid grid-cols-2 gap-2">
@@ -231,8 +235,8 @@ export default function CategorySelect({
                   onChange={(e) => setNewType(e.target.value)}
                   className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs focus:outline-none"
                 >
-                  {TYPE_OPTIONS.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
+                  {TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{t(`categoriesPage.type.${opt.value}`)}</option>
                   ))}
                 </select>
 
@@ -243,11 +247,11 @@ export default function CategorySelect({
                     onChange={(e) => setNewColor(e.target.value)}
                     className="h-7 w-8 cursor-pointer rounded border border-slate-300 p-0.5"
                   />
-                  <span className="text-[11px] text-slate-400">{newColor}</span>
+                  <span className="text-xs text-slate-400">{newColor}</span>
                 </div>
               </div>
 
-              {error && <p className="mt-1.5 text-[11px] text-rose-600">{error}</p>}
+              {error && <p className="mt-1.5 text-xs text-rose-600">{error}</p>}
 
               <div className="mt-2.5 flex justify-end gap-1.5">
                 <button
@@ -255,25 +259,26 @@ export default function CategorySelect({
                   onClick={() => { setAdding(false); setError(""); }}
                   className="rounded-md px-2.5 py-1 text-xs font-medium text-slate-500 hover:bg-slate-200"
                 >
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="button"
                   onClick={handleCreate}
                   disabled={saving}
-                  className="rounded-md bg-teal-700 px-3 py-1 text-xs font-semibold text-white hover:bg-teal-800 disabled:opacity-60"
+                  className="rounded-md bg-brand-600 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
                 >
-                  {saving ? "حفظ..." : "إضافة"}
+                  {saving ? t("categoriesPage.select.adding") : t("categoriesPage.select.add")}
                 </button>
               </div>
             </div>
           ) : (
             <>
               {/* قائمة الاختيارات المسترجعة من الـ API */}
+              {listError && <p className="px-3 py-1.5 text-xs text-rose-600">{listError}</p>}
               <div className="max-h-56 overflow-y-auto space-y-0.5">
                 {categories.length === 0 ? (
                   <p className="px-3 py-2 text-xs text-slate-400">
-                    {loading ? "جارٍ جلب التصنيفات..." : "لا توجد تصنيفات بعد."}
+                    {loading ? t("categoriesPage.select.loadingList") : t("categoriesPage.select.none")}
                   </p>
                 ) : (
                   categories.map((cat) => {
@@ -285,7 +290,7 @@ export default function CategorySelect({
                         key={cat._id || cat.name}
                         onClick={() => handleSelect(cat.name)}
                         className={`group flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition hover:bg-slate-100 ${
-                          isSelected ? "bg-teal-50/70 font-semibold text-teal-800" : "text-slate-700"
+                          isSelected ? "bg-brand-50 font-semibold text-brand-700" : "text-slate-700"
                         }`}
                       >
                         <div className="flex items-center gap-2">
@@ -300,13 +305,13 @@ export default function CategorySelect({
                         {isCustom && (
                           <button
                             type="button"
-                            title="حذف هذا التصنيف"
+                            title={t("categoriesPage.select.deleteTitle")}
                             onClick={(e) => handleDelete(e, cat)}
                             disabled={deletingId === cat._id}
                             className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 hover:bg-rose-100 hover:text-rose-600 disabled:opacity-50"
                           >
                             {deletingId === cat._id ? (
-                              <span className="text-[10px]">...</span>
+                              <span className="text-xs">...</span>
                             ) : (
                               <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
@@ -328,12 +333,12 @@ export default function CategorySelect({
                     setNewType(expenseType || "daily");
                     setAdding(true);
                   }}
-                  className="flex w-full items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-teal-700 transition hover:bg-teal-50"
+                  className="flex w-full items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-brand-600 transition hover:bg-brand-50"
                 >
                   <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
                   </svg>
-                  <span>إضافة تصنيف جديد...</span>
+                  <span>{t("categoriesPage.select.addOption")}</span>
                 </button>
               </div>
             </>

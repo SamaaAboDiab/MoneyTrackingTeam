@@ -9,6 +9,7 @@ function IncomeList({
   totalAmount,
   onEdit,
   onDeleted,
+  onToggled,
   t,
 }) {
   const calculatedTotal = items.reduce(
@@ -45,6 +46,7 @@ function IncomeList({
             displayCurrency={income.convertedAmount !== undefined ? displayCurrency : income.currency}
             onEdit={onEdit}
             onDeleted={onDeleted}
+            onToggled={onToggled}
           />
         ))}
       </div>

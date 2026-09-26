@@ -10,6 +10,7 @@ import AccountHistoryPage from "../pages/accounts/AccountHistoryPage";
 import IncomePage from "../pages/income/IncomePage";
 import ExpensesPage from "../pages/expenses/ExpensesPage";
 import CashPage from "../pages/cash/CashPage";
+import CashExpensesPage from "../pages/cash/CashExpensesPage";
 import DebtsPage from "../pages/debts/DebtsPage";
 import ProfilePage from "../pages/profile/ProfilePage";
 import ProtectedRoute from "./ProtectedRoute";
@@ -38,6 +39,7 @@ function AppRoutes() {
           <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/cash" element={<CashPage />} />
+          <Route path="/cash/expenses" element={<CashExpensesPage />} />
           <Route path="/debts" element={<DebtsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>

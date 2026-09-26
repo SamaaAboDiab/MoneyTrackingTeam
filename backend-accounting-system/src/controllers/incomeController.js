@@ -1,7 +1,7 @@
 const Income   = require("../models/Income");
 const Expense  = require("../models/Expense");
 const User     = require("../models/User");
-const { recordTxn, reverseTxn } = require("./accountController");
+const { recordTxn, reverseTxn, assertAccountsUsable } = require("./accountController");
 
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const SUPPORTED_CURRENCIES = ["EGP", "USD", "EUR", "GBP"];
@@ -76,6 +76,8 @@ exports.create = async (req, res, next) => {
       }
     }
 
+    await assertAccountsUsable(req.userId, accountId);
+
     const income = await Income.create({
       user: req.userId,
       name: name.trim(), category,
@@ -99,6 +101,8 @@ exports.update = async (req, res, next) => {
   try {
     const old = await Income.findOne({ _id: req.params.id, user: req.userId });
     if (!old) return res.status(404).json({ success: false, message: "Income not found" });
+
+    await assertAccountsUsable(req.userId, old.account, req.body.accountId);
 
     if (old.account) {
       await reverseTxn(req.userId, "Income", old._id);
@@ -145,6 +149,8 @@ exports.remove = async (req, res, next) => {
   try {
     const income = await Income.findOne({ _id: req.params.id, user: req.userId });
     if (!income) return res.status(404).json({ success: false, message: "Income not found" });
+
+    await assertAccountsUsable(req.userId, income.account);
 
     if (income.account) {
       await reverseTxn(req.userId, "Income", income._id);

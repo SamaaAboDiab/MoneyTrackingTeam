@@ -12,6 +12,7 @@ import AccountsPreview from "./components/AccountsPreview";
 import DashboardDebtsCard from "./components/DashboardDebtsCard";
 import MonthlySummaryCard from "./components/MonthlySummaryCard";
 import ExpenseCategoryChart from "./components/ExpenseCategoryChart";
+import CashBalanceWidget from "./components/CashBalanceWidget";
 
 function DashboardPage() {
   const { t } = useTranslation();
@@ -37,6 +38,7 @@ function DashboardPage() {
   }, [dispatch, period, from, to]);
 
   const activeAccounts = items.filter((account) => !account.isArchived);
+  const cashAccount = activeAccounts.find((account) => account.type === "cash");
   const totalsByCurrency = summaryData?.accountBalancesByCurrency || {};
   const totalCurrencies = Object.entries(totalsByCurrency);
 
@@ -61,6 +63,7 @@ function DashboardPage() {
         t={t}
       />
       <ExpenseCategoryChart categories={summaryData?.expenseCategories || []} t={t} />
+      {status !== "loading" && <CashBalanceWidget cashAccount={cashAccount} t={t} />}
       <DashboardDebtsCard debts={debts} debtSummary={summaryData?.debts} status={debtsStatus} />
       <QuickLinks t={t} />
       <AccountsPreview status={status} accounts={activeAccounts} t={t} />

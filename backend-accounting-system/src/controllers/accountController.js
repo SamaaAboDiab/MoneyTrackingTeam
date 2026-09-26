@@ -3,9 +3,29 @@ const AccountTransaction = require("../models/AccountTransaction");
 const User = require("../models/User");
 
 /* ── helpers ─────────────────────────────────────── */
+/* ── archived accounts are frozen: no deposits and no withdrawals ── */
+function assertAccountUsable(account) {
+  if (account && (account.isArchived || account.isActive === false)) {
+    throw {
+      status: 400,
+      code: "ACCOUNT_FROZEN",
+      message: `Account "${account.name}" is archived (frozen): you can't deposit into it or withdraw from it.`,
+    };
+  }
+}
+
+async function assertAccountsUsable(userId, ...accountIds) {
+  const ids = [...new Set(accountIds.filter(Boolean).map(String))];
+  for (const id of ids) {
+    const account = await Account.findOne({ _id: id, user: userId });
+    assertAccountUsable(account);
+  }
+}
+
 async function recordTxn(userId, accountId, type, amount, description, date, relatedModel, relatedId, notes) {
   const account = await Account.findById(accountId);
   if (!account) return;
+  assertAccountUsable(account);
   const balanceBefore = account.balance;
   if (type === "debit") account.balance -= amount;
   if (type === "credit") account.balance += amount;
@@ -23,6 +43,7 @@ async function reverseTxn(userId, relatedModel, relatedId) {
   const txn = await AccountTransaction.findOne({ user: userId, relatedModel, relatedId });
   if (!txn) return;
   const account = await Account.findById(txn.account);
+  assertAccountUsable(account);
   if (account) {
     if (txn.type === "debit") account.balance += txn.amount;
     if (txn.type === "credit") account.balance -= txn.amount;
@@ -124,6 +145,7 @@ exports.adjustBalance = async (req, res, next) => {
 
     const account = await Account.findOne({ _id: req.params.id, user: req.userId });
     if (!account) return res.status(404).json({ success: false, message: "Account not found" });
+    assertAccountUsable(account);
 
     const balanceBefore = account.balance;
     const balanceAfter = parseFloat(newBalance);
@@ -203,6 +225,8 @@ exports.transfer = async (req, res, next) => {
     ]);
     if (!from) return res.status(404).json({ success: false, message: "Source account not found." });
     if (!to) return res.status(404).json({ success: false, message: "Destination account not found." });
+    assertAccountUsable(from);
+    assertAccountUsable(to);
     if (from.balance < amt)
       return res.status(400).json({
         success: false,
@@ -240,4 +264,5 @@ exports.transfer = async (req, res, next) => {
 
 /* ── used by expense / income controllers ─────────── */
 exports.recordTxn = recordTxn;
+exports.assertAccountsUsable = assertAccountsUsable;
 exports.reverseTxn = reverseTxn;

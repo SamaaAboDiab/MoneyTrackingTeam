@@ -203,6 +203,9 @@ exports.addPayment = async (req, res, next) => {
     if (accountId) {
       const acc = await Account.findOne({ _id: accountId, user: req.userId });
       if (!acc) return res.status(404).json({ success: false, message: "Account not found." });
+      if (acc.isArchived || acc.isActive === false) {
+        return res.status(400).json({ success: false, code: "ACCOUNT_FROZEN", message: `Account "${acc.name}" is archived (frozen): you can't withdraw from it.` });
+      }
       const balBefore = acc.balance;
       acc.balance -= amt;
       await acc.save();

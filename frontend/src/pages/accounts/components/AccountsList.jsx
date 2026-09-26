@@ -7,7 +7,7 @@ function AccountsList({ accounts, showArchived, status, error, adjustStatus, onT
         <div>
           <h2 className="text-lg font-bold text-slate-900">{t("accounts.listTitle")}</h2>
           <p className="mt-1 text-sm text-slate-500">
-            {showArchived ? "الحسابات المؤرشفة" : "الحسابات النشطة"}
+            {showArchived ? t("accounts.archivedTitle") : t("accounts.activeTitle")}
           </p>
         </div>
 
@@ -16,7 +16,7 @@ function AccountsList({ accounts, showArchived, status, error, adjustStatus, onT
           onClick={onToggleView}
           className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-brand-300 hover:text-brand-700"
         >
-          {showArchived ? "عرض الحسابات النشطة" : "عرض الحسابات المؤرشفة"}
+          {showArchived ? t("accounts.viewActive") : t("accounts.viewArchived")}
         </button>
       </div>
 
@@ -25,7 +25,7 @@ function AccountsList({ accounts, showArchived, status, error, adjustStatus, onT
         <p className="mt-4 rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense">{error}</p>
       )}
       {status === "succeeded" && accounts.length === 0 && (
-        <p className="mt-4 text-slate-500">{showArchived ? "لا توجد حسابات مؤرشفة." : t("accounts.empty")}</p>
+        <p className="mt-4 text-slate-500">{showArchived ? t("accounts.emptyArchived") : t("accounts.empty")}</p>
       )}
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

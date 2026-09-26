@@ -1,0 +1,226 @@
+import { useTranslation } from "react-i18next";
+import { inputClass, labelClass } from "../constants";
+
+function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handleFormChange, updateStatus }) {
+  const { t } = useTranslation();
+
+  return (
+    <>
+    {isEditing && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+        onClick={closeEditModal}
+      >
+        <div
+          className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <h2 className="text-lg font-bold text-slate-900">
+            {t("income.editTitle")}
+          </h2>
+
+          <form
+            onSubmit={handleSubmit}
+            className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2"
+          >
+            {/* Name */}
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <label
+                htmlFor="name"
+                className={labelClass}
+              >
+                {t("income.fields.name")}
+              </label>
+
+              <input
+                id="name"
+                name="name"
+                value={form.name}
+                onChange={handleFormChange}
+                required
+                className={inputClass}
+              />
+            </div>
+
+            {/* Category */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="category"
+                className={labelClass}
+              >
+                {t("income.fields.category")}
+              </label>
+
+              <select
+                id="category"
+                name="category"
+                value={form.category}
+                onChange={handleFormChange}
+                className={inputClass}
+              >
+                {["salary", "freelance", "rental", "investment", "other"].map((category) => (
+                  <option key={category} value={category}>
+                    {t(`income.categories.${category}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Amount */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="amount"
+                className={labelClass}
+              >
+                {t("income.amountLabel")}
+              </label>
+
+              <input
+                id="amount"
+                name="amount"
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.amount}
+                onChange={handleFormChange}
+                required
+                className={inputClass}
+              />
+            </div>
+
+            {/* Currency */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="currency"
+                className={labelClass}
+              >
+                {t("income.currencyLabel")}
+              </label>
+
+              <select
+                id="currency"
+                name="currency"
+                value={form.currency}
+                onChange={handleFormChange}
+                className={inputClass}
+              >
+                <option value="EGP">EGP</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </div>
+
+            {/* Received Date */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="receivedDate"
+                className={labelClass}
+              >
+                {t("income.receivedDateLabel")}
+              </label>
+
+              <input
+                id="receivedDate"
+                name="receivedDate"
+                type="date"
+                value={form.receivedDate}
+                onChange={handleFormChange}
+                required
+                className={inputClass}
+              />
+            </div>
+
+            {/* Recurrence */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="recurrence"
+                className={labelClass}
+              >
+                {t("income.recurrenceLabel")}
+              </label>
+
+              <select
+                id="recurrence"
+                name="recurrence"
+                value={form.recurrence}
+                onChange={handleFormChange}
+                className={inputClass}
+              >
+                {["once", "weekly", "monthly", "yearly"].map((recurrence) => (
+                  <option key={recurrence} value={recurrence}>
+                    {t(`income.recurrence.${recurrence}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Status */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="status"
+                className={labelClass}
+              >
+                {t("income.statusLabel")}
+              </label>
+
+              <select
+                id="status"
+                name="status"
+                value={form.status}
+                onChange={handleFormChange}
+                className={inputClass}
+              >
+                <option value="cleared">{t("income.status.cleared")}</option>
+                <option value="pending">{t("income.status.pending")}</option>
+              </select>
+            </div>
+
+            {/* Notes */}
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <label
+                htmlFor="notes"
+                className={labelClass}
+              >
+                {t("income.notesLabel")}
+              </label>
+
+              <textarea
+                id="notes"
+                name="notes"
+                rows="3"
+                value={form.notes}
+                onChange={handleFormChange}
+                className={`${inputClass} resize-none`}
+              />
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3 sm:col-span-2">
+              <button
+                type="submit"
+                disabled={updateStatus === "loading"}
+                className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65"
+              >
+                {updateStatus === "loading"
+                  ? t("income.submitting")
+                  : t("income.saveChanges")}
+              </button>
+
+              <button
+                type="button"
+                onClick={closeEditModal}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-brand-300 hover:text-brand-700"
+              >
+                {t("income.cancel")}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
+    </>
+  );
+}
+
+export default EditIncomeModal;

@@ -53,7 +53,11 @@
       "submitting": "Logging in...",
       "forgotPassword": "Forgot password?",
       "noAccount": "Don't have an account?",
-      "registerLink": "Create a new account"
+      "registerLink": "Create a new account",
+      "invalidCredentials": "Incorrect email or password",
+      "tooManyAttempts": "Too many attempts, please try again shortly",
+      "accountSuspended": "Your account has been suspended, please contact support",
+      "genericError": "An error occurred while logging in"
     },
     "forgotPassword": {
       "title": "Forgot password",
@@ -86,12 +90,12 @@
     "period": {
       "month": "This month",
       "last_month": "Last month",
-        "3months": "Last 3 months",
-        "custom": "Custom",
-        "from": "From date",
-        "to": "To date",
-        "selected": "Selected period",
-        "invalid": "Choose an end date after the start date"
+      "3months": "Last 3 months",
+      "custom": "Custom",
+      "from": "From date",
+      "to": "To date",
+      "selected": "Selected period",
+      "invalid": "Choose an end date after the start date"
     },
     "summary": {
       "title": "Current month summary",
@@ -122,7 +126,7 @@
       "calculating": "Calculating...",
       "overdueBadge": "{{count}} overdue debt(s)!",
       "dueSoonBadge": "{{count}} debt(s) due soon",
-      "allPaid": "No active debts ✅",
+      "allPaid": "No active debts",
       "activeBadge": "{{count}} active debt(s)",
       "nearestDue": "Nearest payment date",
       "noDueDate": "No due date set",
@@ -145,7 +149,11 @@
     "notifications": "Notifications",
     "quickActionLabel": "New Transfer",
     "collapseSidebar": "Collapse sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "mobileNav": {
+      "home": "Home",
+      "accounts": "Accounts"
+    }
   },
   "transfer": {
     "backToDashboard": "Back to dashboard",
@@ -221,7 +229,14 @@
       "description": "Description",
       "amount": "Amount",
       "balanceAfter": "Balance after"
-    }
+    },
+    "archive": "Archive",
+    "reactivate": "Reactivate",
+    "archivedTitle": "Archived accounts",
+    "activeTitle": "Active accounts",
+    "viewActive": "Show active accounts",
+    "viewArchived": "Show archived accounts",
+    "emptyArchived": "No archived accounts."
   },
   "income": {
     "title": "Income sources",
@@ -288,7 +303,11 @@
       "confirm": "Confirm delete",
       "deleting": "Deleting...",
       "error": "Unable to delete this income."
-    }
+    },
+    "recurringBadge": "Recurring",
+    "pausedBadge": "Paused",
+    "pause": "Pause recurrence",
+    "resume": "Resume recurrence"
   },
   "expenses": {
     "subtitle": "Manage, edit and delete every expense, and track its effect on your accounts.",
@@ -396,7 +415,24 @@
     "selectAccountsError": "Select the source account and the cash account.",
     "amountPositiveError": "Enter an amount greater than zero.",
     "submitting": "Processing...",
-    "confirmWithdraw": "Confirm withdrawal"
+    "confirmWithdraw": "Confirm withdrawal",
+    "emptyAlert": "Cash balance is empty",
+    "viewExpenses": "View cash expenses",
+    "internalTransfer": "Internal transfer",
+    "widgetLabel": "Cash balance",
+    "widgetNoAccount": "No cash account yet",
+    "expenses": {
+      "title": "Cash expenses",
+      "subtitle": "Every expense you paid in cash during the selected period.",
+      "total": "Total cash expenses",
+      "period": "Period",
+      "category": "Category",
+      "allCategories": "All categories",
+      "empty": "No cash expenses in this period.",
+      "noCashAccount": "No cash account yet.",
+      "back": "Back to cash",
+      "loading": "Loading..."
+    }
   },
   "debts": {
     "subtitle": "Track your debts, due dates, and payments made to each creditor.",
@@ -411,7 +447,7 @@
     "deleteSuccess": "Debt deleted successfully",
     "deleteError": "Unable to delete the debt.",
     "markPaidConfirm": "Are you sure you want to mark the debt to \"{{creditor}}\" as fully paid?",
-    "markPaidSuccess": "Debt to \"{{creditor}}\" paid off successfully and moved to completed debts! ✅",
+    "markPaidSuccess": "Debt to \"{{creditor}}\" paid off successfully and moved to completed debts!",
     "markPaidError": "Unable to update the debt status.",
     "paymentAmountPositiveError": "Enter an amount greater than zero.",
     "paymentExceedsRemainingError": "The entered amount is greater than the remaining balance ({{remaining}} {{currency}}).",
@@ -465,7 +501,7 @@
     },
     "overdueBanner": "Alert: this debt is past its due date!",
     "status": {
-      "paid": "Paid off ✅",
+      "paid": "Paid off",
       "overdue": "Overdue",
       "dueSoon": "Due soon",
       "active": "Active"
@@ -520,7 +556,8 @@
       "cancel": "Cancel",
       "confirm": "Confirm payment",
       "saving": "Saving..."
-    }
+    },
+    "confirmTitle": "Are you sure?"
   },
   "profile": {
     "title": "Profile",
@@ -536,5 +573,66 @@
     "save": "Save changes",
     "saving": "Saving...",
     "saveSuccess": "Your information has been updated."
+  },
+  "quickAdd": {
+    "button": "Quick expense",
+    "title": "Quick cash expense",
+    "amount": "Amount",
+    "category": "Category",
+    "selectCategory": "Select category",
+    "description": "Description (optional)",
+    "defaultDescription": "Cash expense",
+    "submit": "Save",
+    "submitting": "Saving...",
+    "cancel": "Cancel",
+    "success": "Expense recorded successfully",
+    "noCashAccount": "Create a cash account first from the Cash page.",
+    "required": "Enter the amount and select a category.",
+    "error": "Unable to record the expense."
+  },
+  "categoriesPage": {
+    "title": "Categories",
+    "addNew": "+ Add new category",
+    "loading": "Loading...",
+    "empty": "No categories yet.",
+    "createSuccess": "Category added successfully",
+    "updateSuccess": "Updated successfully",
+    "deleteSuccess": "Category deleted",
+    "loadError": "Unable to load categories.",
+    "saveError": "Something went wrong while saving.",
+    "deleteError": "Unable to delete the category.",
+    "createError": "Unable to add the category.",
+    "nameRequired": "Category name is required.",
+    "formTitleNew": "New category",
+    "formTitleEdit": "Edit category",
+    "nameLabel": "Name",
+    "namePlaceholder": "e.g. Maintenance, Subscriptions, Gifts...",
+    "nameLocked": "A default category's name can't be changed",
+    "typeLabel": "Type",
+    "typeLocked": "A default category's type can't be changed",
+    "colorLabel": "Color",
+    "save": "Save",
+    "saving": "Saving...",
+    "deleteConfirmTitle": "Are you sure?",
+    "deleteConfirmMessage": "Category \"{{name}}\" will be permanently deleted.",
+    "confirmDelete": "Confirm delete",
+    "deleting": "Deleting...",
+    "type": {
+      "daily": "Daily",
+      "fixed": "Fixed monthly",
+      "emergency": "Emergency"
+    },
+    "select": {
+      "placeholder": "Select category",
+      "loadingList": "Loading categories...",
+      "none": "No categories yet.",
+      "loading": "Loading...",
+      "newTitle": "New category",
+      "newPlaceholder": "e.g. Subscriptions, Maintenance, Gifts...",
+      "add": "Add",
+      "adding": "Saving...",
+      "addOption": "Add new category...",
+      "deleteTitle": "Delete this category"
+    }
   }
 }

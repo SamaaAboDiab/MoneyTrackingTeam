@@ -221,7 +221,9 @@ exports.getDashboard = async (req, res, next) => {
     const debtForecast       = getDebtForecast(debts, debtPayments);
 
     /* ── expense categories ──────────────────────── */
-    const catMap = Object.fromEntries(categories.map((c) => [String(c._id), c]));
+    const catMap = Object.fromEntries(
+      categories.flatMap((c) => [[String(c._id), c], [c.name, c]])
+    );
     const expenseCategories = expCatAgg.map((row) => {
       const cat = catMap[row._id];
       return {

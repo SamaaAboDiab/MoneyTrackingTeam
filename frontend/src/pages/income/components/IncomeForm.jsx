@@ -114,6 +114,26 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, t }) 
           )}
         </div>
 
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="income-recurrence" className={labelClass}>
+            {t("income.recurrenceLabel")}
+          </label>
+          <select
+            id="income-recurrence"
+            name="recurrence"
+            value={form.recurrence || "once"}
+            onChange={onChange}
+            required
+            className={inputClass}
+          >
+            {["once", "weekly", "monthly", "yearly"].map((key) => (
+              <option key={key} value={key}>
+                {t(`income.recurrence.${key}`)}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex flex-col gap-1.5 sm:col-span-2">
           <label htmlFor="income-notes" className={labelClass}>
             {t("income.notesLabel")}

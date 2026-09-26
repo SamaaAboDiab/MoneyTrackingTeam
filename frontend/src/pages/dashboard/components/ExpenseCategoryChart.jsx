@@ -3,6 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { PieChart } from "lucide-react";
 import { formatAmount } from "../../../utils/formatAmount";
 
+const FALLBACK_PALETTE = [
+  "#f97316",
+  "#3b82f6",
+  "#8b5cf6",
+  "#10b981",
+  "#ec4899",
+  "#0ea5e9",
+  "#f59e0b",
+  "#14b8a6",
+  "#ef4444",
+  "#84cc16",
+];
+const NEUTRAL_GRAY = "#6b7280";
+
 const SIZE = 200;
 const CENTER = SIZE / 2;
 const OUTER_R = 90;
@@ -38,14 +52,22 @@ function ExpenseCategoryChart({ categories, t }) {
   const navigate = useNavigate();
   const [hoveredId, setHoveredId] = useState(null);
 
-  const total = categories.reduce((sum, cat) => sum + Number(cat.total || 0), 0);
-  const topThree = [...categories].sort((a, b) => b.total - a.total).slice(0, 3);
+  const coloredCategories = categories.reduce((acc, cat, index) => {
+    const used = new Set(acc.map((item) => item.color));
+    const own = cat.color && cat.color !== NEUTRAL_GRAY && !used.has(cat.color) ? cat.color : null;
+    const fallback = FALLBACK_PALETTE.find((color) => !used.has(color)) || FALLBACK_PALETTE[index % FALLBACK_PALETTE.length];
+    acc.push({ ...cat, color: own || fallback });
+    return acc;
+  }, []);
+
+  const total = coloredCategories.reduce((sum, cat) => sum + Number(cat.total || 0), 0);
+  const topThree = [...coloredCategories].sort((a, b) => b.total - a.total).slice(0, 3);
 
   const goToCategory = (name) => {
     navigate(`/expenses?category=${encodeURIComponent(name)}`);
   };
 
-  const slices = categories.reduce((acc, cat) => {
+  const slices = coloredCategories.reduce((acc, cat) => {
     const fraction = total > 0 ? Number(cat.total || 0) / total : 0;
     const startAngle = acc.length > 0 ? acc[acc.length - 1].endAngle : -Math.PI / 2;
     const endAngle = startAngle + fraction * 2 * Math.PI;
@@ -98,7 +120,7 @@ function ExpenseCategoryChart({ categories, t }) {
                   <strong className="tabular-amount text-sm font-extrabold text-slate-900">
                     {formatAmount(hovered.total)}
                   </strong>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-xs text-slate-400">
                     {Math.round(hovered.fraction * 100)}%
                   </span>
                 </>
@@ -108,7 +130,7 @@ function ExpenseCategoryChart({ categories, t }) {
                   <strong className="tabular-amount text-lg font-extrabold text-slate-900">
                     {formatAmount(total)}
                   </strong>
-                  <span className="text-[11px] text-slate-400">EGP</span>
+                  <span className="text-xs text-slate-400">EGP</span>
                 </>
               )}
             </div>
