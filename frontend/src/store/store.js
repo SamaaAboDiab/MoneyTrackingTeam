@@ -4,6 +4,7 @@ import accountsReducer from "./slices/accountsSlice";
 import incomeReducer from "./slices/incomeSlice";
 import expensesReducer from "./slices/expensesSlice";
 import debtsReducer from "./slices/debtsSlice";
+import dashboardReducer from "./slices/dashboardSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,5 +13,6 @@ export const store = configureStore({
     incomes: incomeReducer,
     expenses: expensesReducer,
     debts: debtsReducer,
+    dashboard: dashboardReducer,
   },
 });

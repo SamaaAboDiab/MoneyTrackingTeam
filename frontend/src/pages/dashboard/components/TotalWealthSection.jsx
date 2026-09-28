@@ -1,6 +1,6 @@
 import TotalWealthCard from "../../../components/dashboard/TotalWealthCard";
 
-function TotalWealthSection({ status, totalCurrencies, t }) {
+function TotalWealthSection({ status, totalCurrencies, onOpenAccounts, t }) {
   if (status === "loading") {
     return (
       <div className="rounded-3xl bg-brand-600 p-6 text-white sm:p-8">
@@ -22,14 +22,19 @@ function TotalWealthSection({ status, totalCurrencies, t }) {
   return (
     <div className="flex flex-col gap-4">
       {totalCurrencies.map(([currency, total]) => (
-        <TotalWealthCard
+        <div
           key={currency}
-          label={t("accounts.totalWealth")}
-          amount={total}
-          currency={currency}
-          showAriaLabel={t("common.showAmount")}
-          hideAriaLabel={t("common.hideAmount")}
-        />
+          className="block w-full text-start"
+        >
+          <TotalWealthCard
+            label={t("accounts.totalWealth")}
+            amount={total}
+            currency={currency}
+            onOpenAccounts={onOpenAccounts}
+            showAriaLabel={t("common.showAmount")}
+            hideAriaLabel={t("common.hideAmount")}
+          />
+        </div>
       ))}
     </div>
   );

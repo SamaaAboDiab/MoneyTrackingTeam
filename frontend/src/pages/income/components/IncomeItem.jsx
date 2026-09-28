@@ -1,8 +1,13 @@
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
+import { toggleIncomeRecurrence } from "../../../store/slices/incomeSlice";
 import DeleteIncomeButton from "./DeleteIncomeButton";
 
-function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted }) {
+function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted, onToggled }) {
   const { t, i18n } = useTranslation();
+  const dispatch = useDispatch();
+  const isRecurring = income.recurrence && income.recurrence !== "once";
+  const isPaused = isRecurring && income.isActive === false;
 
   const date = new Intl.DateTimeFormat(i18n.language, {
     dateStyle: "medium",
@@ -29,12 +34,22 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted 
       {/* اسم المصدر */}
       <div className="min-w-0">
         <span className="text-xs font-semibold text-slate-400">
-          اسم المصدر
+          {t("income.fields.name")}
         </span>
 
         <h3 className="mt-1 truncate font-semibold text-slate-900">
           {income.name}
         </h3>
+
+        {isRecurring && (
+          <span
+            className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold ${
+              isPaused ? "bg-slate-200 text-slate-600" : "bg-brand-50 text-brand-700"
+            }`}
+          >
+            {isPaused ? t("income.pausedBadge") : t("income.recurringBadge")} · {t(`income.recurrence.${income.recurrence}`)}
+          </span>
+        )}
 
         {income.notes && (
           <small className="text-xs text-slate-400">
@@ -46,7 +61,7 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted 
       {/* الفئة */}
       <div>
         <span className="text-xs font-semibold text-slate-400">
-          الفئة
+          {t("income.fields.category")}
         </span>
 
         <p className="mt-1 font-semibold text-slate-700">
@@ -57,7 +72,7 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted 
       {/* المبلغ */}
       <div className="flex flex-col items-start">
         <span className="text-xs font-semibold text-slate-400">
-          المبلغ بالعملة المختارة
+          {t("income.fields.amountConverted")}
         </span>
 
         <strong className="mt-1 block tabular-amount text-lg font-bold text-income">
@@ -65,14 +80,14 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted 
         </strong>
 
         <small className="mt-1 block text-xs text-slate-400">
-          الأصل: {originalAmount} {income.currency}
+          {t("income.fields.originalPrefix")} {originalAmount} {income.currency}
         </small>
       </div>
 
       {/* التاريخ */}
       <div>
         <span className="text-xs font-semibold text-slate-400">
-          التاريخ
+          {t("income.fields.date")}
         </span>
 
         <p className="mt-1 font-semibold text-slate-700">
@@ -82,13 +97,26 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted 
 
       {/* الأزرار */}
       <div className="col-span-2 flex items-center justify-end gap-2 md:col-span-1">
+        {isRecurring && (
+          <button
+            type="button"
+            onClick={async () => {
+              await dispatch(toggleIncomeRecurrence(income._id));
+              onToggled?.();
+            }}
+            className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-brand-300 hover:text-brand-700"
+          >
+            {isPaused ? t("income.resume") : t("income.pause")}
+          </button>
+        )}
+
         {onEdit && (
           <button
             type="button"
             onClick={() => onEdit(income)}
             className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-brand-700"
           >
-            تعديل
+            {t("common.edit")}
           </button>
         )}
 

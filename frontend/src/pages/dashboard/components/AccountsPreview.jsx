@@ -14,7 +14,7 @@ function AccountsPreview({ status, accounts, t }) {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-slate-900">{t("accounts.listTitle")}</h2>
         <Link to="/accounts" className="text-sm font-semibold text-brand-700 hover:underline">
-          {t("accounts.title")}
+          {t("dashboard.accountsSummaryLink")}
         </Link>
       </div>
 
@@ -35,7 +35,7 @@ function AccountsPreview({ status, accounts, t }) {
                 <Icon size={16} />
               </span>
               <span className="min-w-0 flex-1 truncate font-medium text-slate-700">{account.name}</span>
-              <span className="tabular-amount font-bold text-slate-900">
+              <span className={`tabular-amount font-bold ${Number(account.balance) < 0 ? "text-expense" : "text-slate-900"}`}>
                 {formatAmount(account.balance)} {account.currency}
               </span>
             </Link>

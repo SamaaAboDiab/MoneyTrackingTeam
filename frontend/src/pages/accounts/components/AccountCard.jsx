@@ -50,7 +50,7 @@ function AccountCard({ account, adjustStatus, onAdjust, onToggleArchive, t }) {
           onClick={() => onToggleArchive(account._id)}
           className="whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:border-brand-300 hover:text-brand-700"
         >
-          {account.isArchived ? "إعادة تفعيل" : "أرشفة"}
+          {account.isArchived ? t("accounts.reactivate") : t("accounts.archive")}
         </button>
       </div>
     </article>

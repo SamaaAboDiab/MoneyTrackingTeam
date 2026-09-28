@@ -10,7 +10,7 @@ function LanguageSwitcher() {
   };
 
   const baseBtn =
-    "px-3 py-1.5 text-xs font-bold transition-colors";
+    "px-3.5 py-2.5 text-xs font-bold transition-colors sm:px-3 sm:py-1.5";
 
   return (
     <div className="inline-flex overflow-hidden rounded-lg border border-slate-200 bg-white">

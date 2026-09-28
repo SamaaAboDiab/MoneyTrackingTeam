@@ -6,6 +6,7 @@ function TotalWealthCard({
   label,
   amount,
   currency,
+  onOpenAccounts,
   trend = "up",
   trendData = [],
   maskedText = "••••••",
@@ -29,6 +30,12 @@ function TotalWealthCard({
   return (
     <div className="relative">
       <div
+        role="button"
+        tabIndex={0}
+        onClick={onOpenAccounts}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") onOpenAccounts();
+        }}
         className={`relative overflow-hidden rounded-3xl bg-brand-600 p-6 transition-all duration-300 ease-out sm:p-8 ${
           grown ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
@@ -39,7 +46,10 @@ function TotalWealthCard({
 
           <button
             type="button"
-            onClick={() => setHidden((prev) => !prev)}
+            onClick={(event) => {
+              event.stopPropagation();
+              setHidden((prev) => !prev);
+            }}
             aria-label={hidden ? showAriaLabel : hideAriaLabel}
             className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"
           >

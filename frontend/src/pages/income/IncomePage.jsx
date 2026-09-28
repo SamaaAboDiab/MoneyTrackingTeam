@@ -1,7 +1,6 @@
-
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import {
   clearIncomeCreateState,
   clearIncomeUpdateError,
@@ -11,47 +10,17 @@ import {
   fetchIncomes,
   updateIncomeEntry,
 } from "../../store/slices/incomeSlice";
+import { EMPTY_FORM, getCurrentMonth } from "./constants";
+import IncomeHeader from "./components/IncomeHeader";
+import IncomeTotalCard from "./components/IncomeTotalCard";
+import IncomeAlerts from "./components/IncomeAlerts";
 import IncomeForm from "./components/IncomeForm";
+import IncomeSummaryFilter from "./components/IncomeSummaryFilter";
 import IncomeList from "./components/IncomeList";
-
-const EMPTY_FORM = {
-  name: "",
-  category: "salary",
-  amount: "",
-  currency: "EGP",
-  receivedDate: "",
-  recurrence: "once",
-  status: "cleared",
-  notes: "",
-};
-
-const inputClass =
-  "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500";
-
-const labelClass = "text-sm font-semibold text-slate-700";
-
-const errorClass =
-  "rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense";
-
-function formatMoney(value) {
-  const num = Number(value || 0);
-
-  return new Intl.NumberFormat("ar-EG", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(num);
-}
-
-function getCurrentMonth() {
-  const now = new Date();
-
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}`;
-}
+import EditIncomeModal from "./components/EditIncomeModal";
 
 function IncomePage() {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const {
@@ -81,6 +50,7 @@ function IncomePage() {
     amount: "",
     currency: "EGP",
     receivedDate: "",
+    recurrence: "once",
     notes: "",
   });
 
@@ -218,6 +188,7 @@ function IncomePage() {
         amount: "",
         currency: "EGP",
         receivedDate: "",
+        recurrence: "once",
         notes: "",
       });
 
@@ -249,7 +220,7 @@ function IncomePage() {
     );
 
     if (updateIncomeEntry.fulfilled.match(result)) {
-      setSuccessMessage("تم التعديل بنجاح");
+      setSuccessMessage(t("income.updateSuccess"));
 
       closeEditModal();
 
@@ -266,147 +237,37 @@ function IncomePage() {
     refreshSummary();
   };
 
+
   return (
     <div className="mx-auto max-w-5xl">
-      {/* Page Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">
-            مصادر الدخل
-          </h1>
+      <IncomeHeader />
 
-          <p className="mt-1 text-slate-500">
-            إدارة مصادر الدخل وتحديثها بسهولة
-          </p>
-        </div>
+      <IncomeTotalCard
+        displayedTotal={displayedTotal}
+        summaryCurrency={summaryCurrency}
+        summaryStatus={summaryStatus}
+        summaryError={summaryError}
+      />
 
-        <Link
-          to="/dashboard"
-          className="font-semibold text-brand-700 hover:underline"
-        >
-          العودة للوحة التحكم
-        </Link>
-      </div>
+      <IncomeAlerts error={error} updateError={updateError} successMessage={successMessage} />
 
-      {/* Total Income */}
-      <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium text-slate-500">
-              إجمالي الدخل
-            </p>
-
-            <div className="mt-1 flex items-baseline gap-2">
-              <strong className="tabular-amount text-3xl font-extrabold text-slate-900">
-                {formatMoney(displayedTotal)}
-              </strong>
-
-              <span className="text-sm font-medium text-slate-500">
-                {summaryCurrency}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {summaryStatus === "loading" && (
-          <p className="mt-3 text-sm text-slate-500">
-            جارٍ تحديث ملخص الدخل...
-          </p>
-        )}
-
-        {summaryError && (
-          <p className={`mt-3 ${errorClass}`}>
-            {summaryError}
-          </p>
-        )}
-      </section>
-
-      {/* General Errors */}
-      {error && (
-        <p className={`mt-4 ${errorClass}`}>
-          {error}
-        </p>
-      )}
-
-      {updateError && (
-        <p className={`mt-4 ${errorClass}`}>
-          {updateError}
-        </p>
-      )}
-
-      {successMessage && (
-        <p className="mt-4 rounded-xl bg-income-soft px-4 py-2.5 text-sm font-medium text-income">
-          {successMessage}
-        </p>
-      )}
-
-      {/* Add Income Form */}
       <IncomeForm
         form={createForm}
         createStatus={createStatus}
         createError={createError}
         onChange={handleCreateChange}
         onSubmit={handleCreateSubmit}
-        t={(key) =>
-          ({
-            "income.formTitle": "إضافة مصدر دخل",
-            "income.nameLabel": "اسم مصدر الدخل",
-            "income.namePlaceholder": "مثال: راتب شهر سبتمبر",
-            "income.categoryLabel": "نوع الدخل",
-            "income.categoryPlaceholder": "اختار نوع الدخل",
-            "income.amountLabel": "المبلغ",
-            "income.currencyLabel": "العملة",
-            "income.receivedDateLabel": "تاريخ الاستلام",
-            "income.notesLabel": "ملاحظات (اختياري)",
-            "income.notesPlaceholder":
-              "أضف أي تفاصيل تساعدك لاحقاً",
-            "income.submit": "إضافة مصدر الدخل",
-            "income.submitting": "جارٍ الحفظ...",
-            "income.success": "تم إضافة مصدر الدخل بنجاح",
-          }[key] || key)
-        }
+        t={t}
       />
 
-      {/* Summary Filter */}
-      <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-        <h2 className="text-lg font-bold text-slate-900">
-          فلترة ملخص الدخل
-        </h2>
 
-        <div className="mt-4 flex flex-wrap items-end gap-3">
-          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
-            الشهر والسنة
+      <IncomeSummaryFilter
+        selectedMonth={selectedMonth}
+        setSelectedMonth={setSelectedMonth}
+        summaryCurrency={summaryCurrency}
+        setSummaryCurrency={setSummaryCurrency}
+      />
 
-            <input
-              type="month"
-              value={selectedMonth}
-              onChange={(event) =>
-                setSelectedMonth(event.target.value)
-              }
-              className={inputClass}
-            />
-          </label>
-
-          <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
-            العملة الأساسية
-
-            <select
-              value={summaryCurrency}
-              onChange={(event) =>
-                setSummaryCurrency(event.target.value)
-              }
-              className={inputClass}
-            >
-              <option value="EGP">EGP</option>
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
-            </select>
-          </label>
-        </div>
-      </section>
-
-      {/* Income List */}
       <IncomeList
         items={summaryItems}
         status={summary ? summaryStatus : status}
@@ -415,231 +276,21 @@ function IncomePage() {
         totalAmount={displayedTotal}
         onEdit={openEditModal}
         onDeleted={handleDeleteIncome}
-        t={(key) =>
-          ({
-            "income.listTitle": "مصادر الدخل المضافة",
-            "income.loading": "جارٍ تحميل مصادر الدخل...",
-            "income.empty": "لسه مفيش مصادر دخل مضافة.",
-          }[key] || key)
-        }
+        onToggled={refreshSummary}
+        t={t}
       />
 
-      {/* Edit Modal */}
-      {isEditing && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-500/20 p-4 backdrop-blur-[2px]"
-          onClick={closeEditModal}
-        >
-          <div
-            className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <h2 className="text-lg font-bold text-slate-900">
-              تعديل مصدر الدخل
-            </h2>
 
-            <form
-              onSubmit={handleSubmit}
-              className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2"
-            >
-              {/* Name */}
-              <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label
-                  htmlFor="name"
-                  className={labelClass}
-                >
-                  اسم المصدر
-                </label>
-
-                <input
-                  id="name"
-                  name="name"
-                  value={form.name}
-                  onChange={handleFormChange}
-                  required
-                  className={inputClass}
-                />
-              </div>
-
-              {/* Category */}
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="category"
-                  className={labelClass}
-                >
-                  الفئة
-                </label>
-
-                <select
-                  id="category"
-                  name="category"
-                  value={form.category}
-                  onChange={handleFormChange}
-                  className={inputClass}
-                >
-                  <option value="salary">راتب</option>
-                  <option value="freelance">عمل حر</option>
-                  <option value="rental">إيجار</option>
-                  <option value="investment">استثمار</option>
-                  <option value="other">أخرى</option>
-                </select>
-              </div>
-
-              {/* Amount */}
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="amount"
-                  className={labelClass}
-                >
-                  المبلغ
-                </label>
-
-                <input
-                  id="amount"
-                  name="amount"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={form.amount}
-                  onChange={handleFormChange}
-                  required
-                  className={inputClass}
-                />
-              </div>
-
-              {/* Currency */}
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="currency"
-                  className={labelClass}
-                >
-                  العملة
-                </label>
-
-                <select
-                  id="currency"
-                  name="currency"
-                  value={form.currency}
-                  onChange={handleFormChange}
-                  className={inputClass}
-                >
-                  <option value="EGP">EGP</option>
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="GBP">GBP</option>
-                </select>
-              </div>
-
-              {/* Received Date */}
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="receivedDate"
-                  className={labelClass}
-                >
-                  تاريخ الاستلام
-                </label>
-
-                <input
-                  id="receivedDate"
-                  name="receivedDate"
-                  type="date"
-                  value={form.receivedDate}
-                  onChange={handleFormChange}
-                  required
-                  className={inputClass}
-                />
-              </div>
-
-              {/* Recurrence */}
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="recurrence"
-                  className={labelClass}
-                >
-                  التكرار
-                </label>
-
-                <select
-                  id="recurrence"
-                  name="recurrence"
-                  value={form.recurrence}
-                  onChange={handleFormChange}
-                  className={inputClass}
-                >
-                  <option value="once">مرة واحدة</option>
-                  <option value="weekly">أسبوعي</option>
-                  <option value="monthly">شهري</option>
-                  <option value="yearly">سنوي</option>
-                </select>
-              </div>
-
-              {/* Status */}
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="status"
-                  className={labelClass}
-                >
-                  الحالة
-                </label>
-
-                <select
-                  id="status"
-                  name="status"
-                  value={form.status}
-                  onChange={handleFormChange}
-                  className={inputClass}
-                >
-                  <option value="cleared">مستلمة</option>
-                  <option value="pending">قيد الانتظار</option>
-                </select>
-              </div>
-
-              {/* Notes */}
-              <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label
-                  htmlFor="notes"
-                  className={labelClass}
-                >
-                  ملاحظات
-                </label>
-
-                <textarea
-                  id="notes"
-                  name="notes"
-                  rows="3"
-                  value={form.notes}
-                  onChange={handleFormChange}
-                  className={`${inputClass} resize-none`}
-                />
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-3 sm:col-span-2">
-                <button
-                  type="submit"
-                  disabled={updateStatus === "loading"}
-                  className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65"
-                >
-                  {updateStatus === "loading"
-                    ? "جارٍ الحفظ..."
-                    : "حفظ التعديلات"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={closeEditModal}
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-brand-300 hover:text-brand-700"
-                >
-                  إلغاء
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <EditIncomeModal
+        isEditing={isEditing}
+        closeEditModal={closeEditModal}
+        handleSubmit={handleSubmit}
+        form={form}
+        handleFormChange={handleFormChange}
+        updateStatus={updateStatus}
+      />
     </div>
   );
 }
 
 export default IncomePage;
-

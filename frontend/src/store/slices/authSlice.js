@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { TOKEN_KEY } from "../../api/axiosClient";
 import * as authApi from "../../api/authApi";
 import * as settingsApi from "../../api/settingsApi";
+import i18n from "../../i18n/i18n";
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
@@ -24,11 +25,14 @@ export const loginUser = createAsyncThunk(
       const res = await authApi.login({ email, password, rememberMe });
       return res.data.data;
     } catch (err) {
+      const status = err.response?.status;
       const message = err.response?.data?.message;
-      if (err.response?.status === 403 && message === "ACCOUNT_SUSPENDED") {
-        return rejectWithValue("تم إيقاف حسابك، تواصل مع الدعم");
+      if (status === 403 && message === "ACCOUNT_SUSPENDED") {
+        return rejectWithValue(i18n.t("auth.login.accountSuspended"));
       }
-      return rejectWithValue(message || "حدث خطأ أثناء تسجيل الدخول");
+      if (status === 401) return rejectWithValue(i18n.t("auth.login.invalidCredentials"));
+      if (status === 429) return rejectWithValue(i18n.t("auth.login.tooManyAttempts"));
+      return rejectWithValue(i18n.t("auth.login.genericError"));
     }
   }
 );

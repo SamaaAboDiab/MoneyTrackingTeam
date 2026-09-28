@@ -5,7 +5,10 @@
     "backToDashboard": "الرجوع للوحة التحكم",
     "comingSoon": "الصفحة دي قيد الإنشاء.",
     "showAmount": "إظهار المبلغ",
-    "hideAmount": "إخفاء المبلغ"
+    "hideAmount": "إخفاء المبلغ",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "cancel": "إلغاء"
   },
   "nav": {
     "income": "الدخل",
@@ -50,7 +53,11 @@
       "submitting": "جارٍ الدخول...",
       "forgotPassword": "نسيت كلمة السر؟",
       "noAccount": "مفيش حساب؟",
-      "registerLink": "إنشاء حساب جديد"
+      "registerLink": "إنشاء حساب جديد",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة السر غير صحيحة",
+      "tooManyAttempts": "محاولات كثيرة، حاول مرة أخرى بعد قليل",
+      "accountSuspended": "تم إيقاف حسابك، تواصل مع الدعم",
+      "genericError": "حدث خطأ أثناء تسجيل الدخول"
     },
     "forgotPassword": {
       "title": "نسيت كلمة السر",
@@ -74,10 +81,61 @@
     }
   },
   "dashboard": {
+    "accountsSummaryLink": "الإجمالي",
     "title": "لوحة التحكم",
     "greeting": "أهلاً، {{name}}",
     "accountsLink": "إدارة الحسابات والمحافظ",
-    "transferLink": "تحويل بين حسابين"
+    "transferLink": "تحويل بين حسابين",
+    "periodLabel": "الفترة",
+    "period": {
+      "month": "هذا الشهر",
+      "last_month": "الشهر الماضي",
+      "3months": "آخر 3 شهور",
+      "custom": "مخصص",
+      "from": "من تاريخ",
+      "to": "إلى تاريخ",
+      "selected": "الفترة المختارة",
+      "invalid": "اختاري تاريخ نهاية بعد تاريخ البداية"
+    },
+    "summary": {
+      "title": "ملخص الشهر الحالي",
+      "loading": "جارٍ تحميل الملخص...",
+      "income": "إجمالي الدخل",
+      "expenses": "إجمالي المصاريف",
+      "net": "المتبقي",
+      "deficit": "عجز",
+      "currentPeriod": "الفترة الحالية",
+      "previousPeriod": "الفترة السابقة",
+      "difference": "الفرق",
+      "noComparison": "لا يوجد بيانات للمقارنة",
+      "notAvailable": "غير متاح"
+    },
+    "chart": {
+      "title": "توزيع المصاريف حسب التصنيف",
+      "empty": "لا توجد مصروفات في هذه الفترة.",
+      "topCategories": "أعلى 3 تصنيفات",
+      "viewInExpenses": "عرض في المصروفات",
+      "otherCount": "{{count}} عملية"
+    },
+    "debtsCard": {
+      "title": "إجمالي الديون المستحقة",
+      "activeCount": "{{count}} دين نشط يتطلب السداد",
+      "noneDue": "لا توجد ديون مستحقة عليك حالياً",
+      "manage": "الملخص",
+      "remaining": "المبلغ المتبقي للسداد",
+      "calculating": "جارٍ الحساب...",
+      "overdueBadge": "{{count}} ديون متأخرة!",
+      "dueSoonBadge": "{{count}} ديون موعدها قريب",
+      "allPaid": "لا يوجد ديون نشطة",
+      "activeBadge": "{{count}} ديون نشطة",
+      "nearestDue": "أقرب موعد سداد",
+      "noDueDate": "لم يُحدد موعد",
+      "payoffForecast": "التوقع الزمني للسداد الكامل",
+      "forecastUnavailable": "لا توجد بيانات كافية للتوقع",
+      "dueToday": "موعد السداد اليوم",
+      "dueTomorrow": "موعد السداد غداً",
+      "dueInDays": "موعد السداد بعد {{count}} أيام"
+    }
   },
   "layout": {
     "brand": "Money Tracker",
@@ -91,7 +149,11 @@
     "notifications": "الإشعارات",
     "quickActionLabel": "تحويل جديد",
     "collapseSidebar": "طي القائمة الجانبية",
-    "expandSidebar": "توسيع القائمة الجانبية"
+    "expandSidebar": "توسيع القائمة الجانبية",
+    "mobileNav": {
+      "home": "الرئيسية",
+      "accounts": "الحسابات"
+    }
   },
   "transfer": {
     "backToDashboard": "الرجوع للوحة التحكم",
@@ -167,12 +229,22 @@
       "description": "الوصف",
       "amount": "المبلغ",
       "balanceAfter": "الرصيد بعد الحركة"
-    }
+    },
+    "archive": "أرشفة",
+    "reactivate": "إعادة تفعيل",
+    "archivedTitle": "الحسابات المؤرشفة",
+    "activeTitle": "الحسابات النشطة",
+    "viewActive": "عرض الحسابات النشطة",
+    "viewArchived": "عرض الحسابات المؤرشفة",
+    "emptyArchived": "لا توجد حسابات مؤرشفة."
   },
   "income": {
     "title": "مصادر الدخل",
     "description": "سجّل كل مصادر دخلك وتابعها في قائمة واحدة.",
+    "totalLabel": "إجمالي الدخل",
+    "summaryUpdating": "جارٍ تحديث ملخص الدخل...",
     "formTitle": "إضافة مصدر دخل",
+    "editTitle": "تعديل مصدر الدخل",
     "nameLabel": "اسم مصدر الدخل",
     "namePlaceholder": "مثال: راتب شهر سبتمبر",
     "categoryLabel": "نوع الدخل",
@@ -180,21 +252,312 @@
     "amountLabel": "المبلغ",
     "currencyLabel": "العملة",
     "receivedDateLabel": "تاريخ الاستلام",
+    "recurrenceLabel": "التكرار",
+    "recurrence": {
+      "once": "مرة واحدة",
+      "weekly": "أسبوعي",
+      "monthly": "شهري",
+      "yearly": "سنوي"
+    },
+    "statusLabel": "الحالة",
+    "status": {
+      "cleared": "مستلمة",
+      "pending": "قيد الانتظار"
+    },
     "notesLabel": "ملاحظات (اختياري)",
     "notesPlaceholder": "أضف أي تفاصيل تساعدك لاحقاً",
     "submit": "إضافة مصدر الدخل",
     "submitting": "جارٍ الحفظ...",
     "success": "تم إضافة مصدر الدخل بنجاح",
+    "saveChanges": "حفظ التعديلات",
+    "updateSuccess": "تم التعديل بنجاح",
+    "cancel": "إلغاء",
     "listTitle": "مصادر الدخل المضافة",
     "loading": "جارٍ تحميل مصادر الدخل...",
     "empty": "لسه مفيش مصادر دخل مضافة.",
+    "totalConvertedLabel": "الإجمالي بالعملة المختارة",
+    "filter": {
+      "title": "فلترة ملخص الدخل",
+      "monthYearLabel": "الشهر والسنة",
+      "baseCurrencyLabel": "العملة الأساسية"
+    },
+    "fields": {
+      "name": "اسم المصدر",
+      "category": "الفئة",
+      "amountConverted": "المبلغ بالعملة المختارة",
+      "originalPrefix": "الأصل:",
+      "date": "التاريخ"
+    },
     "categories": {
       "salary": "مرتب",
       "freelance": "فري لانس",
       "rental": "إيجار",
       "investment": "أرباح",
       "other": "غيره"
+    },
+    "delete": {
+      "trigger": "حذف",
+      "confirmTitle": "هل أنت متأكد؟",
+      "confirmMessage": "هيتم حذف \"{{name}}\" نهائيًا. لو الدخل ده متكرر، هيتوقف من كل الفترات الجاية.",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد الحذف",
+      "deleting": "جاري الحذف...",
+      "error": "تعذر حذف الدخل."
+    },
+    "recurringBadge": "متكرر",
+    "pausedBadge": "متوقف",
+    "pause": "إيقاف التكرار",
+    "resume": "استئناف التكرار"
+  },
+  "expenses": {
+    "subtitle": "إدارة وتعديل وحذف كل مصروف، ومتابعة التأثير على الحسابات.",
+    "totalLabel": "إجمالي المصروفات",
+    "totalFilteredSuffix": "(المفلترة)",
+    "addFormTitle": "إضافة مصروف جديد",
+    "fields": {
+      "description": "الوصف",
+      "amount": "المبلغ",
+      "date": "التاريخ",
+      "paymentMethod": "طريقة الدفع",
+      "expenseType": "نوع المصروف",
+      "category": "التصنيف",
+      "account": "الحساب المخصوم منه (اختياري)",
+      "notes": "ملاحظات (اختياري)"
+    },
+    "descriptionPlaceholder": "مثال: مشتريات السوبرماركت، فاتورة إنترنت، صيانة السيارة...",
+    "noAccountOption": "بدون حساب محدد",
+    "unknownAccount": "حساب",
+    "notesPlaceholder": "أضف أي تفاصيل أو ملاحظات إضافية هنا (اختياري)...",
+    "paymentMethod": {
+      "cash": "كاش",
+      "card": "بطاقة",
+      "wallet": "محفظة"
+    },
+    "selectType": "اختر النوع",
+    "expenseType": {
+      "daily": "يومي",
+      "fixed": "شهري ثابت",
+      "emergency": "طارئ"
+    },
+    "submit": "إضافة المصروف",
+    "submitting": "جارٍ الحفظ...",
+    "success": "تم إضافة المصروف بنجاح",
+    "listTitle": "قائمة المصروفات",
+    "listSubtitle": "فلترة المصروفات، وتعديلها أو حذفها مع تحديث الأرصدة تلقائياً.",
+    "clearFilters": "مسح الفلاتر",
+    "filters": {
+      "periodLabel": "الفترة الزمنية",
+      "period": {
+        "all": "كل الفترات",
+        "day": "اليوم",
+        "week": "آخر 7 أيام",
+        "month": "هذا الشهر",
+        "custom": "مخصص (تحديد تاريخين)"
+      },
+      "typeLabel": "نوع المصروف",
+      "typeAll": "كل الأنواع",
+      "categoryLabel": "التصنيف",
+      "categoryAll": "كل التصنيفات",
+      "accountLabel": "الحساب",
+      "accountAll": "كل الحسابات",
+      "startDate": "من تاريخ",
+      "endDate": "إلى تاريخ"
+    },
+    "emptyFiltered": "لا توجد مصروفات تطابق معايير الفلترة المحددة.",
+    "emptyAll": "لا توجد مصروفات مسجلة حاليًا.",
+    "resetFiltersCta": "إعادة ضبط الفلاتر لعرض كل المصروفات",
+    "loading": "جارٍ تحميل المصروفات...",
+    "editAction": "تعديل",
+    "editTitleAttr": "تعديل هذا المصروف",
+    "deleteAction": "حذف",
+    "deleteTitleAttr": "حذف هذا المصروف",
+    "editModal": {
+      "title": "تعديل المصروف",
+      "accountLabel": "الحساب المخصوم منه",
+      "save": "حفظ التعديلات",
+      "saving": "جارٍ الحفظ...",
+      "cancel": "إلغاء"
+    },
+    "deleteModal": {
+      "title": "تأكيد حذف المصروف",
+      "confirmQuestion": "هل أنت متأكد من حذف مصروف \"{{description}}\" بمبلغ {{amount}} التابع لفئة \"{{category}}\"؟",
+      "refundNote": "استرجاع الرصيد تلقائياً: سيتم إضافة مبلغ {{amount}} تلقائياً إلى حساب \"{{account}}\".",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد الحذف",
+      "deleting": "جارٍ الحذف..."
+    },
+    "toast": {
+      "added": "تمت إضافة المصروف وخصمه من الحساب بنجاح",
+      "updated": "تم تحديث المصروف وتحديث رصيد الحساب بنجاح",
+      "deleted": "تم حذف المصروف واسترجاع الرصيد للحساب بنجاح"
+    },
+    "validation": {
+      "typeAndCategoryRequired": "يرجى اختيار نوع المصروف والتصنيف."
+    },
+    "errors": {
+      "updateFailed": "تعذر تعديل المصروف.",
+      "deleteFailed": "تعذر حذف المصروف."
     }
+  },
+  "cash": {
+    "subtitle": "حوّل من حساباتك إلى رصيد الكاش الفعلي.",
+    "totalBalance": "إجمالي رصيد الكاش",
+    "noAccount": "لا يوجد حساب كاش.",
+    "createAccount": "إنشاء حساب كاش",
+    "createAccountError": "تعذر إنشاء حساب الكاش.",
+    "withdrawTitle": "تسجيل سحب",
+    "sourceAccount": "الحساب المصدر",
+    "cashAccount": "حساب الكاش",
+    "selectAccount": "اختر الحساب",
+    "selectCashAccount": "اختر حساب الكاش",
+    "amount": "المبلغ",
+    "accountOption": "{{name}} - {{balance}} {{currency}}",
+    "selectAccountsError": "اختر الحساب المصدر وحساب الكاش.",
+    "amountPositiveError": "اكتب مبلغًا أكبر من صفر.",
+    "submitting": "جار التنفيذ...",
+    "confirmWithdraw": "تأكيد السحب",
+    "emptyAlert": "رصيد الكاش فاضي",
+    "viewExpenses": "عرض مصاريف الكاش",
+    "internalTransfer": "تحويل داخلي",
+    "widgetLabel": "رصيد الكاش",
+    "widgetNoAccount": "مفيش حساب كاش لسه",
+    "expenses": {
+      "title": "مصاريف الكاش",
+      "subtitle": "كل المصاريف اللي دفعتها كاش في الفترة المختارة.",
+      "total": "إجمالي مصاريف الكاش",
+      "period": "الفترة",
+      "category": "التصنيف",
+      "allCategories": "كل التصنيفات",
+      "empty": "لا توجد مصاريف كاش في هذه الفترة.",
+      "noCashAccount": "لا يوجد حساب كاش بعد.",
+      "back": "الرجوع للكاش",
+      "loading": "جارٍ التحميل..."
+    }
+  },
+  "debts": {
+    "subtitle": "سجّل ديونك، تابع مواعيد السداد والدفعات المسددة لكل دائن.",
+    "addNew": "إضافة دين جديد",
+    "cancel": "إلغاء",
+    "createValidationError": "يرجى ملء جميع الحقول الإلزامية (اسم الدائن، المبلغ، العملة، تاريخ النشأة، تاريخ السداد).",
+    "createSuccess": "تم إضافة الدين بنجاح",
+    "createError": "تعذر إضافة الدين.",
+    "dueDateUpdateSuccess": "تم تعديل تاريخ السداد بنجاح",
+    "dueDateUpdateError": "تعذر تعديل تاريخ السداد.",
+    "deleteConfirm": "هل أنت متأكد من رغبتك في حذف هذا الدين؟",
+    "deleteSuccess": "تم حذف الدين بنجاح",
+    "deleteError": "تعذر حذف الدين.",
+    "markPaidConfirm": "هل أنت متأكد من تحديد دين \"{{creditor}}\" كمسدد بالكامل؟",
+    "markPaidSuccess": "تم سداد دين \"{{creditor}}\" بنجاح وانتقل إلى قائمة الديون المكتملة!",
+    "markPaidError": "تعذر تحديث حالة الدين.",
+    "paymentAmountPositiveError": "اكتب مبلغًا أكبر من صفر.",
+    "paymentExceedsRemainingError": "المبلغ المدخل أكبر من المبلغ المتبقي ({{remaining}} {{currency}}).",
+    "paymentAccountRequiredError": "اختر الحساب الذي سيتم الدفع منه.",
+    "paymentDateRequiredError": "حدد تاريخ الدفعة.",
+    "paymentSuccess": "تم تسجيل الدفعة بنجاح",
+    "paymentError": "تعذر تسجيل الدفعة.",
+    "historyFetchError": "تعذر جلب سجل الدفعات من الخادم.",
+    "form": {
+      "title": "تسجيل دين جديد",
+      "requiredNote": "جميع الحقول بعلامة (*) إلزامية",
+      "creditorLabel": "اسم الدائن",
+      "creditorPlaceholder": "مثال: البنك الأهلي، محمد أحمد",
+      "totalAmountLabel": "المبلغ الكلي",
+      "currencyLabel": "العملة",
+      "categoryLabel": "التصنيف",
+      "startDateLabel": "تاريخ نشأة الدين",
+      "dueDateLabel": "تاريخ السداد المتوقع",
+      "notesLabel": "ملاحظات (اختياري)",
+      "notesPlaceholder": "أضف أي تفاصيل أخرى أو شروط السداد...",
+      "save": "حفظ الدين",
+      "saving": "جار الحفظ..."
+    },
+    "currencyOptions": {
+      "EGP": "جنيه مصري (EGP)",
+      "USD": "دولار أمريكي (USD)",
+      "EUR": "يورو (EUR)",
+      "SAR": "ريال سعودي (SAR)",
+      "AED": "درهم إماراتي (AED)"
+    },
+    "category": {
+      "other": "أخرى",
+      "personal": "شخصي",
+      "credit_card": "بطاقة ائتمان",
+      "auto_loan": "قرض سيارة",
+      "mortgage": "تمويل عقاري",
+      "student": "تعليمي"
+    },
+    "tabs": {
+      "active": "الديون النشطة",
+      "completed": "مكتمل",
+      "all": "الكل"
+    },
+    "loading": "جارٍ تحميل الديون...",
+    "empty": {
+      "activeTitle": "لا توجد ديون نشطة حالياً! أحسنت",
+      "completedTitle": "لا توجد ديون مكتملة السداد بعد.",
+      "allTitle": "لا توجد ديون مسجلة.",
+      "activeSubtitle": "جميع التزاماتك المالية مسددة بالكامل.",
+      "otherSubtitle": "اضغط على \"إضافة دين جديد\" لتسجيل دين جديد."
+    },
+    "overdueBanner": "تنبيه: هذا الدين متأخر عن موعد السداد المحدد!",
+    "status": {
+      "paid": "تم السداد",
+      "overdue": "متأخر",
+      "dueSoon": "قريب الموعد",
+      "active": "نشط"
+    },
+    "clickForHistory": "اضغط لعرض سجل الدفعات",
+    "amounts": {
+      "original": "المبلغ الأصلي",
+      "paid": "إجمالي المدفوع",
+      "remaining": "المتبقي"
+    },
+    "progressLabel": "نسبة الإنجاز في السداد",
+    "progressComplete": "100% (مكتمل)",
+    "startDatePrefix": "تاريخ النشأة:",
+    "dueDatePrefix": "تاريخ السداد المتوقع:",
+    "dueSoonMessage": {
+      "today": "تنبيه: موعد السداد اليوم",
+      "tomorrow": "تنبيه: موعد السداد غداً",
+      "inDays": "تنبيه: موعد السداد بعد {{count}} أيام"
+    },
+    "editDueDate": "تعديل تاريخ السداد",
+    "saveDate": "حفظ التاريخ",
+    "forecast": {
+      "averageMonthly": "متوسط دفعاتك الشهرية: {{amount}}",
+      "notEnoughData": "أضف دفعات أكثر لحساب التوقع"
+    },
+    "actions": {
+      "addPayment": "إضافة دفعة",
+      "markPaid": "تم السداد",
+      "showHistory": "سجل الدفعات",
+      "hideHistory": "إخفاء السجل",
+      "delete": "حذف"
+    },
+    "history": {
+      "title": "سجل الدفعات المسجلة ({{count}})",
+      "addNew": "+ إضافة دفعة جديدة",
+      "loading": "جارٍ تحميل سجل الدفعات من الخادم...",
+      "empty": "لا توجد دفعات مسجلة بعد لهذا الدين في قاعدة البيانات.",
+      "unknownAccount": "حساب محدد"
+    },
+    "paymentModal": {
+      "title": "تسجيل دفعة جديدة",
+      "payingFor": "سداد للدائن:",
+      "remainingLabel": "المبلغ المتبقي على الدين:",
+      "amountLabel": "المبلغ",
+      "dateLabel": "التاريخ",
+      "accountLabel": "الحساب الذي سيتم الدفع منه",
+      "selectAccount": "اختر الحساب",
+      "accountOption": "{{name}} (رصيد: {{balance}} {{currency}})",
+      "accountHint": "سيتم خصم مبلغ الدفعة تلقائياً من رصيد الحساب المختار.",
+      "notesLabel": "ملاحظات (اختياري)",
+      "notesPlaceholder": "مثال: قسط شهر 10، تحويل بنكي",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد الدفعة",
+      "saving": "جار الحفظ..."
+    },
+    "confirmTitle": "هل أنت متأكد؟"
   },
   "profile": {
     "title": "الملف الشخصي",
@@ -210,5 +573,66 @@
     "save": "حفظ التعديلات",
     "saving": "جارٍ الحفظ...",
     "saveSuccess": "تم تحديث بياناتك بنجاح."
+  },
+  "quickAdd": {
+    "button": "تسجيل مصروف سريع",
+    "title": "مصروف كاش سريع",
+    "amount": "المبلغ",
+    "category": "التصنيف",
+    "selectCategory": "اختر التصنيف",
+    "description": "وصف (اختياري)",
+    "defaultDescription": "مصروف كاش",
+    "submit": "حفظ",
+    "submitting": "جارٍ الحفظ...",
+    "cancel": "إلغاء",
+    "success": "تم تسجيل المصروف بنجاح",
+    "noCashAccount": "محتاج حساب كاش الأول من صفحة الكاش.",
+    "required": "اكتب المبلغ واختر التصنيف.",
+    "error": "تعذر تسجيل المصروف."
+  },
+  "categoriesPage": {
+    "title": "التصنيفات",
+    "addNew": "+ إضافة تصنيف جديد",
+    "loading": "جاري التحميل...",
+    "empty": "مفيش تصنيفات لسة.",
+    "createSuccess": "تم إضافة التصنيف بنجاح",
+    "updateSuccess": "تم التعديل بنجاح",
+    "deleteSuccess": "تم حذف التصنيف",
+    "loadError": "تعذر تحميل التصنيفات.",
+    "saveError": "حصل خطأ أثناء الحفظ.",
+    "deleteError": "تعذر حذف التصنيف.",
+    "createError": "تعذر إضافة التصنيف.",
+    "nameRequired": "اسم التصنيف مطلوب.",
+    "formTitleNew": "تصنيف جديد",
+    "formTitleEdit": "تعديل التصنيف",
+    "nameLabel": "الاسم",
+    "namePlaceholder": "مثال: صيانة، اشتراكات شهرية، هدايا...",
+    "nameLocked": "اسم التصنيف الافتراضي لا يمكن تغييره",
+    "typeLabel": "النوع",
+    "typeLocked": "نوع التصنيف الافتراضي لا يمكن تغييره",
+    "colorLabel": "اللون",
+    "save": "حفظ",
+    "saving": "جاري الحفظ...",
+    "deleteConfirmTitle": "هل أنت متأكد؟",
+    "deleteConfirmMessage": "هيتم حذف تصنيف \"{{name}}\" نهائيًا.",
+    "confirmDelete": "تأكيد الحذف",
+    "deleting": "جاري الحذف...",
+    "type": {
+      "daily": "يومي",
+      "fixed": "شهري ثابت",
+      "emergency": "طارئ"
+    },
+    "select": {
+      "placeholder": "اختر التصنيف",
+      "loadingList": "جارٍ جلب التصنيفات...",
+      "none": "لا توجد تصنيفات بعد.",
+      "loading": "جارٍ التحميل...",
+      "newTitle": "تصنيف جديد",
+      "newPlaceholder": "مثال: اشتراكات، صيانة، هدايا...",
+      "add": "إضافة",
+      "adding": "حفظ...",
+      "addOption": "إضافة تصنيف جديد...",
+      "deleteTitle": "حذف هذا التصنيف"
+    }
   }
 }

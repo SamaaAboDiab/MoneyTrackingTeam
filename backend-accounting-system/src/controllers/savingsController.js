@@ -7,6 +7,7 @@ const AccountTransaction = require("../models/AccountTransaction");
 async function creditAccount(userId, accountId, amount, description, date) {
   const acc = await Account.findOne({ _id: accountId, user: userId });
   if (!acc) throw { status: 404, message: "Account not found." };
+  if (acc.isArchived || acc.isActive === false) throw { status: 400, code: "ACCOUNT_FROZEN", message: `Account "${acc.name}" is archived (frozen).` };
   const balBefore = acc.balance;
   acc.balance += amount;
   await acc.save();
@@ -24,6 +25,7 @@ async function creditAccount(userId, accountId, amount, description, date) {
 async function debitAccount(userId, accountId, amount, description, date) {
   const acc = await Account.findOne({ _id: accountId, user: userId });
   if (!acc) throw { status: 404, message: "Account not found." };
+  if (acc.isArchived || acc.isActive === false) throw { status: 400, code: "ACCOUNT_FROZEN", message: `Account "${acc.name}" is archived (frozen).` };
   if (acc.balance < amount) throw { status: 400, message: "Insufficient account balance." };
   const balBefore = acc.balance;
   acc.balance -= amount;
