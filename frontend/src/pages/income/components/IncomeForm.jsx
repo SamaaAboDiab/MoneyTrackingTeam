@@ -1,12 +1,14 @@
-import { useTranslation } from "react-i18next";
+import DatePicker from "../../../components/common/DatePicker";
+import Select from "../../../components/common/Select";
+import NumberInput from "../../../components/common/NumberInput";
+import { currencyName } from "../../../utils/formatAmount";
+import { INCOME_CURRENCIES } from "../constants";
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500";
 const labelClass = "text-sm font-semibold text-slate-700";
 
 function IncomeForm({ form, createStatus, createError, onChange, onSubmit, t }) {
-  const { i18n } = useTranslation();
-
   return (
     <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
       <h2 className="text-lg font-bold text-slate-900">{t("income.formTitle")}</h2>
@@ -32,12 +34,12 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, t }) 
           <label htmlFor="income-category" className={labelClass}>
             {t("income.categoryLabel")}
           </label>
-          <select
+          <Select
             id="income-category"
             name="category"
+            required
             value={form.category}
             onChange={onChange}
-            required
             className={inputClass}
           >
             <option value="">{t("income.categoryPlaceholder")}</option>
@@ -46,17 +48,16 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, t }) 
                 {t(`income.categories.${category}`)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="income-amount" className={labelClass}>
             {t("income.amountLabel")}
           </label>
-          <input
+          <NumberInput
             id="income-amount"
             name="amount"
-            type="number"
             min="0.01"
             step="0.01"
             value={form.amount}
@@ -71,59 +72,43 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, t }) 
           <label htmlFor="income-currency" className={labelClass}>
             {t("income.currencyLabel")}
           </label>
-          <select
+          <Select
             id="income-currency"
             name="currency"
             value={form.currency}
             onChange={onChange}
-            required
             className={inputClass}
           >
-            <option value="EGP">EGP</option>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="GBP">GBP</option>
-          </select>
+            {INCOME_CURRENCIES.map((code) => (
+              <option key={code} value={code}>
+                {currencyName(code)}
+              </option>
+            ))}
+          </Select>
         </div>
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="income-date" className={labelClass}>
             {t("income.receivedDateLabel")}
           </label>
-          <input
+          <DatePicker
             id="income-date"
-            name="receivedDate"
-            type="date"
-            value={form.receivedDate}
-            onChange={onChange}
             required
+            value={form.receivedDate}
+            onChange={(value) => onChange({ target: { name: "receivedDate", value } })}
             className={`${inputClass} font-medium text-slate-800`}
           />
-          {form.receivedDate && (
-            <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500 pr-1">
-              <svg className="h-3.5 w-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clipRule="evenodd" />
-              </svg>
-              {new Date(form.receivedDate).toLocaleDateString(i18n.language, {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
-          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="income-recurrence" className={labelClass}>
             {t("income.recurrenceLabel")}
           </label>
-          <select
+          <Select
             id="income-recurrence"
             name="recurrence"
             value={form.recurrence || "once"}
             onChange={onChange}
-            required
             className={inputClass}
           >
             {["once", "weekly", "monthly", "yearly"].map((key) => (
@@ -131,7 +116,7 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, t }) 
                 {t(`income.recurrence.${key}`)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">

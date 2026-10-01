@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { formatAmount } from "../../../utils/formatAmount";
+import { formatMoney } from "../../../utils/formatAmount";
+import { categoryLabel } from "../../categories/components/mandatoryCategories";
 
 function DeleteExpenseModal({ deletingExpense, setDeletingExpense, deleteLoading, deleteError, handleConfirmDelete, getCategoryName }) {
   const { t } = useTranslation();
@@ -27,8 +28,8 @@ function DeleteExpenseModal({ deletingExpense, setDeletingExpense, deleteLoading
           <p className="mt-3 text-sm text-slate-600">
             {t("expenses.deleteModal.confirmQuestion", {
               description: deletingExpense.description,
-              amount: `${formatAmount(deletingExpense.amount)} EGP`,
-              category: getCategoryName(deletingExpense.category),
+              amount: formatMoney(deletingExpense.amount, deletingExpense.currency),
+              category: categoryLabel(getCategoryName(deletingExpense.category)),
             })}
           </p>
 
@@ -39,7 +40,7 @@ function DeleteExpenseModal({ deletingExpense, setDeletingExpense, deleteLoading
               </svg>
               <span>
                 {t("expenses.deleteModal.refundNote", {
-                  amount: `${formatAmount(deletingExpense.amount)} EGP`,
+                  amount: formatMoney(deletingExpense.amount, deletingExpense.currency),
                   account: deletingExpense.account.name,
                 })}
               </span>

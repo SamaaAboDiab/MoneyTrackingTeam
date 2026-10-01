@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Landmark, Smartphone, Banknote } from "lucide-react";
 import AdjustBalanceButton from "./AdjustBalanceModal";
+import { formatMoney } from "../../../utils/formatAmount";
 
 const ACCOUNT_TYPE_STYLE = {
   bank: { icon: Landmark, badge: "bg-blue-50 text-blue-600" },
@@ -36,8 +37,7 @@ function AccountCard({ account, adjustStatus, onAdjust, onToggleArchive, t }) {
           Number(account.balance) < 0 ? "text-expense" : "text-slate-900"
         }`}
       >
-        {t("accounts.balance")}: {Number(account.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })}{" "}
-        {account.currency}
+        {t("accounts.balance")}: {formatMoney(account.balance, account.currency)}
       </p>
 
       <div className="mt-auto flex items-center gap-2 border-t border-slate-100 pt-3">
@@ -48,7 +48,7 @@ function AccountCard({ account, adjustStatus, onAdjust, onToggleArchive, t }) {
         <button
           type="button"
           onClick={() => onToggleArchive(account._id)}
-          className="whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:border-brand-300 hover:text-brand-700"
+          className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition hover:border-brand-300 hover:bg-slate-50"
         >
           {account.isArchived ? t("accounts.reactivate") : t("accounts.archive")}
         </button>

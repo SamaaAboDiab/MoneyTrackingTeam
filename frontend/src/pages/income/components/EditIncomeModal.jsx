@@ -1,5 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { inputClass, labelClass } from "../constants";
+import DatePicker from "../../../components/common/DatePicker";
+import Select from "../../../components/common/Select";
+import NumberInput from "../../../components/common/NumberInput";
+import { currencyName } from "../../../utils/formatAmount";
+import { INCOME_CURRENCIES } from "../constants";
 
 function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handleFormChange, updateStatus }) {
   const { t } = useTranslation();
@@ -51,7 +56,7 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
                 {t("income.fields.category")}
               </label>
 
-              <select
+              <Select
                 id="category"
                 name="category"
                 value={form.category}
@@ -63,7 +68,7 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
                     {t(`income.categories.${category}`)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             {/* Amount */}
@@ -75,11 +80,10 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
                 {t("income.amountLabel")}
               </label>
 
-              <input
+              <NumberInput
                 id="amount"
                 name="amount"
-                type="number"
-                min="0"
+                min="0.01"
                 step="0.01"
                 value={form.amount}
                 onChange={handleFormChange}
@@ -97,18 +101,19 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
                 {t("income.currencyLabel")}
               </label>
 
-              <select
+              <Select
                 id="currency"
                 name="currency"
                 value={form.currency}
                 onChange={handleFormChange}
                 className={inputClass}
               >
-                <option value="EGP">EGP</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-              </select>
+                {INCOME_CURRENCIES.map((code) => (
+                  <option key={code} value={code}>
+                    {currencyName(code)}
+                  </option>
+                ))}
+              </Select>
             </div>
 
             {/* Received Date */}
@@ -120,13 +125,11 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
                 {t("income.receivedDateLabel")}
               </label>
 
-              <input
+              <DatePicker
                 id="receivedDate"
-                name="receivedDate"
-                type="date"
-                value={form.receivedDate}
-                onChange={handleFormChange}
                 required
+                value={form.receivedDate}
+                onChange={(value) => handleFormChange({ target: { name: "receivedDate", value } })}
                 className={inputClass}
               />
             </div>
@@ -140,7 +143,7 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
                 {t("income.recurrenceLabel")}
               </label>
 
-              <select
+              <Select
                 id="recurrence"
                 name="recurrence"
                 value={form.recurrence}
@@ -152,7 +155,7 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
                     {t(`income.recurrence.${recurrence}`)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             {/* Status */}
@@ -164,7 +167,7 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
                 {t("income.statusLabel")}
               </label>
 
-              <select
+              <Select
                 id="status"
                 name="status"
                 value={form.status}
@@ -173,7 +176,7 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
               >
                 <option value="cleared">{t("income.status.cleared")}</option>
                 <option value="pending">{t("income.status.pending")}</option>
-              </select>
+              </Select>
             </div>
 
             {/* Notes */}

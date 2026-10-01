@@ -3,6 +3,7 @@ import { TOKEN_KEY } from "../../api/axiosClient";
 import * as authApi from "../../api/authApi";
 import * as settingsApi from "../../api/settingsApi";
 import i18n from "../../i18n/i18n";
+import { extractError } from "../../utils/errorHandler";
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
@@ -12,7 +13,7 @@ export const registerUser = createAsyncThunk(
       return res.data.data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "حدث خطأ أثناء إنشاء الحساب"
+        extractError(err, "errors.auth.register")
       );
     }
   }
@@ -45,7 +46,7 @@ export const forgotPassword = createAsyncThunk(
       return res.data.message;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "حدث خطأ أثناء إرسال رابط الاستعادة"
+        extractError(err, "errors.auth.forgot")
       );
     }
   }
@@ -59,7 +60,7 @@ export const resetPassword = createAsyncThunk(
       return res.data.message;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data?.message || "الرابط غير صالح أو منتهي الصلاحية"
+        extractError(err, "errors.auth.reset")
       );
     }
   }
@@ -84,7 +85,7 @@ export const updateProfile = createAsyncThunk(
       const res = await settingsApi.updateProfile({ name, phone });
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "تعذّر تحديث البيانات");
+      return rejectWithValue(extractError(err, "errors.auth.profile"));
     }
   }
 );
@@ -96,7 +97,7 @@ export const uploadAvatar = createAsyncThunk(
       const res = await settingsApi.uploadPhoto(avatar);
       return res.data.data.avatar;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "تعذّر رفع الصورة");
+      return rejectWithValue(extractError(err, "errors.auth.avatarUpload"));
     }
   }
 );
@@ -108,7 +109,55 @@ export const deleteAvatar = createAsyncThunk(
       await settingsApi.deletePhoto();
       return true;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "تعذّر حذف الصورة");
+      return rejectWithValue(extractError(err, "errors.auth.avatarDelete"));
+    }
+  }
+);
+
+export const requestEmailChange = createAsyncThunk(
+  "auth/requestEmailChange",
+  async (email, { rejectWithValue }) => {
+    try {
+      const res = await settingsApi.requestEmailChange(email);
+      return res.data.message;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "errors.auth.emailCode"));
+    }
+  }
+);
+
+export const confirmEmailChange = createAsyncThunk(
+  "auth/confirmEmailChange",
+  async (code, { rejectWithValue }) => {
+    try {
+      const res = await settingsApi.confirmEmailChange(code);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "errors.auth.emailConfirm"));
+    }
+  }
+);
+
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async ({ currentPassword, newPassword, confirmPassword }, { rejectWithValue }) => {
+    try {
+      const res = await settingsApi.changePassword({ currentPassword, newPassword, confirmPassword });
+      return res.data.message;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "errors.auth.password"));
+    }
+  }
+);
+
+export const saveLocale = createAsyncThunk(
+  "auth/saveLocale",
+  async (locale, { rejectWithValue }) => {
+    try {
+      const res = await settingsApi.saveLocale(locale);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(extractError(err, "errors.auth.locale"));
     }
   }
 );
@@ -121,6 +170,14 @@ const initialState = {
   authChecked: false,
   profileStatus: "idle",
   profileError: null,
+  emailRequestStatus: "idle",
+  emailRequestError: null,
+  emailConfirmStatus: "idle",
+  emailConfirmError: null,
+  passwordStatus: "idle",
+  passwordError: null,
+  localeStatus: "idle",
+  localeError: null,
 };
 
 const authSlice = createSlice({
@@ -143,6 +200,16 @@ const authSlice = createSlice({
     },
     clearProfileError(state) {
       state.profileError = null;
+    },
+    resetEmailChangeState(state) {
+      state.emailRequestStatus = "idle";
+      state.emailRequestError = null;
+      state.emailConfirmStatus = "idle";
+      state.emailConfirmError = null;
+    },
+    resetPasswordChangeState(state) {
+      state.passwordStatus = "idle";
+      state.passwordError = null;
     },
   },
   extraReducers: (builder) => {
@@ -221,9 +288,62 @@ const authSlice = createSlice({
       })
       .addCase(deleteAvatar.fulfilled, (state) => {
         if (state.user) state.user.avatar = "";
+      })
+      .addCase(requestEmailChange.pending, (state) => {
+        state.emailRequestStatus = "loading";
+        state.emailRequestError = null;
+      })
+      .addCase(requestEmailChange.fulfilled, (state) => {
+        state.emailRequestStatus = "succeeded";
+      })
+      .addCase(requestEmailChange.rejected, (state, action) => {
+        state.emailRequestStatus = "failed";
+        state.emailRequestError = action.payload;
+      })
+      .addCase(confirmEmailChange.pending, (state) => {
+        state.emailConfirmStatus = "loading";
+        state.emailConfirmError = null;
+      })
+      .addCase(confirmEmailChange.fulfilled, (state, action) => {
+        state.emailConfirmStatus = "succeeded";
+        state.user = action.payload;
+      })
+      .addCase(confirmEmailChange.rejected, (state, action) => {
+        state.emailConfirmStatus = "failed";
+        state.emailConfirmError = action.payload;
+      })
+      .addCase(changePassword.pending, (state) => {
+        state.passwordStatus = "loading";
+        state.passwordError = null;
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.passwordStatus = "succeeded";
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.passwordStatus = "failed";
+        state.passwordError = action.payload;
+      })
+      .addCase(saveLocale.pending, (state) => {
+        state.localeStatus = "loading";
+        state.localeError = null;
+      })
+      .addCase(saveLocale.fulfilled, (state, action) => {
+        state.localeStatus = "succeeded";
+        state.user = action.payload;
+      })
+      .addCase(saveLocale.rejected, (state, action) => {
+        state.localeStatus = "failed";
+        state.localeError = action.payload;
       });
   },
 });
 
-export const { logout, clearAuthError, markAuthChecked, clearProfileError } = authSlice.actions;
+export const {
+  logout,
+  clearAuthError,
+  markAuthChecked,
+  clearProfileError,
+  resetEmailChangeState,
+  resetPasswordChangeState,
+} = authSlice.actions;
 export default authSlice.reducer;

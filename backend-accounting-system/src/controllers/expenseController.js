@@ -5,6 +5,13 @@ const ExpenseCategory = require("../models/ExpenseCategory");
 const Account         = require("../models/Account");
 const { recordTxn, reverseTxn, assertAccountsUsable } = require("./accountController");
 
+// An expense paid from an account is in that account's currency, whatever the client sent.
+async function accountCurrency(userId, accountId) {
+  if (!accountId) return null;
+  const acc = await Account.findOne({ _id: accountId, user: userId }).select("currency").lean();
+  return acc?.currency || null;
+}
+
 // GET /api/expenses
 // Supported query filters (can be combined):
 // - period: "day" | "today", "week", "month", "custom"
@@ -119,7 +126,7 @@ exports.create = async (req, res, next) => {
       amount: parseFloat(amount), description,
       date:   date ? new Date(date) : new Date(),
       paymentMethod, expenseType, category: category.trim(),
-      currency: currency || "EGP",
+      currency: (await accountCurrency(req.userId, accountId)) || currency || "EGP",
       notes, status: status || "confirmed",
       account: accountId || null,
     });
@@ -169,7 +176,7 @@ exports.update = async (req, res, next) => {
         paymentMethod,
         expenseType,
         category: category ? category.trim() : old.category,
-        currency: currency || old.currency,
+        currency: (await accountCurrency(req.userId, targetAccountId)) || currency || old.currency,
         notes,
         status: status || old.status,
         account: targetAccountId,

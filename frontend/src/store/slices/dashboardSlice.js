@@ -9,7 +9,7 @@ export const fetchDashboardSummary = createAsyncThunk(
       const res = await dashboardApi.getDashboardSummary(params);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تحميل ملخص لوحة التحكم"));
+      return rejectWithValue(extractError(err, "errors.dashboard.load"));
     }
   }
 );

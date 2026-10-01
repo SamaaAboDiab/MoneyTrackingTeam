@@ -1,11 +1,14 @@
 import { useTranslation } from "react-i18next";
 import CategorySelect from "../../categories/components/CategorySelect";
-import { formatAmount } from "../../../utils/formatAmount";
+import { formatMoney } from "../../../utils/formatAmount";
+import NumberInput from "../../../components/common/NumberInput";
 import { inputClass, labelClass } from "../constants";
+import DatePicker from "../../../components/common/DatePicker";
+import Select from "../../../components/common/Select";
 
 
 function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccounts, createStatus, createError }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -28,10 +31,9 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="amount" className={labelClass}>{t("expenses.fields.amount")}</label>
-          <input
+          <NumberInput
             id="amount"
             name="amount"
-            type="number"
             min="0.01"
             step="0.01"
             value={form.amount}
@@ -44,66 +46,51 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="date" className={labelClass}>{t("expenses.fields.date")}</label>
-          <input
+          <DatePicker
             id="date"
-            name="date"
-            type="date"
-            value={form.date}
-            onChange={handleChange}
             required
+            value={form.date}
+            onChange={(value) => handleChange({ target: { name: "date", value } })}
             className={`${inputClass} font-medium text-slate-800`}
           />
-          {form.date && (
-            <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500 pr-1">
-              <svg className="h-3.5 w-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clipRule="evenodd" />
-              </svg>
-              {new Date(form.date).toLocaleDateString(i18n.language, {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
-          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="paymentMethod" className={labelClass}>{t("expenses.fields.paymentMethod")}</label>
-          <select
+          <Select
             id="paymentMethod"
             name="paymentMethod"
             value={form.paymentMethod}
             onChange={handleChange}
-            required
             className={inputClass}
           >
             <option value="cash">{t("expenses.paymentMethod.cash")}</option>
             <option value="card">{t("expenses.paymentMethod.card")}</option>
             <option value="wallet">{t("expenses.paymentMethod.wallet")}</option>
-          </select>
+          </Select>
         </div>
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="expenseType" className={labelClass}>{t("expenses.fields.expenseType")}</label>
-          <select
+          <Select
             id="expenseType"
             name="expenseType"
+            required
             value={form.expenseType}
             onChange={handleChange}
-            required
             className={inputClass}
           >
             <option value="">{t("expenses.selectType")}</option>
             <option value="daily">{t("expenses.expenseType.daily")}</option>
             <option value="fixed">{t("expenses.expenseType.fixed")}</option>
             <option value="emergency">{t("expenses.expenseType.emergency")}</option>
-          </select>
+          </Select>
         </div>
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="category" className={labelClass}>{t("expenses.fields.category")}</label>
           <CategorySelect
+            required
             value={form.category}
             expenseType={form.expenseType}
             onChange={(value) =>
@@ -114,7 +101,7 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="accountId" className={labelClass}>{t("expenses.fields.account")}</label>
-          <select
+          <Select
             id="accountId"
             name="accountId"
             value={form.accountId}
@@ -124,10 +111,10 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
             <option value="">{t("expenses.noAccountOption")}</option>
             {availableAccounts.map((acc) => (
               <option key={acc._id} value={acc._id}>
-                {acc.name} ({formatAmount(acc.balance)} {acc.currency || "EGP"})
+                {acc.name} ({formatMoney(acc.balance, acc.currency)})
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">

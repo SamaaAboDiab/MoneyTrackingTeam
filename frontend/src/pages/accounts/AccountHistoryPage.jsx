@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getAccountTransactions } from "../../api/accountsApi";
 import { extractError } from "../../utils/errorHandler";
+import { formatDateTime } from "../../utils/formatAmount";
 import TransactionFilters from "./components/TransactionFilters";
 import TransactionList from "./components/TransactionList";
+import PageHeader from "../../components/common/PageHeader";
 
 function AccountHistoryPage() {
   const { t } = useTranslation();
@@ -43,25 +45,17 @@ function AccountHistoryPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId]);
 
-  const formatDate = (value) => new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-
   return (
-    <main className="mx-auto max-w-4xl">
-      <p>
-        <Link to="/accounts" className="font-semibold text-brand-700 hover:underline">
-          {t("accounts.transactions.back")}
-        </Link>
-      </p>
-      <h1 className="mt-2 text-2xl font-extrabold text-slate-900">
-        {t("accounts.historyTitle", { name: accountName || "..." })}
-      </h1>
+    <div className="mx-auto max-w-5xl">
+      <PageHeader
+        backTo="/accounts"
+        backLabel={t("accounts.transactions.back")}
+        title={t("accounts.historyTitle", { name: accountName || "..." })}
+      />
 
       <TransactionFilters start={start} end={end} onStartChange={setStart} onEndChange={setEnd} onSubmit={(event) => { event.preventDefault(); loadTransactions(); }} t={t} />
-      <TransactionList transactions={transactions} status={status} error={error} formatDate={formatDate} t={t} />
-    </main>
+      <TransactionList transactions={transactions} status={status} error={error} formatDate={formatDateTime} t={t} />
+    </div>
   );
 }
 

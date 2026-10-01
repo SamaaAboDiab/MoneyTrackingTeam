@@ -9,7 +9,7 @@ export const fetchIncomes = createAsyncThunk(
       const res = await incomeApi.getIncomes();
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تحميل مصادر الدخل"));
+      return rejectWithValue(extractError(err, "errors.income.load"));
     }
   }
 );
@@ -21,7 +21,7 @@ export const createIncomeEntry = createAsyncThunk(
       const res = await incomeApi.createIncome(payload);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر إضافة مصدر الدخل"));
+      return rejectWithValue(extractError(err, "errors.income.create"));
     }
   }
 );
@@ -33,7 +33,7 @@ export const deleteIncome = createAsyncThunk(
       await incomeApi.deleteIncome(id);
       return id;
     } catch (error) {
-      return rejectWithValue(extractError(error, "تعذّر حذف مصدر الدخل"));
+      return rejectWithValue(extractError(error, "errors.income.delete"));
     }
   }
 );
@@ -45,7 +45,7 @@ export const fetchIncomeSummary = createAsyncThunk(
       const res = await incomeApi.getIncomeSummary(params);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تحميل ملخص الدخل"));
+      return rejectWithValue(extractError(err, "errors.income.summary"));
     }
   }
 );
@@ -57,7 +57,7 @@ export const updateIncomeEntry = createAsyncThunk(
       const res = await incomeApi.updateIncome(id, payload);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تحديث مصدر الدخل"));
+      return rejectWithValue(extractError(err, "errors.income.update"));
     }
   }
 );
@@ -69,7 +69,7 @@ export const toggleIncomeRecurrence = createAsyncThunk(
       const res = await incomeApi.toggleIncomeRecurrenceApi(id);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تحديث حالة الدخل المتكرر"));
+      return rejectWithValue(extractError(err, "errors.income.recurring"));
     }
   }
 );

@@ -2,21 +2,22 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { listCategories, createCategory, updateCategory, deleteCategory } from "../../../api/categoryApi";
 import { MANDATORY_CATEGORIES } from "./mandatoryCategories";
+import { extractError } from "../../../utils/errorHandler";
 
 import CategoryList from "./manager/CategoryList";
 import CategoryFormModal from "./manager/CategoryFormModal";
 import DeleteCategoryModal from "./manager/DeleteCategoryModal";
+import PageHeader from "../../../components/common/PageHeader";
+import { Tags } from "lucide-react";
 const DEFAULT_COLOR = "#6b7280";
 
+// labels come from categoriesPage.type.* in the active language
 const TYPE_OPTIONS = [
-  { value: "daily",     label: "يومي",        pill: "bg-red-100 text-red-700" },
-  { value: "fixed",     label: "شهري ثابت",   pill: "bg-yellow-100 text-yellow-700" },
-  { value: "emergency", label: "طارئ",         pill: "bg-slate-200 text-slate-600" },
+  { value: "daily",     pill: "bg-red-100 text-red-700" },
+  { value: "fixed",     pill: "bg-yellow-100 text-yellow-700" },
+  { value: "emergency", pill: "bg-slate-200 text-slate-600" },
 ];
 
-function extractErrMsg(err, fallback) {
-  return err?.response?.data?.message || err?.message || fallback;
-}
 
 export default function CategoryManager() {
   const { t } = useTranslation();
@@ -48,7 +49,7 @@ export default function CategoryManager() {
       const data = await listCategories();
       setCategories(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(extractErrMsg(err, t("categoriesPage.loadError")));
+      setError(extractError(err, t("categoriesPage.loadError")));
     } finally {
       setLoading(false);
     }
@@ -118,7 +119,7 @@ export default function CategoryManager() {
       closeForm();
     } catch (err) {
       // Fix #8 — رسالة الخطأ الصح من الـ backend
-      setFormError(extractErrMsg(err, t("categoriesPage.saveError")));
+      setFormError(extractError(err, t("categoriesPage.saveError")));
     } finally {
       setSaving(false);
     }
@@ -134,7 +135,7 @@ export default function CategoryManager() {
       flashSuccess(t("categoriesPage.deleteSuccess"));
     } catch (err) {
       // Fix #8 — رسالة الخطأ الصح
-      setError(extractErrMsg(err, t("categoriesPage.deleteError")));
+      setError(extractError(err, t("categoriesPage.deleteError")));
       setDeleteTarget(null);
     } finally {
       setDeleting(false);
@@ -145,17 +146,16 @@ export default function CategoryManager() {
   const typeInfo = (value) => typeOptions.find((o) => o.value === value) || typeOptions[0];
 
   return (
-    <div className="mx-auto max-w-lg p-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-slate-900">{t("categoriesPage.title")}</h1>
-        <button
-          type="button"
-          onClick={openAddForm}
-          className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700"
-        >
-          {t("categoriesPage.addNew")}
-        </button>
-      </div>
+    <div className="mx-auto max-w-3xl">
+      <PageHeader
+        icon={Tags}
+        title={t("categoriesPage.title")}
+        actions={
+          <button type="button" onClick={openAddForm} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700">
+            {t("categoriesPage.addNew")}
+          </button>
+        }
+      />
 
       {successMsg && (
         <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">

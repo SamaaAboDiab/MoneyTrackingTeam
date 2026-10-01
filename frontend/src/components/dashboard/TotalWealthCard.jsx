@@ -1,18 +1,40 @@
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, ArrowUp, ArrowDown } from "lucide-react";
-import { formatAmount } from "../../utils/formatAmount";
+import { useTranslation } from "react-i18next";
+import { Eye, EyeOff, ArrowUpRight, ArrowDownRight, Wallet, Scale } from "lucide-react";
+import { formatMoney } from "../../utils/formatAmount";
+
+// Shows a value, or the mask when amounts are hidden (both kept in the layout so nothing jumps).
+function Masked({ hidden, masked, children, className = "" }) {
+  return (
+    <span className={`relative inline-grid ${className}`}>
+      <span className={`col-start-1 row-start-1 transition-opacity duration-200 ${hidden ? "opacity-0" : "opacity-100"}`} aria-hidden={hidden}>
+        {children}
+      </span>
+      <span
+        className={`col-start-1 row-start-1 tracking-widest transition-opacity duration-200 ${hidden ? "opacity-100" : "opacity-0"}`}
+        aria-hidden={!hidden}
+      >
+        {masked}
+      </span>
+    </span>
+  );
+}
 
 function TotalWealthCard({
   label,
   amount,
   currency,
   onOpenAccounts,
-  trend = "up",
   trendData = [],
   maskedText = "••••••",
   showAriaLabel,
   hideAriaLabel,
+  accountsCount,
+  periodIncome,
+  periodExpenses,
+  periodLabel,
 }) {
+  const { t } = useTranslation();
   const [hidden, setHidden] = useState(false);
   const [grown, setGrown] = useState(false);
 
@@ -21,14 +43,18 @@ function TotalWealthCard({
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  const isUp = trend !== "down";
-  const capsuleClass = isUp ? "bg-income" : "bg-expense";
-  const TrendIcon = isUp ? ArrowUp : ArrowDown;
-
   const maxTrendValue = trendData.length ? Math.max(...trendData, 1) : 0;
+  const showPeriod = Number.isFinite(periodIncome) || Number.isFinite(periodExpenses);
+  const net = Number(periodIncome || 0) - Number(periodExpenses || 0);
+
+  const stats = [
+    { key: "income", icon: ArrowUpRight, tone: "bg-income/90", label: t("dashboard.summary.income"), value: periodIncome },
+    { key: "expenses", icon: ArrowDownRight, tone: "bg-expense/90", label: t("dashboard.summary.expenses"), value: periodExpenses },
+    { key: "net", icon: Scale, tone: net >= 0 ? "bg-white/25" : "bg-expense/90", label: t("dashboard.wealth.net"), value: net, desktopOnly: true },
+  ];
 
   return (
-    <div className="relative">
+    <div className="relative h-full">
       <div
         role="button"
         tabIndex={0}
@@ -36,64 +62,83 @@ function TotalWealthCard({
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") onOpenAccounts();
         }}
-        className={`relative overflow-hidden rounded-3xl bg-brand-600 p-6 transition-all duration-300 ease-out sm:p-8 ${
+        className={`relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-3xl bg-brand-600 p-6 text-white transition-all duration-300 ease-out sm:p-7 ${
           grown ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
       >
-        {/* Top row */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-white/80">{label}</span>
+        {/* Decorative rings, purely visual */}
+        <span aria-hidden="true" className="pointer-events-none absolute -top-24 -end-16 h-64 w-64 rounded-full border-[28px] border-white/[0.04]" />
+        <span aria-hidden="true" className="pointer-events-none absolute -bottom-28 end-40 h-56 w-56 rounded-full bg-white/[0.03]" />
 
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              setHidden((prev) => !prev);
-            }}
-            aria-label={hidden ? showAriaLabel : hideAriaLabel}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"
-          >
-            {hidden ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
-        </div>
-
-        {/* Main row */}
-        <div className="mt-6 flex items-end justify-between gap-4">
-          <div
-            className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 transition-all duration-300 ease-out ${capsuleClass} ${
-              grown ? "scale-100 opacity-100 delay-150" : "scale-90 opacity-0"
-            }`}
-          >
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/25">
-              <TrendIcon size={13} strokeWidth={2.5} className="text-white" />
-            </span>
-            <span className="relative grid font-bold text-white">
-              <span
-                className={`tabular-amount col-start-1 row-start-1 transition-opacity duration-200 ${
-                  hidden ? "opacity-0" : "opacity-100"
-                }`}
-              >
-                {currency} {formatAmount(amount)}
-              </span>
-              <span
-                className={`col-start-1 row-start-1 tracking-widest transition-opacity duration-200 ${
-                  hidden ? "opacity-100" : "opacity-0"
-                }`}
-                aria-hidden={!hidden}
-              >
-                {maskedText}
-              </span>
-            </span>
+        {/* Top row: label + visibility toggle together, accounts count on the other side */}
+        <div className="relative flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-white/80">{label}</span>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                setHidden((prev) => !prev);
+              }}
+              aria-label={hidden ? showAriaLabel : hideAriaLabel}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"
+            >
+              {hidden ? <EyeOff size={15} /> : <Eye size={15} />}
+            </button>
           </div>
 
+          {Number.isFinite(accountsCount) && accountsCount > 0 && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/85">
+              <Wallet size={13} />
+              {t("dashboard.wealth.accounts", { count: accountsCount })}
+            </span>
+          )}
+        </div>
+
+        {/* Amount */}
+        <div className="relative">
+          <Masked hidden={hidden} masked={maskedText} className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+            <span className="tabular-amount">{formatMoney(amount, currency)}</span>
+          </Masked>
+        </div>
+
+        {/* Period income / expenses + trend bars */}
+        <div className="relative flex flex-wrap items-end justify-between gap-4">
+          {showPeriod && (
+            <div className="min-w-0">
+              {periodLabel && <p className="mb-2 text-xs font-medium text-white/60">{periodLabel}</p>}
+              <div className="flex flex-wrap gap-2">
+                {stats.map(({ key, icon: Icon, tone, label: statLabel, value, desktopOnly }) => (
+                  <div
+                    key={key}
+                    className={`items-center gap-2.5 rounded-2xl bg-white/10 py-2 pe-3.5 ps-2 ${desktopOnly ? "hidden lg:flex" : "flex"}`}
+                  >
+                    <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${tone}`}>
+                      <Icon size={15} strokeWidth={2.5} className="rtl:-scale-x-100" />
+                    </span>
+                    <span className="flex flex-col leading-tight">
+                      <span className="text-[11px] font-medium text-white/65">{statLabel}</span>
+                      <Masked hidden={hidden} masked="•••" className="text-sm font-bold">
+                        <span className="tabular-amount" dir="ltr">
+                          {key === "net" && value > 0 ? "+" : ""}
+                          {formatMoney(value || 0, currency)}
+                        </span>
+                      </Masked>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {trendData.length > 0 && (
-            <div className="flex h-16 flex-1 items-end justify-end gap-1">
+            <div aria-hidden="true" className="ms-auto hidden h-14 w-40 items-end justify-end gap-1 sm:flex">
               {trendData.map((value, index) => {
-                const heightPct = Math.max((value / maxTrendValue) * 100, 6);
+                const heightPct = Math.max((value / maxTrendValue) * 100, 8);
                 return (
                   <div
                     key={index}
-                    className="w-1.5 rounded-full bg-white/25 transition-all duration-500 ease-out"
+                    className="w-1.5 rounded-full bg-white/30 transition-all duration-500 ease-out"
                     style={{
                       height: grown ? `${heightPct}%` : "0%",
                       transitionDelay: `${150 + index * 40}ms`,

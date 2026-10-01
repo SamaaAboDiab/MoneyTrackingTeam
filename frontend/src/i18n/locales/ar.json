@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Money Tracker",
+    "appName": "متتبّع الأموال",
     "loading": "جارٍ التحميل...",
     "backToDashboard": "الرجوع للوحة التحكم",
     "comingSoon": "الصفحة دي قيد الإنشاء.",
@@ -8,14 +8,28 @@
     "hideAmount": "إخفاء المبلغ",
     "edit": "تعديل",
     "delete": "حذف",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "datePicker": {
+      "placeholder": "اختر تاريخ",
+      "clear": "مسح",
+      "today": "اليوم",
+      "prevMonth": "الشهر السابق",
+      "nextMonth": "الشهر التالي"
+    },
+    "close": "إغلاق",
+    "colorPicker": {
+      "custom": "لون مخصص"
+    }
   },
   "nav": {
     "income": "الدخل",
     "expenses": "المصروفات",
     "cash": "الكاش",
     "debts": "الديون",
-    "categories": "التصنيفات"
+    "categories": "التصنيفات",
+    "savings": "أهداف الادخار",
+    "reports": "التقارير",
+    "settings": "الإعدادات"
   },
   "auth": {
     "showPassword": "إظهار كلمة السر",
@@ -28,22 +42,22 @@
     },
     "register": {
       "title": "إنشاء حسابك",
-      "subtitle": "ابدأ/ي تتابع/ي فلوسك في أقل من دقيقة.",
+      "subtitle": "ابدأ تتابع فلوسك في أقل من دقيقة.",
       "nameLabel": "الاسم",
       "emailLabel": "البريد الإلكتروني",
       "passwordLabel": "كلمة السر",
       "confirmPasswordLabel": "تأكيد كلمة السر",
       "passwordMismatch": "كلمة السر وتأكيدها مش متطابقين",
       "agreeTerms": "أوافق على الشروط والأحكام",
-      "mustAgreeTerms": "لازم توافقي على الشروط والأحكام عشان تكمّلي",
+      "mustAgreeTerms": "لازم توافق على الشروط والأحكام عشان تكمّل",
       "submit": "إنشاء حساب",
       "submitting": "جارٍ الإنشاء...",
       "haveAccount": "عندك حساب بالفعل؟",
       "loginLink": "تسجيل الدخول"
     },
     "login": {
-      "title": "أهلاً بيك تاني!",
-      "subtitle": "سجّل/ي دخولك عشان تتابع/ي فلوسك بكل سهولة.",
+      "title": "أهلاً بعودتك!",
+      "subtitle": "سجّل دخولك عشان تتابع فلوسك بكل سهولة.",
       "registeredSuccess": "تم إنشاء الحساب بنجاح، سجّل دخولك الآن",
       "passwordResetSuccess": "تم تغيير كلمة السر بنجاح، سجّل دخولك بكلمة السر الجديدة",
       "emailLabel": "البريد الإلكتروني",
@@ -61,7 +75,7 @@
     },
     "forgotPassword": {
       "title": "نسيت كلمة السر",
-      "sentMessage": "لو الإيميل ده مسجّل عندنا، هيوصلك رابط لاستعادة كلمة السر. الرابط صالح لمدة 24 ساعة فقط.",
+      "sentMessage": "لو البريد الإلكتروني ده مسجّل عندنا، هيوصلك رابط لاستعادة كلمة السر. الرابط صالح لمدة ٢٤ ساعة فقط.",
       "instructions": "أدخل بريدك الإلكتروني وهنبعتلك رابط لإعادة تعيين كلمة السر.",
       "emailLabel": "البريد الإلكتروني",
       "submit": "إرسال رابط الاستعادة",
@@ -90,84 +104,136 @@
     "period": {
       "month": "هذا الشهر",
       "last_month": "الشهر الماضي",
-      "3months": "آخر 3 شهور",
+      "3months": "آخر ٣ شهور",
       "custom": "مخصص",
       "from": "من تاريخ",
       "to": "إلى تاريخ",
       "selected": "الفترة المختارة",
-      "invalid": "اختاري تاريخ نهاية بعد تاريخ البداية"
+      "invalid": "اختر تاريخ نهاية بعد تاريخ البداية"
     },
     "summary": {
-      "title": "ملخص الشهر الحالي",
+      "title": "الملخص المالي",
       "loading": "جارٍ تحميل الملخص...",
       "income": "إجمالي الدخل",
-      "expenses": "إجمالي المصاريف",
+      "expenses": "إجمالي المصروفات",
       "net": "المتبقي",
       "deficit": "عجز",
       "currentPeriod": "الفترة الحالية",
       "previousPeriod": "الفترة السابقة",
       "difference": "الفرق",
       "noComparison": "لا يوجد بيانات للمقارنة",
-      "notAvailable": "غير متاح"
+      "notAvailable": "غير متاح",
+      "savingsRate": "نسبة الادخار",
+      "currency": "العملة"
     },
     "chart": {
-      "title": "توزيع المصاريف حسب التصنيف",
+      "title": "توزيع المصروفات حسب التصنيف",
       "empty": "لا توجد مصروفات في هذه الفترة.",
-      "topCategories": "أعلى 3 تصنيفات",
+      "topCategories": "أعلى ٣ تصنيفات",
       "viewInExpenses": "عرض في المصروفات",
-      "otherCount": "{{count}} عملية"
+      "otherCount_zero": "لا توجد عمليات",
+      "otherCount_one": "عملية واحدة",
+      "otherCount_two": "عمليتان",
+      "otherCount_few": "{{count}} عمليات",
+      "otherCount_many": "{{count}} عملية",
+      "otherCount_other": "{{count}} عملية"
     },
     "debtsCard": {
       "title": "إجمالي الديون المستحقة",
-      "activeCount": "{{count}} دين نشط يتطلب السداد",
       "noneDue": "لا توجد ديون مستحقة عليك حالياً",
       "manage": "الملخص",
       "remaining": "المبلغ المتبقي للسداد",
       "calculating": "جارٍ الحساب...",
-      "overdueBadge": "{{count}} ديون متأخرة!",
-      "dueSoonBadge": "{{count}} ديون موعدها قريب",
       "allPaid": "لا يوجد ديون نشطة",
-      "activeBadge": "{{count}} ديون نشطة",
       "nearestDue": "أقرب موعد سداد",
       "noDueDate": "لم يُحدد موعد",
       "payoffForecast": "التوقع الزمني للسداد الكامل",
       "forecastUnavailable": "لا توجد بيانات كافية للتوقع",
       "dueToday": "موعد السداد اليوم",
       "dueTomorrow": "موعد السداد غداً",
-      "dueInDays": "موعد السداد بعد {{count}} أيام"
+      "activeCount_zero": "لا توجد ديون نشطة",
+      "activeCount_one": "دين واحد نشط يتطلب السداد",
+      "activeCount_two": "دينان نشطان يتطلبان السداد",
+      "activeCount_few": "{{count}} ديون نشطة تتطلب السداد",
+      "activeCount_many": "{{count}} دينًا نشطًا يتطلب السداد",
+      "activeCount_other": "{{count}} دين نشط يتطلب السداد",
+      "overdueBadge_zero": "لا توجد ديون متأخرة",
+      "overdueBadge_one": "دين واحد متأخر!",
+      "overdueBadge_two": "دينان متأخران!",
+      "overdueBadge_few": "{{count}} ديون متأخرة!",
+      "overdueBadge_many": "{{count}} دينًا متأخرًا!",
+      "overdueBadge_other": "{{count}} دين متأخر!",
+      "dueSoonBadge_zero": "لا توجد ديون موعدها قريب",
+      "dueSoonBadge_one": "دين واحد موعده قريب",
+      "dueSoonBadge_two": "دينان موعدهما قريب",
+      "dueSoonBadge_few": "{{count}} ديون موعدها قريب",
+      "dueSoonBadge_many": "{{count}} دينًا موعدها قريب",
+      "dueSoonBadge_other": "{{count}} دين موعده قريب",
+      "activeBadge_zero": "لا توجد ديون نشطة",
+      "activeBadge_one": "دين واحد نشط",
+      "activeBadge_two": "دينان نشطان",
+      "activeBadge_few": "{{count}} ديون نشطة",
+      "activeBadge_many": "{{count}} دينًا نشطًا",
+      "activeBadge_other": "{{count}} دين نشط",
+      "dueInDays_zero": "موعد السداد النهارده",
+      "dueInDays_one": "موعد السداد بعد يوم واحد",
+      "dueInDays_two": "موعد السداد بعد يومين",
+      "dueInDays_few": "موعد السداد بعد {{count}} أيام",
+      "dueInDays_many": "موعد السداد بعد {{count}} يومًا",
+      "dueInDays_other": "موعد السداد بعد {{count}} يوم"
+    },
+    "wealth": {
+      "accounts_zero": "لا توجد حسابات",
+      "accounts_one": "حساب واحد",
+      "accounts_two": "حسابان",
+      "accounts_few": "{{count}} حسابات",
+      "accounts_many": "{{count}} حسابًا",
+      "accounts_other": "{{count}} حساب",
+      "net": "الصافي"
+    },
+    "cash": {
+      "shareOfWealth": "نسبته من إجمالي ثروتك",
+      "open": "إدارة الكاش",
+      "spentThisMonth": "صُرف كاش هذا الشهر",
+      "transactions": "عدد المصروفات"
     }
   },
   "layout": {
-    "brand": "Money Tracker",
+    "brand": "متتبّع الأموال",
     "logout": "تسجيل الخروج",
     "logoutConfirmTitle": "تسجيل الخروج؟",
     "logoutConfirmMessage": "متأكد إنك عايز تسجل خروج من حسابك؟ هتحتاج تسجل دخولك تاني عشان توصل لبياناتك.",
     "cancel": "إلغاء",
-    "upgradeTitle": "الترقية لـ Premium",
-    "upgradeSubtitle": "افتحي تقارير غير محدودة والمزيد.",
-    "upgradeButton": "رقّي دلوقتي",
+    "upgradeTitle": "الترقية للباقة المميزة",
+    "upgradeSubtitle": "افتح تقارير غير محدودة ومزايا أكثر.",
+    "upgradeButton": "ترقية الآن",
     "notifications": "الإشعارات",
     "quickActionLabel": "تحويل جديد",
     "collapseSidebar": "طي القائمة الجانبية",
     "expandSidebar": "توسيع القائمة الجانبية",
     "mobileNav": {
       "home": "الرئيسية",
-      "accounts": "الحسابات"
-    }
+      "accounts": "الحسابات",
+      "more": "المزيد"
+    },
+    "userMenu": {
+      "profile": "الملف الشخصي"
+    },
+    "primaryNav": "القائمة الرئيسية"
   },
   "transfer": {
     "backToDashboard": "الرجوع للوحة التحكم",
     "title": "تحويل بين حسابين",
     "loadingAccounts": "جارٍ تحميل الحسابات...",
-    "needTwoAccounts": "محتاجة على الأقل حسابين نشطين عشان تقدري تحوّلي بينهم.",
-    "selectBothAccounts": "لازم تختاري الحساب المصدر والحساب المستهدف",
-    "sameAccountError": "مينفعش تحوّلي لنفس الحساب",
+    "needTwoAccounts": "محتاج على الأقل حسابين نشطين عشان تقدر تحوّل بينهم.",
+    "selectBothAccounts": "لازم تختار الحساب المصدر والحساب المستهدف",
+    "sameAccountError": "مينفعش تحوّل لنفس الحساب",
     "amountPositiveError": "المبلغ لازم يكون أكبر من صفر",
     "successMessage": "تم التحويل بنجاح. رصيد \"{{fromName}}\" دلوقتي {{fromBalance}} {{fromCurrency}}، ورصيد \"{{toName}}\" دلوقتي {{toBalance}} {{toCurrency}}.",
     "fromLabel": "من حساب",
-    "fromPlaceholder": "اختاري الحساب المصدر",
+    "fromPlaceholder": "اختر الحساب المصدر",
     "toLabel": "إلى حساب",
-    "toPlaceholder": "اختاري الحساب المستهدف",
+    "toPlaceholder": "اختر الحساب المستهدف",
     "amountLabel": "المبلغ",
     "descriptionLabel": "وصف (اختياري)",
     "submit": "تحويل",
@@ -175,12 +241,12 @@
   },
   "accounts": {
     "backToDashboard": "الرجوع للوحة التحكم",
-    "title": "حساباتي ومحافظي",
+    "title": "حساباتي",
     "formDescription": "أضف حساباتك البنكية ومحافظك النقدية وتابع أرصدتها من مكان واحد.",
     "nameLabel": "اسم الحساب",
     "namePlaceholder": "مثال: حساب البنك الأهلي",
     "typeLabel": "نوع الحساب",
-    "typePlaceholder": "اختار النوع",
+    "typePlaceholder": "اختر النوع",
     "bank": "بنك",
     "wallet": "محفظة إلكترونية",
     "cash": "كاش",
@@ -211,7 +277,7 @@
       "difference": "الفرق",
       "notePrefix": "ملاحظة:",
       "back": "رجوع",
-      "saving": "جاري الحفظ...",
+      "saving": "جارٍ الحفظ...",
       "confirmSave": "تأكيد الحفظ",
       "invalidBalance": "من فضلك أدخل رصيد صحيح.",
       "sameBalance": "الرصيد الجديد مطابق للرصيد الحالي.",
@@ -236,7 +302,8 @@
     "activeTitle": "الحسابات النشطة",
     "viewActive": "عرض الحسابات النشطة",
     "viewArchived": "عرض الحسابات المؤرشفة",
-    "emptyArchived": "لا توجد حسابات مؤرشفة."
+    "emptyArchived": "لا توجد حسابات مؤرشفة.",
+    "linkedAccountsCount": "عدد الحسابات المربوطة"
   },
   "income": {
     "title": "مصادر الدخل",
@@ -248,7 +315,7 @@
     "nameLabel": "اسم مصدر الدخل",
     "namePlaceholder": "مثال: راتب شهر سبتمبر",
     "categoryLabel": "نوع الدخل",
-    "categoryPlaceholder": "اختار نوع الدخل",
+    "categoryPlaceholder": "اختر نوع الدخل",
     "amountLabel": "المبلغ",
     "currencyLabel": "العملة",
     "receivedDateLabel": "تاريخ الاستلام",
@@ -279,11 +346,11 @@
     "filter": {
       "title": "فلترة ملخص الدخل",
       "monthYearLabel": "الشهر والسنة",
-      "baseCurrencyLabel": "العملة الأساسية"
+      "baseCurrencyLabel": "العملة"
     },
     "fields": {
       "name": "اسم المصدر",
-      "category": "الفئة",
+      "category": "نوع الدخل",
       "amountConverted": "المبلغ بالعملة المختارة",
       "originalPrefix": "الأصل:",
       "date": "التاريخ"
@@ -301,7 +368,7 @@
       "confirmMessage": "هيتم حذف \"{{name}}\" نهائيًا. لو الدخل ده متكرر، هيتوقف من كل الفترات الجاية.",
       "cancel": "إلغاء",
       "confirm": "تأكيد الحذف",
-      "deleting": "جاري الحذف...",
+      "deleting": "جارٍ الحذف...",
       "error": "تعذر حذف الدخل."
     },
     "recurringBadge": "متكرر",
@@ -350,7 +417,7 @@
       "period": {
         "all": "كل الفترات",
         "day": "اليوم",
-        "week": "آخر 7 أيام",
+        "week": "آخر ٧ أيام",
         "month": "هذا الشهر",
         "custom": "مخصص (تحديد تاريخين)"
       },
@@ -380,7 +447,7 @@
     },
     "deleteModal": {
       "title": "تأكيد حذف المصروف",
-      "confirmQuestion": "هل أنت متأكد من حذف مصروف \"{{description}}\" بمبلغ {{amount}} التابع لفئة \"{{category}}\"؟",
+      "confirmQuestion": "هل أنت متأكد من حذف مصروف \"{{description}}\" بمبلغ {{amount}} في تصنيف \"{{category}}\"؟",
       "refundNote": "استرجاع الرصيد تلقائياً: سيتم إضافة مبلغ {{amount}} تلقائياً إلى حساب \"{{account}}\".",
       "cancel": "إلغاء",
       "confirm": "تأكيد الحذف",
@@ -414,21 +481,21 @@
     "accountOption": "{{name}} - {{balance}} {{currency}}",
     "selectAccountsError": "اختر الحساب المصدر وحساب الكاش.",
     "amountPositiveError": "اكتب مبلغًا أكبر من صفر.",
-    "submitting": "جار التنفيذ...",
+    "submitting": "جارٍ التنفيذ...",
     "confirmWithdraw": "تأكيد السحب",
     "emptyAlert": "رصيد الكاش فاضي",
-    "viewExpenses": "عرض مصاريف الكاش",
+    "viewExpenses": "عرض مصروفات الكاش",
     "internalTransfer": "تحويل داخلي",
     "widgetLabel": "رصيد الكاش",
     "widgetNoAccount": "مفيش حساب كاش لسه",
     "expenses": {
-      "title": "مصاريف الكاش",
-      "subtitle": "كل المصاريف اللي دفعتها كاش في الفترة المختارة.",
-      "total": "إجمالي مصاريف الكاش",
+      "title": "مصروفات الكاش",
+      "subtitle": "كل المصروفات اللي دفعتها كاش في الفترة المختارة.",
+      "total": "إجمالي مصروفات الكاش",
       "period": "الفترة",
       "category": "التصنيف",
       "allCategories": "كل التصنيفات",
-      "empty": "لا توجد مصاريف كاش في هذه الفترة.",
+      "empty": "لا توجد مصروفات كاش في هذه الفترة.",
       "noCashAccount": "لا يوجد حساب كاش بعد.",
       "back": "الرجوع للكاش",
       "loading": "جارٍ التحميل..."
@@ -455,7 +522,7 @@
     "paymentDateRequiredError": "حدد تاريخ الدفعة.",
     "paymentSuccess": "تم تسجيل الدفعة بنجاح",
     "paymentError": "تعذر تسجيل الدفعة.",
-    "historyFetchError": "تعذر جلب سجل الدفعات من الخادم.",
+    "historyFetchError": "تعذّر تحميل سجل الدفعات.",
     "form": {
       "title": "تسجيل دين جديد",
       "requiredNote": "جميع الحقول بعلامة (*) إلزامية",
@@ -469,14 +536,7 @@
       "notesLabel": "ملاحظات (اختياري)",
       "notesPlaceholder": "أضف أي تفاصيل أخرى أو شروط السداد...",
       "save": "حفظ الدين",
-      "saving": "جار الحفظ..."
-    },
-    "currencyOptions": {
-      "EGP": "جنيه مصري (EGP)",
-      "USD": "دولار أمريكي (USD)",
-      "EUR": "يورو (EUR)",
-      "SAR": "ريال سعودي (SAR)",
-      "AED": "درهم إماراتي (AED)"
+      "saving": "جارٍ الحفظ..."
     },
     "category": {
       "other": "أخرى",
@@ -488,7 +548,7 @@
     },
     "tabs": {
       "active": "الديون النشطة",
-      "completed": "مكتمل",
+      "completed": "الديون المكتملة",
       "all": "الكل"
     },
     "loading": "جارٍ تحميل الديون...",
@@ -513,23 +573,29 @@
       "remaining": "المتبقي"
     },
     "progressLabel": "نسبة الإنجاز في السداد",
-    "progressComplete": "100% (مكتمل)",
+    "progressComplete": "١٠٠٪ (مكتمل)",
     "startDatePrefix": "تاريخ النشأة:",
     "dueDatePrefix": "تاريخ السداد المتوقع:",
     "dueSoonMessage": {
       "today": "تنبيه: موعد السداد اليوم",
       "tomorrow": "تنبيه: موعد السداد غداً",
-      "inDays": "تنبيه: موعد السداد بعد {{count}} أيام"
+      "inDays_zero": "تنبيه: موعد السداد النهارده",
+      "inDays_one": "تنبيه: موعد السداد بعد يوم واحد",
+      "inDays_two": "تنبيه: موعد السداد بعد يومين",
+      "inDays_few": "تنبيه: موعد السداد بعد {{count}} أيام",
+      "inDays_many": "تنبيه: موعد السداد بعد {{count}} يومًا",
+      "inDays_other": "تنبيه: موعد السداد بعد {{count}} يوم"
     },
     "editDueDate": "تعديل تاريخ السداد",
     "saveDate": "حفظ التاريخ",
     "forecast": {
       "averageMonthly": "متوسط دفعاتك الشهرية: {{amount}}",
-      "notEnoughData": "أضف دفعات أكثر لحساب التوقع"
+      "notEnoughData": "أضف دفعات أكثر لحساب التوقع",
+      "payoffBy": "بناءً على معدل دفعك الحالي، ستسدد الدين بحلول {{date}}"
     },
     "actions": {
       "addPayment": "إضافة دفعة",
-      "markPaid": "تم السداد",
+      "markPaid": "تحديد كمسدَّد",
       "showHistory": "سجل الدفعات",
       "hideHistory": "إخفاء السجل",
       "delete": "حذف"
@@ -537,8 +603,8 @@
     "history": {
       "title": "سجل الدفعات المسجلة ({{count}})",
       "addNew": "+ إضافة دفعة جديدة",
-      "loading": "جارٍ تحميل سجل الدفعات من الخادم...",
-      "empty": "لا توجد دفعات مسجلة بعد لهذا الدين في قاعدة البيانات.",
+      "loading": "جارٍ تحميل سجل الدفعات...",
+      "empty": "لا توجد دفعات مسجلة لهذا الدين بعد.",
       "unknownAccount": "حساب محدد"
     },
     "paymentModal": {
@@ -552,10 +618,10 @@
       "accountOption": "{{name}} (رصيد: {{balance}} {{currency}})",
       "accountHint": "سيتم خصم مبلغ الدفعة تلقائياً من رصيد الحساب المختار.",
       "notesLabel": "ملاحظات (اختياري)",
-      "notesPlaceholder": "مثال: قسط شهر 10، تحويل بنكي",
+      "notesPlaceholder": "مثال: قسط شهر ١٠، تحويل بنكي",
       "cancel": "إلغاء",
       "confirm": "تأكيد الدفعة",
-      "saving": "جار الحفظ..."
+      "saving": "جارٍ الحفظ..."
     },
     "confirmTitle": "هل أنت متأكد؟"
   },
@@ -568,11 +634,41 @@
     "editTitle": "البيانات الشخصية",
     "nameLabel": "الاسم بالكامل",
     "phoneLabel": "رقم الهاتف",
-    "phonePlaceholder": "مثال: 01000000000",
+    "phonePlaceholder": "مثال: ٠١٠٠٠٠٠٠٠٠٠",
     "emailLabel": "البريد الإلكتروني",
     "save": "حفظ التعديلات",
     "saving": "جارٍ الحفظ...",
-    "saveSuccess": "تم تحديث بياناتك بنجاح."
+    "saveSuccess": "تم تحديث بياناتك بنجاح.",
+    "email": {
+      "title": "تغيير البريد الإلكتروني",
+      "subtitle": "هيتبعت كود تحقق للبريد الجديد قبل ما نفعّله.",
+      "newEmailLabel": "البريد الإلكتروني الجديد",
+      "sendCode": "إرسال كود التحقق",
+      "sending": "جارٍ الإرسال...",
+      "codeSentMessage": "اتبعت كود مكوّن من ٦ أرقام على البريد الجديد. صلاحيته ١٥ دقيقة.",
+      "codeLabel": "كود التحقق",
+      "confirm": "تأكيد التغيير",
+      "confirming": "جارٍ التأكيد...",
+      "changeSuccess": "تم تغيير البريد الإلكتروني بنجاح",
+      "changeEmail": "تغيير البريد",
+      "cancel": "إلغاء"
+    },
+    "password": {
+      "title": "تغيير كلمة السر",
+      "currentLabel": "كلمة السر الحالية",
+      "newLabel": "كلمة السر الجديدة",
+      "confirmLabel": "تأكيد كلمة السر الجديدة",
+      "hint": "٨ أحرف على الأقل، وتحتوي على حرف كبير ورقم.",
+      "mismatch": "كلمة السر الجديدة وتأكيدها مش متطابقين",
+      "submit": "تغيير كلمة السر",
+      "submitting": "جارٍ التغيير...",
+      "success": "تم تغيير كلمة السر بنجاح"
+    },
+    "locale": {
+      "title": "لغة الحساب",
+      "subtitle": "بتتحفظ مع حسابك وتتزامن على أي جهاز تسجّل دخولك منه.",
+      "saving": "جارٍ الحفظ..."
+    }
   },
   "quickAdd": {
     "button": "تسجيل مصروف سريع",
@@ -593,8 +689,8 @@
   "categoriesPage": {
     "title": "التصنيفات",
     "addNew": "+ إضافة تصنيف جديد",
-    "loading": "جاري التحميل...",
-    "empty": "مفيش تصنيفات لسة.",
+    "loading": "جارٍ التحميل...",
+    "empty": "مفيش تصنيفات لسه.",
     "createSuccess": "تم إضافة التصنيف بنجاح",
     "updateSuccess": "تم التعديل بنجاح",
     "deleteSuccess": "تم حذف التصنيف",
@@ -612,11 +708,11 @@
     "typeLocked": "نوع التصنيف الافتراضي لا يمكن تغييره",
     "colorLabel": "اللون",
     "save": "حفظ",
-    "saving": "جاري الحفظ...",
+    "saving": "جارٍ الحفظ...",
     "deleteConfirmTitle": "هل أنت متأكد؟",
     "deleteConfirmMessage": "هيتم حذف تصنيف \"{{name}}\" نهائيًا.",
     "confirmDelete": "تأكيد الحذف",
-    "deleting": "جاري الحذف...",
+    "deleting": "جارٍ الحذف...",
     "type": {
       "daily": "يومي",
       "fixed": "شهري ثابت",
@@ -630,9 +726,342 @@
       "newTitle": "تصنيف جديد",
       "newPlaceholder": "مثال: اشتراكات، صيانة، هدايا...",
       "add": "إضافة",
-      "adding": "حفظ...",
+      "adding": "جارٍ الإضافة...",
       "addOption": "إضافة تصنيف جديد...",
       "deleteTitle": "حذف هذا التصنيف"
+    }
+  },
+  "savings": {
+    "title": "أهداف الادخار",
+    "subtitle": "حدد أهداف مالية وتابع تقدمك فيها.",
+    "addGoal": "إضافة هدف",
+    "cancel": "إلغاء",
+    "loading": "جارٍ تحميل أهداف الادخار...",
+    "empty": "لا توجد أهداف ادخار هنا حتى الآن.",
+    "createValidationError": "من فضلك أدخل اسم ومبلغ مستهدف صحيح.",
+    "createSuccess": "تم إنشاء هدف الادخار بنجاح",
+    "createError": "تعذّر حفظ هدف الادخار",
+    "updateSuccess": "تم تعديل هدف الادخار بنجاح",
+    "tabs": {
+      "active": "النشطة",
+      "completed": "المكتملة",
+      "archived": "المؤرشفة",
+      "all": "الكل"
+    },
+    "status": {
+      "active": "نشط",
+      "completed": "مكتمل",
+      "archived": "مؤرشف"
+    },
+    "form": {
+      "title": "هدف ادخار جديد",
+      "editTitle": "تعديل هدف الادخار",
+      "requiredNote": "* حقول إجبارية",
+      "emojiLabel": "الأيقونة",
+      "nameLabel": "اسم الهدف",
+      "namePlaceholder": "مثال: لابتوب جديد",
+      "targetAmountLabel": "المبلغ المستهدف",
+      "currencyLabel": "العملة",
+      "targetDateLabel": "تاريخ الهدف",
+      "descriptionLabel": "ملاحظات",
+      "descriptionPlaceholder": "أي تفاصيل إضافية عن الهدف...",
+      "saving": "جارٍ الحفظ...",
+      "save": "حفظ"
+    },
+    "card": {
+      "targetDate": "تاريخ الهدف",
+      "of": "من",
+      "transactions": "سجل الحركات",
+      "loadingTransactions": "جارٍ تحميل الحركات...",
+      "noTransactions": "لا توجد حركات مسجلة بعد.",
+      "deposit": "إيداع",
+      "withdrawal": "سحب"
+    },
+    "actions": {
+      "edit": "تعديل",
+      "delete": "حذف",
+      "deposit": "إيداع",
+      "withdraw": "سحب",
+      "complete": "إنهاء الهدف",
+      "archive": "أرشفة"
+    },
+    "deposit": {
+      "title": "إيداع",
+      "submit": "إيداع",
+      "success": "تم الإيداع بنجاح"
+    },
+    "withdraw": {
+      "title": "سحب",
+      "submit": "سحب",
+      "success": "تم السحب بنجاح"
+    },
+    "complete": {
+      "title": "إنهاء هدف الادخار",
+      "submit": "إنهاء الهدف",
+      "success": "تم إنهاء الهدف بنجاح"
+    },
+    "archive": {
+      "title": "أرشفة الهدف",
+      "submit": "أرشفة",
+      "success": "تم أرشفة الهدف بنجاح"
+    },
+    "deleteAction": {
+      "title": "حذف الهدف",
+      "submit": "حذف",
+      "success": "تم حذف الهدف بنجاح",
+      "confirmNoBalance": "متأكد إنك عايز تحذف الهدف ده؟ الخطوة دي مينفعش ترجع فيها."
+    },
+    "actionModal": {
+      "amountLabel": "المبلغ",
+      "maxLabel": "الحد الأقصى",
+      "accountLabel": "الحساب",
+      "noAccount": "من غير حساب (تسجيل المبلغ بس)",
+      "chooseAccount": "اختر حساب",
+      "dateLabel": "التاريخ",
+      "noteLabel": "ملاحظة",
+      "amountRequiredError": "من فضلك أدخل مبلغ صحيح.",
+      "error": "العملية فشلت. حاول تاني.",
+      "balanceTransferNote": "المبلغ المتبقي ({{amount}} {{currency}}) هيتحول للحساب اللي هتختاره."
+    }
+  },
+  "reports": {
+    "title": "التقارير والتحليلات",
+    "subtitle": "تحليل مالي تفصيلي ورؤى عن وضعك المالي",
+    "loading": "جارٍ تحميل التقرير...",
+    "loadError": "تعذّر تحميل هذا التقرير.",
+    "empty": "لا توجد بيانات لهذه الفترة.",
+    "period": {
+      "1y": "سنة",
+      "6m": "٦ شهور",
+      "3m": "٣ شهور",
+      "1m": "شهر"
+    },
+    "tabs": {
+      "incomeExpenses": "الدخل والمصروفات",
+      "categories": "التصنيفات",
+      "cashFlow": "التدفق النقدي",
+      "savingsRate": "معدل الادخار",
+      "netWorth": "صافي الثروة",
+      "debtProgress": "تقدّم سداد الديون",
+      "habits": "عادات الإنفاق"
+    },
+    "incomeExpenses": {
+      "avgExpenses": "متوسط الصرف الشهري",
+      "netSavings": "صافي الادخار",
+      "totalExpenses": "إجمالي المصروفات",
+      "totalIncome": "إجمالي الدخل",
+      "chartTitle": "المقارنة الشهرية"
+    },
+    "categories": {
+      "title": "توزيع المصروفات على التصنيفات"
+    },
+    "cashFlow": {
+      "totalIn": "إجمالي الوارد",
+      "totalOut": "إجمالي المنصرف",
+      "netFlow": "صافي التدفق",
+      "timelineTitle": "السجل الزمني",
+      "runningBalance": "الرصيد المتراكم"
+    },
+    "savingsRate": {
+      "avgRate": "متوسط معدل الادخار",
+      "targetNote": "الهدف: {{rate}}",
+      "avgSavings": "متوسط الادخار الشهري",
+      "monthlyTitle": "التفصيل الشهري"
+    },
+    "netWorth": {
+      "current": "صافي الثروة الحالي",
+      "historyTitle": "تاريخ صافي الثروة"
+    },
+    "debtProgress": {
+      "totalPaid": "إجمالي المسدد",
+      "totalRemaining": "إجمالي المتبقي",
+      "estPayoff": "التوقع الزمني للسداد"
+    },
+    "habits": {
+      "weekdayTotal": "صرف أيام الأسبوع",
+      "weekendTotal": "صرف عطلة نهاية الأسبوع",
+      "byDayTitle": "الصرف حسب يوم الأسبوع",
+      "topExpensesTitle": "أعلى المصروفات",
+      "topCategoriesTitle": "أعلى التصنيفات",
+      "spikeAlert": "صرف تصنيف {{category}} زاد {{pct}} عن الفترة اللي قبلها"
+    }
+  },
+  "currencies": {
+    "short": {
+      "EGP": "ج.م",
+      "USD": "دولار",
+      "EUR": "يورو",
+      "GBP": "جنيه إسترليني",
+      "SAR": "ر.س",
+      "AED": "د.إ"
+    },
+    "name": {
+      "EGP": "جنيه مصري (ج.م)",
+      "USD": "دولار أمريكي",
+      "EUR": "يورو",
+      "GBP": "جنيه إسترليني",
+      "SAR": "ريال سعودي (ر.س)",
+      "AED": "درهم إماراتي (د.إ)"
+    }
+  },
+  "validation": {
+    "required": "من فضلك املأ هذا الحقل.",
+    "selectRequired": "من فضلك اختر من القائمة.",
+    "email": "من فضلك اكتب بريد إلكتروني صحيح.",
+    "number": "من فضلك اكتب رقم صحيح.",
+    "min": "القيمة لازم تكون {{min}} أو أكثر.",
+    "max": "القيمة لازم تكون {{max}} أو أقل.",
+    "step": "من فضلك اكتب قيمة صحيحة (رقمين عشريين بحد أقصى).",
+    "pattern": "الصيغة غير صحيحة.",
+    "invalid": "القيمة غير صالحة.",
+    "minLength_zero": "لازم يكون فيه حروف.",
+    "minLength_one": "لازم يكون حرف واحد على الأقل.",
+    "minLength_two": "لازم يكون حرفين على الأقل.",
+    "minLength_few": "لازم يكون {{count}} حروف على الأقل.",
+    "minLength_many": "لازم يكون {{count}} حرفًا على الأقل.",
+    "minLength_other": "لازم يكون {{count}} حرف على الأقل.",
+    "maxLength_zero": "الحقل ده لازم يفضل فاضي.",
+    "maxLength_one": "لازم ميزيدش عن حرف واحد.",
+    "maxLength_two": "لازم ميزيدش عن حرفين.",
+    "maxLength_few": "لازم ميزيدش عن {{count}} حروف.",
+    "maxLength_many": "لازم ميزيدش عن {{count}} حرفًا.",
+    "maxLength_other": "لازم ميزيدش عن {{count}} حرف."
+  },
+  "defaultCategories": {
+    "food": "أكل",
+    "transport": "مواصلات",
+    "rent": "إيجار",
+    "bills": "فواتير",
+    "health": "صحة",
+    "education": "تعليم",
+    "entertainment": "تسلية",
+    "other": "غيره"
+  },
+  "errors": {
+    "generic": "حدث خطأ غير متوقع. حاول مرة أخرى.",
+    "subscriptionExpired": "انتهى اشتراكك. جدّد اشتراكك عشان تقدر تعدّل بياناتك.",
+    "accounts": {
+      "load": "تعذّر تحميل الحسابات",
+      "transfer": "تعذّر إتمام التحويل",
+      "create": "تعذّر إضافة الحساب",
+      "adjust": "تعذّر تعديل رصيد الحساب",
+      "archive": "تعذّر أرشفة الحساب"
+    },
+    "auth": {
+      "register": "حدث خطأ أثناء إنشاء الحساب",
+      "forgot": "حدث خطأ أثناء إرسال رابط الاستعادة",
+      "reset": "الرابط غير صالح أو منتهي الصلاحية",
+      "profile": "تعذّر تحديث البيانات",
+      "avatarUpload": "تعذّر رفع الصورة",
+      "avatarDelete": "تعذّر حذف الصورة",
+      "emailCode": "تعذّر إرسال كود التحقق",
+      "emailConfirm": "الكود غير صحيح أو منتهي الصلاحية",
+      "password": "تعذّر تغيير كلمة السر",
+      "locale": "تعذّر حفظ اللغة"
+    },
+    "dashboard": {
+      "load": "تعذّر تحميل ملخص لوحة التحكم"
+    },
+    "debts": {
+      "load": "تعذّر تحميل الديون",
+      "create": "تعذّر إضافة الدين",
+      "update": "تعذّر تعديل الدين",
+      "delete": "تعذّر حذف الدين",
+      "status": "تعذّر تحديث حالة الدين",
+      "payment": "تعذّر تسجيل الدفعة"
+    },
+    "expenses": {
+      "load": "تعذّر تحميل المصروفات",
+      "create": "تعذّر إضافة المصروف",
+      "update": "تعذّر تعديل المصروف",
+      "delete": "تعذّر حذف المصروف"
+    },
+    "income": {
+      "load": "تعذّر تحميل مصادر الدخل",
+      "create": "تعذّر إضافة مصدر الدخل",
+      "delete": "تعذّر حذف مصدر الدخل",
+      "summary": "تعذّر تحميل ملخص الدخل",
+      "update": "تعذّر تحديث مصدر الدخل",
+      "recurring": "تعذّر تحديث حالة الدخل المتكرر"
+    },
+    "savings": {
+      "load": "تعذّر تحميل أهداف الادخار",
+      "create": "تعذّر إنشاء هدف الادخار",
+      "update": "تعذّر تعديل هدف الادخار",
+      "delete": "تعذّر حذف هدف الادخار",
+      "deposit": "تعذّر الإيداع في الهدف",
+      "withdraw": "تعذّر السحب من الهدف",
+      "complete": "تعذّر إنهاء الهدف",
+      "archive": "تعذّر أرشفة الهدف",
+      "transactions": "تعذّر تحميل حركات الهدف"
+    },
+    "server": {
+      "goalNotFound": "هدف الادخار غير موجود.",
+      "debtNotFound": "الدين غير موجود.",
+      "accountNotFound": "الحساب غير موجود.",
+      "userNotFound": "المستخدم غير موجود.",
+      "transactionNotFound": "العملية غير موجودة.",
+      "incomeNotFound": "الدخل غير موجود.",
+      "expenseNotFound": "المصروف غير موجود.",
+      "categoryNotFound": "التصنيف غير موجود.",
+      "sourceAccountNotFound": "الحساب المحوَّل منه غير موجود.",
+      "destinationAccountNotFound": "الحساب المحوَّل إليه غير موجود.",
+      "amountPositive": "المبلغ لازم يكون أكبر من صفر.",
+      "unauthorized": "انتهت الجلسة. سجّل الدخول مرة أخرى.",
+      "forbidden": "غير مسموح لك بتنفيذ هذا الإجراء.",
+      "trialLimit": "وصلت للحد الأقصى في الفترة التجريبية ({{max}} عملية).",
+      "trialOneAccount": "مسموح بحساب واحد فقط في الفترة التجريبية.",
+      "invalidCategory": "التصنيف غير موجود في قائمة تصنيفاتك.",
+      "categoryRequired": "التصنيف مطلوب.",
+      "accountNameExists": "يوجد حساب بنفس الاسم بالفعل.",
+      "goalNameExists": "يوجد هدف ادخار بنفس الاسم بالفعل.",
+      "accountArchived": "الحساب \"{{name}}\" مؤرشف (مجمّد): لا يمكن الإيداع فيه أو السحب منه.",
+      "insufficientBalance": "الرصيد غير كافٍ.",
+      "insufficientBalanceIn": "الرصيد غير كافٍ — الرصيد الحالي في \"{{name}}\" هو {{balance}} {{currency}}.",
+      "receivedDateInvalid": "تاريخ الاستلام غير صالح.",
+      "newBalanceRequired": "الرصيد الجديد مطلوب.",
+      "transferAccountsRequired": "اختر الحساب المحوَّل منه والحساب المحوَّل إليه.",
+      "typeRequired": "النوع مطلوب ولازم يكون يومي أو شهري ثابت أو طارئ.",
+      "typeInvalid": "النوع غير صالح.",
+      "tooManyRequests": "طلبات كثيرة جدًا، حاول مرة أخرى بعد قليل.",
+      "targetBelowSaved": "المبلغ المستهدف لا يمكن أن يكون أقل من المبلغ المدّخر بالفعل.",
+      "selectAccountBeforeDelete": "اختر حسابًا يستلم الرصيد المتبقي قبل الحذف.",
+      "selectAccountBeforeArchive": "اختر حسابًا يستلم الرصيد قبل الأرشفة.",
+      "onlyActiveGoalsArchive": "يمكن أرشفة الأهداف النشطة فقط.",
+      "noGoalBalance": "لا يوجد رصيد في هذا الهدف.",
+      "incomeFieldsRequired": "الاسم والتصنيف والمبلغ والعملة وتاريخ الاستلام مطلوبة.",
+      "nameRequired": "الاسم مطلوب.",
+      "nameEmpty": "الاسم لا يمكن أن يكون فارغًا.",
+      "goalFieldsRequired": "الاسم والمبلغ المستهدف مطلوبان.",
+      "resetLinkInvalid": "رابط الاستعادة غير صالح أو منتهي الصلاحية.",
+      "invalidLocale": "اللغة غير مدعومة.",
+      "invalidIncomeCategory": "تصنيف الدخل غير صالح.",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة السر غير صحيحة",
+      "goalNotActive": "الهدف غير نشط.",
+      "goalCompleted": "الهدف مكتمل بالفعل.",
+      "emailInUse": "البريد الإلكتروني مستخدم بالفعل.",
+      "debtFullyPaid": "الدين مسدَّد بالكامل بالفعل.",
+      "debtFieldsRequired": "اسم الدائن والمبلغ الإجمالي مطلوبان.",
+      "withdrawOverBalance": "لا يمكن سحب مبلغ أكبر من الرصيد الحالي.",
+      "cannotRenameDefault": "لا يمكن إعادة تسمية تصنيف افتراضي.",
+      "cannotEditGoal": "لا يمكن تعديل هدف مكتمل أو مؤرشف.",
+      "cannotChangeDefaultType": "لا يمكن تغيير نوع تصنيف افتراضي.",
+      "accountNameRequired": "اسم الحساب مطلوب.",
+      "noImage": "لم يتم إرسال صورة.",
+      "passwordMinLength": "كلمة السر لازم تكون {{min}} حروف على الأقل.",
+      "passwordDigit": "كلمة السر لازم تحتوي على رقم.",
+      "passwordUppercase": "كلمة السر لازم تحتوي على حرف كبير.",
+      "currentPasswordWrong": "كلمة السر الحالية غير صحيحة.",
+      "passwordMismatch": "كلمة السر الجديدة مش متطابقة.",
+      "allFieldsRequired": "كل الحقول مطلوبة.",
+      "imageFormat": "صيغة الصورة غير مدعومة (JPG / PNG / WEBP فقط).",
+      "sameEmail": "ده نفس بريدك الإلكتروني الحالي.",
+      "imageTooLarge": "حجم الصورة كبير، الحد الأقصى {{max}} ميجابايت.",
+      "codeExpired": "الكود منتهي أو غير صالح، أعد الإرسال.",
+      "codeWrong": "الكود غلط.",
+      "defaultCategoryDelete": "التصنيفات الافتراضية إلزامية ولا يمكن حذفها نهائيًا.",
+      "emailRequired": "البريد الإلكتروني مطلوب.",
+      "emailTaken": "البريد الإلكتروني ده مستخدم بالفعل."
     }
   }
 }

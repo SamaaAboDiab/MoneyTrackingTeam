@@ -1,3 +1,5 @@
+import { formatNumber, currencyLabel } from "../../../utils/formatAmount";
+
 function WealthSummary({ accounts, t }) {
   const totalsByCurrency = accounts.reduce((totals, account) => {
     const currency = account.currency || "EGP";
@@ -16,10 +18,8 @@ function WealthSummary({ accounts, t }) {
         <div className="mt-3 flex flex-wrap gap-x-8 gap-y-2">
           {currencies.map(([currency, total]) => (
             <div key={currency} className="flex items-baseline gap-2">
-              <span className="text-sm font-medium text-slate-500">{currency}</span>
-              <strong className="tabular-amount text-2xl font-extrabold text-slate-900">
-                {Number(total).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-              </strong>
+              <strong className="tabular-amount text-2xl font-extrabold text-slate-900">{formatNumber(total)}</strong>
+              <span className="text-sm font-medium text-slate-500">{currencyLabel(currency)}</span>
             </div>
           ))}
         </div>

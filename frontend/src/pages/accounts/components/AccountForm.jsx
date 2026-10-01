@@ -1,3 +1,10 @@
+import Select from "../../../components/common/Select";
+import NumberInput from "../../../components/common/NumberInput";
+import ColorPicker from "../../../components/common/ColorPicker";
+import { currencyName } from "../../../utils/formatAmount";
+
+const CURRENCIES = ["EGP", "USD", "EUR", "GBP"];
+
 const inputClass =
   "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500";
 const labelClass = "text-sm font-semibold text-slate-700";
@@ -29,22 +36,21 @@ function AccountForm({ form, createStatus, createError, onChange, onSubmit, t })
           <label htmlFor="type" className={labelClass}>
             {t("accounts.typeLabel")}
           </label>
-          <select id="type" name="type" value={form.type} onChange={onChange} required className={inputClass}>
+          <Select id="type" name="type" required value={form.type} onChange={onChange} className={inputClass}>
             <option value="">{t("accounts.typePlaceholder")}</option>
             <option value="bank">{t("accounts.bank")}</option>
             <option value="wallet">{t("accounts.wallet")}</option>
             <option value="cash">{t("accounts.cash")}</option>
-          </select>
+          </Select>
         </div>
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="initialBalance" className={labelClass}>
             {t("accounts.balanceLabel")}
           </label>
-          <input
+          <NumberInput
             id="initialBalance"
             name="initialBalance"
-            type="number"
             step="0.01"
             value={form.initialBalance}
             onChange={onChange}
@@ -58,26 +64,20 @@ function AccountForm({ form, createStatus, createError, onChange, onSubmit, t })
           <label htmlFor="currency" className={labelClass}>
             {t("accounts.currencyLabel")}
           </label>
-          <select id="currency" name="currency" value={form.currency} onChange={onChange} required className={inputClass}>
-            <option value="EGP">EGP</option>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="GBP">GBP</option>
-          </select>
+          <Select id="currency" name="currency" value={form.currency} onChange={onChange} className={inputClass}>
+            {CURRENCIES.map((code) => (
+              <option key={code} value={code}>
+                {currencyName(code)}
+              </option>
+            ))}
+          </Select>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="color" className={labelClass}>
+        <div className="flex flex-col gap-1.5 sm:col-span-2">
+          <label id="color-label" htmlFor="color" className={labelClass}>
             {t("accounts.colorLabel")}
           </label>
-          <input
-            id="color"
-            name="color"
-            type="color"
-            value={form.color}
-            onChange={onChange}
-            className="h-11 w-16 cursor-pointer rounded-lg border border-slate-200 p-1"
-          />
+          <ColorPicker id="color" name="color" value={form.color} onChange={onChange} labelledBy="color-label" />
         </div>
 
         <div className="flex flex-col justify-end gap-3 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">

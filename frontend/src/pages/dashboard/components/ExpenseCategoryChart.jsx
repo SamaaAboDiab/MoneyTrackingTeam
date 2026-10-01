@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PieChart } from "lucide-react";
-import { formatAmount } from "../../../utils/formatAmount";
+import { formatAmount, formatMoney, formatNumber, formatPercent, currencyLabel } from "../../../utils/formatAmount";
+import { categoryLabel } from "../../categories/components/mandatoryCategories";
 
 const FALLBACK_PALETTE = [
   "#f97316",
@@ -48,7 +49,7 @@ function donutSlicePath(startAngle, endAngle) {
   ].join(" ");
 }
 
-function ExpenseCategoryChart({ categories, t }) {
+function ExpenseCategoryChart({ categories, loading, currency = "EGP", t }) {
   const navigate = useNavigate();
   const [hoveredId, setHoveredId] = useState(null);
 
@@ -78,16 +79,26 @@ function ExpenseCategoryChart({ categories, t }) {
   const hovered = slices.find((slice) => slice.categoryId === hoveredId);
 
   return (
-    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-      <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+    <section className="@container h-full rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6">
+      <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
         <PieChart size={18} className="text-brand-600" />
         {t("dashboard.chart.title")}
       </h2>
 
-      {categories.length === 0 ? (
+      {loading ? (
+        <div role="status" aria-live="polite" className="mt-5 flex flex-col items-center gap-6 @2xl:flex-row @2xl:items-start">
+          <span className="sr-only">{t("common.loading")}</span>
+          <span aria-hidden="true" className="skeleton block h-[200px] w-[200px] shrink-0 rounded-full" />
+          <div aria-hidden="true" className="w-full flex-1 space-y-3">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <span key={i} className="skeleton block h-8 rounded-lg" />
+            ))}
+          </div>
+        </div>
+      ) : categories.length === 0 ? (
         <p className="mt-4 text-sm text-slate-500">{t("dashboard.chart.empty")}</p>
       ) : (
-        <div className="mt-5 flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+        <div className="mt-5 flex flex-col items-center gap-6 @2xl:flex-row @2xl:items-start">
           <div className="relative shrink-0" style={{ width: SIZE, height: SIZE }}>
             <svg
               viewBox={`0 0 ${SIZE} ${SIZE}`}
@@ -107,7 +118,7 @@ function ExpenseCategoryChart({ categories, t }) {
                   onMouseLeave={() => setHoveredId(null)}
                   onClick={() => goToCategory(slice.name)}
                 >
-                  <title>{`${slice.name}: ${formatAmount(slice.total)} EGP`}</title>
+                  <title>{`${categoryLabel(slice.name)}: ${formatMoney(slice.total, currency)}`}</title>
                 </path>
               ))}
             </svg>
@@ -116,12 +127,12 @@ function ExpenseCategoryChart({ categories, t }) {
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
               {hovered ? (
                 <>
-                  <span className="max-w-[7rem] truncate text-xs font-semibold text-slate-500">{hovered.name}</span>
+                  <span className="max-w-[7rem] truncate text-xs font-semibold text-slate-500">{categoryLabel(hovered.name)}</span>
                   <strong className="tabular-amount text-sm font-extrabold text-slate-900">
                     {formatAmount(hovered.total)}
                   </strong>
                   <span className="text-xs text-slate-400">
-                    {Math.round(hovered.fraction * 100)}%
+                    {formatPercent(hovered.fraction * 100)}
                   </span>
                 </>
               ) : (
@@ -130,7 +141,7 @@ function ExpenseCategoryChart({ categories, t }) {
                   <strong className="tabular-amount text-lg font-extrabold text-slate-900">
                     {formatAmount(total)}
                   </strong>
-                  <span className="text-xs text-slate-400">EGP</span>
+                  <span className="text-xs text-slate-400">{currencyLabel(currency)}</span>
                 </>
               )}
             </div>
@@ -138,7 +149,7 @@ function ExpenseCategoryChart({ categories, t }) {
 
           <div className="w-full flex-1">
             {/* أعلى 3 تصنيفات */}
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-2 @md:grid-cols-3">
               {topThree.map((cat, index) => (
                 <button
                   key={cat.categoryId}
@@ -150,10 +161,10 @@ function ExpenseCategoryChart({ categories, t }) {
                     className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                     style={{ backgroundColor: cat.color }}
                   >
-                    {index + 1}
+                    {formatNumber(index + 1)}
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-xs font-semibold text-slate-700">{cat.name}</span>
+                    <span className="block truncate text-xs font-semibold text-slate-700">{categoryLabel(cat.name)}</span>
                     <span className="tabular-amount block text-sm font-bold text-slate-900">
                       {formatAmount(cat.total)}
                     </span>
@@ -178,10 +189,10 @@ function ExpenseCategoryChart({ categories, t }) {
                       className="h-2.5 w-2.5 shrink-0 rounded-full"
                       style={{ backgroundColor: slice.color }}
                     />
-                    <span className="truncate font-medium text-slate-700">{slice.name}</span>
+                    <span className="truncate font-medium text-slate-700">{categoryLabel(slice.name)}</span>
                   </span>
                   <span className="tabular-amount shrink-0 font-semibold text-slate-900">
-                    {formatAmount(slice.total)} · {Math.round(slice.fraction * 100)}%
+                    {formatAmount(slice.total)} · {formatPercent(slice.fraction * 100)}
                   </span>
                 </button>
               ))}

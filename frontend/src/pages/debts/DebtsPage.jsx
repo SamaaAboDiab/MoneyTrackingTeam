@@ -12,7 +12,7 @@ import {
   markDebtPaidThunk,
   addDebtPaymentThunk,
 } from "../../store/slices/debtsSlice";
-import { formatAmount } from "../../utils/formatAmount";
+import { formatAmount, currencyLabel } from "../../utils/formatAmount";
 import ConfirmModal from "../../components/common/ConfirmModal";
 import { getTodayString, EMPTY_DEBT_FORM } from "./constants";
 import { getErrorMessage } from "./utils";
@@ -233,7 +233,7 @@ function DebtsPage() {
       setError(
         t("debts.paymentExceedsRemainingError", {
           remaining: formatAmount(remaining),
-          currency: paymentModalDebt.currency,
+          currency: currencyLabel(paymentModalDebt.currency),
         })
       );
       return;
@@ -302,7 +302,7 @@ function DebtsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-5">
       <DebtsHeader
         showAddForm={showAddForm}
         setShowAddForm={setShowAddForm}

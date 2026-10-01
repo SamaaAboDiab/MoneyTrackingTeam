@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -12,6 +12,7 @@ import {
 import { getAccounts } from "../../api/accountsApi";
 import { listCategories } from "../../api/categoryApi";
 import { EMPTY_FORM, EMPTY_FILTERS, FALLBACK_CATEGORY_COLORS } from "./constants";
+import { todayISODate } from "../../utils/formatAmount";
 import ExpenseToast from "./components/ExpenseToast";
 import ExpensesSummary from "./components/ExpensesSummary";
 import ExpenseForm from "./components/ExpenseForm";
@@ -19,6 +20,8 @@ import ExpenseFilters from "./components/ExpenseFilters";
 import ExpensesList from "./components/ExpensesList";
 import EditExpenseModal from "./components/EditExpenseModal";
 import DeleteExpenseModal from "./components/DeleteExpenseModal";
+import PageHeader from "../../components/common/PageHeader";
+import { TrendingDown } from "lucide-react";
 
 function ExpensesPage() {
   const { t } = useTranslation();
@@ -144,10 +147,15 @@ function ExpensesPage() {
     return () => dispatch(resetExpenseCreateStatus());
   }, [dispatch]);
 
-  const totalExpenses = useMemo(
-    () => items.reduce((sum, item) => sum + Number(item.amount || 0), 0),
-    [items]
-  );
+  // Totals per currency (largest first); amounts in different currencies are never added together.
+  const totalsByCurrency = useMemo(() => {
+    const totals = items.reduce((acc, item) => {
+      const code = item.currency || "EGP";
+      acc[code] = (acc[code] || 0) + Number(item.amount || 0);
+      return acc;
+    }, {});
+    return Object.entries(totals).sort((a, b) => b[1] - a[1]);
+  }, [items]);
 
   const handleChange = ({ target }) => {
     const { name, value } = target;
@@ -204,7 +212,7 @@ function ExpensesPage() {
     const result = await dispatch(createExpenseEntry(payload));
 
     if (createExpenseEntry.fulfilled.match(result)) {
-      setForm({ ...EMPTY_FORM, date: new Date().toISOString().slice(0, 10) });
+      setForm({ ...EMPTY_FORM, date: todayISODate() });
       showToast(t("expenses.toast.added"));
       loadAccounts();
       loadCategories();
@@ -219,7 +227,7 @@ function ExpensesPage() {
     setEditForm({
       description: expense.description || "",
       amount: expense.amount ?? "",
-      date: expense.date ? new Date(expense.date).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+      date: expense.date ? new Date(expense.date).toISOString().slice(0, 10) : todayISODate(),
       paymentMethod: expense.paymentMethod || "cash",
       expenseType: expense.expenseType || "daily",
       category: resolvedCat,
@@ -293,21 +301,12 @@ function ExpensesPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl">
       <ExpenseToast toastMessage={toastMessage} />
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">{t("nav.expenses")}</h1>
-          <p className="mt-1 text-slate-500">{t("expenses.subtitle")}</p>
-        </div>
+      <PageHeader icon={TrendingDown} title={t("nav.expenses")} subtitle={t("expenses.subtitle")} />
 
-        <Link to="/dashboard" className="font-semibold text-brand-700 hover:underline">
-          {t("common.backToDashboard")}
-        </Link>
-      </div>
-
-      <ExpensesSummary isFiltered={isFiltered} totalExpenses={totalExpenses} />
+      <ExpensesSummary isFiltered={isFiltered} totalsByCurrency={totalsByCurrency} />
 
       <ExpenseForm
         form={form}

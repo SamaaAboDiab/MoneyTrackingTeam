@@ -1,7 +1,10 @@
 import { useTranslation } from "react-i18next";
 import CategorySelect from "../../categories/components/CategorySelect";
-import { formatAmount } from "../../../utils/formatAmount";
+import { formatMoney } from "../../../utils/formatAmount";
+import NumberInput from "../../../components/common/NumberInput";
 import { inputClass, labelClass } from "../constants";
+import DatePicker from "../../../components/common/DatePicker";
+import Select from "../../../components/common/Select";
 
 
 function EditExpenseModal({ editingExpense, setEditingExpense, editForm, setEditForm, handleEditChange, handleEditSubmit, editSaving, editError, availableAccounts }) {
@@ -24,6 +27,7 @@ function EditExpenseModal({ editingExpense, setEditingExpense, editForm, setEdit
               type="button"
               disabled={editSaving}
               onClick={() => setEditingExpense(null)}
+              aria-label={t("common.close")}
               className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
             >
               <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -34,8 +38,9 @@ function EditExpenseModal({ editingExpense, setEditingExpense, editForm, setEdit
 
           <form onSubmit={handleEditSubmit} className="mt-4 space-y-3.5">
             <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>{t("expenses.fields.description")}</label>
+              <label htmlFor="edit-description" className={labelClass}>{t("expenses.fields.description")}</label>
               <input
+                id="edit-description"
                 name="description"
                 value={editForm.description}
                 onChange={handleEditChange}
@@ -46,10 +51,10 @@ function EditExpenseModal({ editingExpense, setEditingExpense, editForm, setEdit
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>{t("expenses.fields.amount")}</label>
-                <input
+                <label htmlFor="edit-amount" className={labelClass}>{t("expenses.fields.amount")}</label>
+                <NumberInput
+                  id="edit-amount"
                   name="amount"
-                  type="number"
                   min="0.01"
                   step="0.01"
                   value={editForm.amount}
@@ -60,13 +65,12 @@ function EditExpenseModal({ editingExpense, setEditingExpense, editForm, setEdit
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>{t("expenses.fields.date")}</label>
-                <input
-                  name="date"
-                  type="date"
-                  value={editForm.date}
-                  onChange={handleEditChange}
+                <label htmlFor="edit-date" className={labelClass}>{t("expenses.fields.date")}</label>
+                <DatePicker
+                  id="edit-date"
                   required
+                  value={editForm.date}
+                  onChange={(value) => handleEditChange({ target: { name: "date", value } })}
                   className={inputClass}
                 />
               </div>
@@ -74,40 +78,44 @@ function EditExpenseModal({ editingExpense, setEditingExpense, editForm, setEdit
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>{t("expenses.fields.paymentMethod")}</label>
-                <select
+                <label htmlFor="edit-paymentMethod" className={labelClass}>{t("expenses.fields.paymentMethod")}</label>
+                <Select
+                  id="edit-paymentMethod"
                   name="paymentMethod"
                   value={editForm.paymentMethod}
                   onChange={handleEditChange}
-                  required
                   className={inputClass}
                 >
                   <option value="cash">{t("expenses.paymentMethod.cash")}</option>
                   <option value="card">{t("expenses.paymentMethod.card")}</option>
                   <option value="wallet">{t("expenses.paymentMethod.wallet")}</option>
-                </select>
+                </Select>
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>{t("expenses.fields.expenseType")}</label>
-                <select
+                <label htmlFor="edit-expenseType" className={labelClass}>{t("expenses.fields.expenseType")}</label>
+                <Select
+                  id="edit-expenseType"
+                  required
                   name="expenseType"
                   value={editForm.expenseType}
                   onChange={handleEditChange}
-                  required
                   className={inputClass}
                 >
                   <option value="daily">{t("expenses.expenseType.daily")}</option>
                   <option value="fixed">{t("expenses.expenseType.fixed")}</option>
                   <option value="emergency">{t("expenses.expenseType.emergency")}</option>
-                </select>
+                </Select>
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>{t("expenses.fields.category")}</label>
+                <label htmlFor="edit-category" className={labelClass}>{t("expenses.fields.category")}</label>
                 <CategorySelect
+                  id="edit-category"
+                  name="edit-category"
+                  required
                   value={editForm.category}
                   expenseType={editForm.expenseType}
                   onChange={(value) =>
@@ -117,8 +125,9 @@ function EditExpenseModal({ editingExpense, setEditingExpense, editForm, setEdit
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>{t("expenses.editModal.accountLabel")}</label>
-                <select
+                <label htmlFor="edit-accountId" className={labelClass}>{t("expenses.editModal.accountLabel")}</label>
+                <Select
+                  id="edit-accountId"
                   name="accountId"
                   value={editForm.accountId}
                   onChange={handleEditChange}
@@ -127,16 +136,17 @@ function EditExpenseModal({ editingExpense, setEditingExpense, editForm, setEdit
                   <option value="">{t("expenses.noAccountOption")}</option>
                   {availableAccounts.map((acc) => (
                     <option key={acc._id} value={acc._id}>
-                      {acc.name} ({formatAmount(acc.balance)} {acc.currency || "EGP"})
+                      {acc.name} ({formatMoney(acc.balance, acc.currency)})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>{t("expenses.fields.notes")}</label>
+              <label htmlFor="edit-notes" className={labelClass}>{t("expenses.fields.notes")}</label>
               <textarea
+                id="edit-notes"
                 name="notes"
                 value={editForm.notes}
                 onChange={handleEditChange}

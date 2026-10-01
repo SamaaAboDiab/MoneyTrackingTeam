@@ -35,11 +35,100 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Financial amounts always render with Western digits, even in the Arabic UI. */
+/* Financial amounts: fixed-width digits, isolated so the number + currency label keep their
+   order next to surrounding text. Digits follow the UI language (see utils/formatAmount). */
 .tabular-amount {
   font-variant-numeric: tabular-nums;
-  direction: ltr;
   unicode-bidi: isolate;
+}
+
+/* Language switch: a soft cross-fade of the whole page (View Transitions API). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Page enter: a quick fade of the page; the cards inside then reveal one by one. */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+  }
+}
+
+.page-enter {
+  animation: page-enter 0.3s ease-out backwards;
+}
+
+/* Cards: hidden until they scroll into view (see useRevealCards), then fade + rise. */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.55s ease-out,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* Loading indicators: the spinner only rotates; skeletons shimmer softly. */
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: #e2e8f0;
+  border-radius: 0.5rem;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+html[dir="rtl"] .skeleton::after {
+  transform: translateX(100%);
+  animation-name: skeleton-shimmer-rtl;
+}
+
+@keyframes skeleton-shimmer-rtl {
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 /* No focus ring/outline on form fields anywhere in the app. */

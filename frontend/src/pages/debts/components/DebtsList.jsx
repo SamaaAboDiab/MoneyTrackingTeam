@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { CreditCard } from "lucide-react";
 import DebtCard from "./DebtCard";
+import { CardGridSkeleton } from "../../../components/common/Skeleton";
 
 function DebtsList({ debtsLoadingStatus, debts, displayedDebts, activeTab, ...cardProps }) {
   const { t } = useTranslation();
@@ -8,9 +9,7 @@ function DebtsList({ debtsLoadingStatus, debts, displayedDebts, activeTab, ...ca
   return (
     <>
     {debtsLoadingStatus === "loading" && debts.length === 0 ? (
-      <div className="rounded-2xl bg-white p-12 text-center text-slate-500 shadow-sm ring-1 ring-slate-100">
-        {t("debts.loading")}
-      </div>
+      <CardGridSkeleton cards={2} className="grid gap-5" label={t("debts.loading")} />
     ) : displayedDebts.length === 0 ? (
       <div className="rounded-2xl bg-white p-12 text-center text-slate-500 shadow-sm ring-1 ring-slate-100">
         <CreditCard className="mx-auto mb-3 text-slate-300" size={42} />

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { extractError } from "../../../utils/errorHandler";
 
 export default function DeleteIncomeButton({ incomeId, incomeName, onConfirmDelete }) {
   const { t } = useTranslation();
@@ -14,7 +15,7 @@ export default function DeleteIncomeButton({ incomeId, incomeName, onConfirmDele
       await onConfirmDelete?.(incomeId);
       setOpen(false);
     } catch (err) {
-      setError(typeof err === "string" ? err : err?.message || t("income.delete.error"));
+      setError(extractError(err, t("income.delete.error")));
     } finally {
       setDeleting(false);
     }

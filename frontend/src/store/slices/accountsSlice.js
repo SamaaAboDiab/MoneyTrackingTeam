@@ -9,7 +9,7 @@ export const fetchAccounts = createAsyncThunk(
       const res = await accountsApi.getAccounts();
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تحميل الحسابات"));
+      return rejectWithValue(extractError(err, "errors.accounts.load"));
     }
   }
 );
@@ -26,7 +26,7 @@ export const transferFunds = createAsyncThunk(
       });
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر إتمام التحويل"));
+      return rejectWithValue(extractError(err, "errors.accounts.transfer"));
     }
   }
 );
@@ -38,7 +38,7 @@ export const createAccount = createAsyncThunk(
       const res = await accountsApi.createAccount(account);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر إضافة الحساب"));
+      return rejectWithValue(extractError(err, "errors.accounts.create"));
     }
   }
 );
@@ -50,7 +50,7 @@ export const adjustBalance = createAsyncThunk(
       const res = await accountsApi.adjustBalance({ accountId, newBalance, notes });
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تعديل رصيد الحساب"));
+      return rejectWithValue(extractError(err, "errors.accounts.adjust"));
     }
   }
 );
@@ -62,7 +62,7 @@ export const toggleArchiveAccount = createAsyncThunk(
       const res = await accountsApi.archiveAccountApi(id);
       return res.data.data || res.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر أرشفة الحساب"));
+      return rejectWithValue(extractError(err, "errors.accounts.archive"));
     }
   }
 );

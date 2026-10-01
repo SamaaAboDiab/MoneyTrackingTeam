@@ -1,19 +1,22 @@
 import { useTranslation } from "react-i18next";
+import { categoryLabel } from "../mandatoryCategories";
+import { ListSkeleton } from "../../../../components/common/Skeleton";
 
 function CategoryList({ categories, loading, openEditForm, setDeleteTarget, MANDATORY_CATEGORIES, typeInfo }) {
   const { t } = useTranslation();
   return (
     <>
-    <div className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200">
+    <div className="mt-4 divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm shadow-slate-200 ring-1 ring-slate-100">
       {loading ? (
-        <p className="p-4 text-sm text-slate-500">{t("categoriesPage.loading")}</p>
+        <ListSkeleton rows={6} compact label={t("categoriesPage.loading")} />
       ) : categories.length === 0 ? (
         <p className="p-4 text-sm text-slate-500">{t("categoriesPage.empty")}</p>
       ) : (
         categories.map((cat) => (
-          <div key={cat._id} className="flex items-center justify-between p-3">
+          <div key={cat._id} className="flex items-center justify-between gap-3 px-4 py-3.5 transition hover:bg-slate-50/60">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-medium text-slate-800">{cat.name}</span>
+              <span className="inline-block h-3 w-3 shrink-0 rounded-full ring-1 ring-black/5" style={{ backgroundColor: cat.color || "#6b7280" }} />
+              <span className="text-sm font-semibold text-slate-800">{categoryLabel(cat.name)}</span>
               {/* نوع التصنيف */}
               <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${typeInfo(cat.type).pill}`}>
                 {typeInfo(cat.type).label}

@@ -2,32 +2,18 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { toggleIncomeRecurrence } from "../../../store/slices/incomeSlice";
 import DeleteIncomeButton from "./DeleteIncomeButton";
+import { formatMoney, formatDate } from "../../../utils/formatAmount";
 
 function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted, onToggled }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const isRecurring = income.recurrence && income.recurrence !== "once";
   const isPaused = isRecurring && income.isActive === false;
 
-  const date = new Intl.DateTimeFormat(i18n.language, {
-    dateStyle: "medium",
-  }).format(new Date(income.receivedDate));
-
-  const amount = Number(displayAmount ?? income.amount).toLocaleString(
-    i18n.language,
-    {
-      maximumFractionDigits: 2,
-    }
-  );
-
-  const originalAmount = Number(income.amount || 0).toLocaleString(
-    i18n.language,
-    {
-      maximumFractionDigits: 2,
-    }
-  );
-
+  const date = formatDate(income.receivedDate, { dateStyle: "medium" });
   const currency = displayCurrency || income.currency;
+  const amount = formatMoney(displayAmount ?? income.amount, currency);
+  const originalAmount = formatMoney(income.amount || 0, income.currency);
 
   return (
     <article className="grid grid-cols-2 gap-4 py-5 md:grid-cols-[minmax(10rem,1.4fr)_minmax(7rem,1fr)_minmax(10rem,1fr)_minmax(8rem,1fr)_auto] md:items-center">
@@ -76,11 +62,11 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted,
         </span>
 
         <strong className="mt-1 block tabular-amount text-lg font-bold text-income">
-          {amount} {currency}
+          {amount}
         </strong>
 
         <small className="mt-1 block text-xs text-slate-400">
-          {t("income.fields.originalPrefix")} {originalAmount} {income.currency}
+          {t("income.fields.originalPrefix")} {originalAmount}
         </small>
       </div>
 

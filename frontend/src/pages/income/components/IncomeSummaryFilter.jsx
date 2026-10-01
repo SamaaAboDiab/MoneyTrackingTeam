@@ -1,5 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { inputClass } from "../constants";
+import Select from "../../../components/common/Select";
+import MonthYearPicker from "../../../components/common/MonthYearPicker";
+import { currencyName } from "../../../utils/formatAmount";
+import { INCOME_CURRENCIES } from "../constants";
 
 function IncomeSummaryFilter({ selectedMonth, setSelectedMonth, summaryCurrency, setSummaryCurrency }) {
   const { t } = useTranslation();
@@ -12,35 +16,34 @@ function IncomeSummaryFilter({ selectedMonth, setSelectedMonth, summaryCurrency,
       </h2>
 
       <div className="mt-4 flex flex-wrap items-end gap-3">
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
-          {t("income.filter.monthYearLabel")}
-
-          <input
-            type="month"
+        <div className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+          <label htmlFor="summary-month">{t("income.filter.monthYearLabel")}</label>
+          <MonthYearPicker
+            id="summary-month"
             value={selectedMonth}
-            onChange={(event) =>
-              setSelectedMonth(event.target.value)
-            }
+            onChange={setSelectedMonth}
             className={inputClass}
           />
-        </label>
+        </div>
 
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
-          {t("income.filter.baseCurrencyLabel")}
+        <div className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+          <label htmlFor="summary-currency">{t("income.filter.baseCurrencyLabel")}</label>
 
-          <select
+          <Select
+            id="summary-currency"
             value={summaryCurrency}
             onChange={(event) =>
               setSummaryCurrency(event.target.value)
             }
             className={inputClass}
           >
-            <option value="EGP">EGP</option>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="GBP">GBP</option>
-          </select>
-        </label>
+            {INCOME_CURRENCIES.map((code) => (
+              <option key={code} value={code}>
+                {currencyName(code)}
+              </option>
+            ))}
+          </Select>
+        </div>
       </div>
     </section>
     </>

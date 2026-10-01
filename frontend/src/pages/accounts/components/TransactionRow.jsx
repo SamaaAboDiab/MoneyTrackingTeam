@@ -1,9 +1,11 @@
+import { formatMoney } from "../../../utils/formatAmount";
+
 function TransactionRow({ transaction, formatDate, t }) {
   const isCredit = transaction.type === "credit";
   const isDebit = transaction.type === "debit";
   const amountClass = isCredit ? "text-income" : isDebit ? "text-expense" : "text-slate-900";
-  const sign = isCredit ? "+" : isDebit ? "-" : "";
-  const currency = transaction.account?.currency || "";
+  const currency = transaction.account?.currency;
+  const signedAmount = isDebit ? -Math.abs(Number(transaction.amount)) : Number(transaction.amount);
 
   return (
     <article className="grid grid-cols-2 gap-3 py-4 sm:grid-cols-4">
@@ -18,14 +20,13 @@ function TransactionRow({ transaction, formatDate, t }) {
       <div>
         <span className="block text-xs font-medium text-slate-500">{t("accounts.transactions.amount")}</span>
         <span className={`tabular-amount text-sm font-bold ${amountClass}`}>
-          {sign}
-          {Number(transaction.amount).toLocaleString()} {currency}
+          {formatMoney(signedAmount, currency, { signDisplay: isCredit || isDebit ? "exceptZero" : "auto" })}
         </span>
       </div>
       <div>
         <span className="block text-xs font-medium text-slate-500">{t("accounts.transactions.balanceAfter")}</span>
         <span className="tabular-amount text-sm font-bold text-slate-900">
-          {Number(transaction.balanceAfter).toLocaleString()} {currency}
+          {formatMoney(transaction.balanceAfter, currency)}
         </span>
       </div>
     </article>

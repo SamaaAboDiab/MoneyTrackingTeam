@@ -8,14 +8,28 @@
     "hideAmount": "Hide amount",
     "edit": "Edit",
     "delete": "Delete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "datePicker": {
+      "placeholder": "Select a date",
+      "clear": "Clear",
+      "today": "Today",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month"
+    },
+    "close": "Close",
+    "colorPicker": {
+      "custom": "Custom color"
+    }
   },
   "nav": {
     "income": "Income",
     "expenses": "Expenses",
     "cash": "Cash",
     "debts": "Debts",
-    "categories": "Categories"
+    "categories": "Categories",
+    "savings": "Savings Goals",
+    "reports": "Reports",
+    "settings": "Settings"
   },
   "auth": {
     "showPassword": "Show password",
@@ -98,7 +112,7 @@
       "invalid": "Choose an end date after the start date"
     },
     "summary": {
-      "title": "Current month summary",
+      "title": "Financial summary",
       "loading": "Loading summary...",
       "income": "Total income",
       "expenses": "Total expenses",
@@ -108,33 +122,52 @@
       "previousPeriod": "Previous period",
       "difference": "Difference",
       "noComparison": "No comparison data",
-      "notAvailable": "N/A"
+      "notAvailable": "N/A",
+      "savingsRate": "Savings rate",
+      "currency": "Currency"
     },
     "chart": {
       "title": "Expenses by category",
       "empty": "No expenses in this period.",
       "topCategories": "Top 3 categories",
       "viewInExpenses": "View in expenses",
-      "otherCount": "{{count}} transactions"
+      "otherCount_one": "{{count}} transaction",
+      "otherCount_other": "{{count}} transactions"
     },
     "debtsCard": {
       "title": "Total outstanding debts",
-      "activeCount": "{{count}} active debt(s) awaiting payment",
       "noneDue": "You have no outstanding debts right now",
       "manage": "Summary",
       "remaining": "Remaining amount to pay",
       "calculating": "Calculating...",
-      "overdueBadge": "{{count}} overdue debt(s)!",
-      "dueSoonBadge": "{{count}} debt(s) due soon",
       "allPaid": "No active debts",
-      "activeBadge": "{{count}} active debt(s)",
       "nearestDue": "Nearest payment date",
       "noDueDate": "No due date set",
       "payoffForecast": "Estimated full payoff",
       "forecastUnavailable": "Not enough data for a forecast",
       "dueToday": "Due today",
       "dueTomorrow": "Due tomorrow",
-      "dueInDays": "Due in {{count}} days"
+      "activeCount_one": "{{count}} active debt awaiting payment",
+      "activeCount_other": "{{count}} active debts awaiting payment",
+      "overdueBadge_one": "{{count}} overdue debt!",
+      "overdueBadge_other": "{{count}} overdue debts!",
+      "dueSoonBadge_one": "{{count}} debt due soon",
+      "dueSoonBadge_other": "{{count}} debts due soon",
+      "activeBadge_one": "{{count}} active debt",
+      "activeBadge_other": "{{count}} active debts",
+      "dueInDays_one": "Due in {{count}} day",
+      "dueInDays_other": "Due in {{count}} days"
+    },
+    "wealth": {
+      "accounts_one": "{{count}} account",
+      "accounts_other": "{{count}} accounts",
+      "net": "Net"
+    },
+    "cash": {
+      "shareOfWealth": "Share of your total wealth",
+      "open": "Manage cash",
+      "spentThisMonth": "Cash spent this month",
+      "transactions": "Expenses"
     }
   },
   "layout": {
@@ -143,6 +176,9 @@
     "logoutConfirmTitle": "Log Out?",
     "logoutConfirmMessage": "Are you sure you want to log out of your account? You'll need to sign in again to access your data.",
     "cancel": "Cancel",
+    "userMenu": {
+      "profile": "Profile"
+    },
     "upgradeTitle": "Upgrade to Premium",
     "upgradeSubtitle": "Unlock unlimited reports and more.",
     "upgradeButton": "Upgrade Now",
@@ -152,8 +188,10 @@
     "expandSidebar": "Expand sidebar",
     "mobileNav": {
       "home": "Home",
-      "accounts": "Accounts"
-    }
+      "accounts": "Accounts",
+      "more": "More"
+    },
+    "primaryNav": "Main navigation"
   },
   "transfer": {
     "backToDashboard": "Back to dashboard",
@@ -196,6 +234,7 @@
     "historyTitle": "{{name}} transaction history",
     "balance": "Balance",
     "totalWealth": "Total wealth",
+    "linkedAccountsCount": "Linked accounts",
     "noBalance": "No balances yet",
     "adjustBalance": {
       "trigger": "Adjust balance",
@@ -279,11 +318,11 @@
     "filter": {
       "title": "Filter income summary",
       "monthYearLabel": "Month and year",
-      "baseCurrencyLabel": "Base currency"
+      "baseCurrencyLabel": "Currency"
     },
     "fields": {
       "name": "Source name",
-      "category": "Category",
+      "category": "Income type",
       "amountConverted": "Amount in selected currency",
       "originalPrefix": "Original:",
       "date": "Date"
@@ -455,7 +494,7 @@
     "paymentDateRequiredError": "Set the payment date.",
     "paymentSuccess": "Payment recorded successfully",
     "paymentError": "Unable to record the payment.",
-    "historyFetchError": "Unable to fetch the payment history from the server.",
+    "historyFetchError": "Unable to load the payment history.",
     "form": {
       "title": "Register a new debt",
       "requiredNote": "All fields marked (*) are required",
@@ -471,13 +510,6 @@
       "save": "Save debt",
       "saving": "Saving..."
     },
-    "currencyOptions": {
-      "EGP": "Egyptian pound (EGP)",
-      "USD": "US dollar (USD)",
-      "EUR": "Euro (EUR)",
-      "SAR": "Saudi riyal (SAR)",
-      "AED": "UAE dirham (AED)"
-    },
     "category": {
       "other": "Other",
       "personal": "Personal",
@@ -488,7 +520,7 @@
     },
     "tabs": {
       "active": "Active debts",
-      "completed": "Completed",
+      "completed": "Completed debts",
       "all": "All"
     },
     "loading": "Loading debts...",
@@ -519,13 +551,15 @@
     "dueSoonMessage": {
       "today": "Alert: payment due today",
       "tomorrow": "Alert: payment due tomorrow",
-      "inDays": "Alert: payment due in {{count}} days"
+      "inDays_one": "Alert: payment due in {{count}} day",
+      "inDays_other": "Alert: payment due in {{count}} days"
     },
     "editDueDate": "Edit due date",
     "saveDate": "Save date",
     "forecast": {
       "averageMonthly": "Your average monthly payment: {{amount}}",
-      "notEnoughData": "Add more payments to calculate a forecast"
+      "notEnoughData": "Add more payments to calculate a forecast",
+      "payoffBy": "At your current payment rate, you'll pay off this debt by {{date}}"
     },
     "actions": {
       "addPayment": "Add payment",
@@ -537,7 +571,7 @@
     "history": {
       "title": "Recorded payments ({{count}})",
       "addNew": "+ Add new payment",
-      "loading": "Loading payment history from the server...",
+      "loading": "Loading payment history...",
       "empty": "No payments recorded yet for this debt.",
       "unknownAccount": "Selected account"
     },
@@ -572,7 +606,37 @@
     "emailLabel": "Email",
     "save": "Save changes",
     "saving": "Saving...",
-    "saveSuccess": "Your information has been updated."
+    "saveSuccess": "Your information has been updated.",
+    "email": {
+      "title": "Change email",
+      "subtitle": "A verification code will be sent to the new email before it's activated.",
+      "newEmailLabel": "New email",
+      "sendCode": "Send verification code",
+      "sending": "Sending...",
+      "codeSentMessage": "A 6-digit code was sent to the new email. It's valid for 15 minutes.",
+      "codeLabel": "Verification code",
+      "confirm": "Confirm change",
+      "confirming": "Confirming...",
+      "changeSuccess": "Email changed successfully",
+      "changeEmail": "Change email",
+      "cancel": "Cancel"
+    },
+    "password": {
+      "title": "Change password",
+      "currentLabel": "Current password",
+      "newLabel": "New password",
+      "confirmLabel": "Confirm new password",
+      "hint": "At least 8 characters, with an uppercase letter and a digit.",
+      "mismatch": "The new password and its confirmation don't match",
+      "submit": "Change password",
+      "submitting": "Changing...",
+      "success": "Password changed successfully"
+    },
+    "locale": {
+      "title": "Account language",
+      "subtitle": "Saved with your account and synced on any device you sign in from.",
+      "saving": "Saving..."
+    }
   },
   "quickAdd": {
     "button": "Quick expense",
@@ -630,9 +694,334 @@
       "newTitle": "New category",
       "newPlaceholder": "e.g. Subscriptions, Maintenance, Gifts...",
       "add": "Add",
-      "adding": "Saving...",
+      "adding": "Adding...",
       "addOption": "Add new category...",
       "deleteTitle": "Delete this category"
+    }
+  },
+  "savings": {
+    "title": "Savings Goals",
+    "subtitle": "Set targets and track your progress toward them.",
+    "addGoal": "Add goal",
+    "cancel": "Cancel",
+    "loading": "Loading savings goals...",
+    "empty": "No savings goals here yet.",
+    "createValidationError": "Please enter a name and a valid target amount.",
+    "createSuccess": "Savings goal created successfully",
+    "createError": "Could not save the savings goal",
+    "updateSuccess": "Savings goal updated successfully",
+    "tabs": {
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived",
+      "all": "All"
+    },
+    "status": {
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived"
+    },
+    "form": {
+      "title": "New savings goal",
+      "editTitle": "Edit savings goal",
+      "requiredNote": "* required",
+      "emojiLabel": "Icon",
+      "nameLabel": "Goal name",
+      "namePlaceholder": "e.g. New laptop",
+      "targetAmountLabel": "Target amount",
+      "currencyLabel": "Currency",
+      "targetDateLabel": "Target date",
+      "descriptionLabel": "Notes",
+      "descriptionPlaceholder": "Any extra details about this goal...",
+      "saving": "Saving...",
+      "save": "Save"
+    },
+    "card": {
+      "targetDate": "Target date",
+      "of": "of",
+      "transactions": "Transaction history",
+      "loadingTransactions": "Loading transactions...",
+      "noTransactions": "No transactions recorded yet.",
+      "deposit": "Deposit",
+      "withdrawal": "Withdrawal"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "deposit": "Deposit",
+      "withdraw": "Withdraw",
+      "complete": "Mark complete",
+      "archive": "Archive"
+    },
+    "deposit": {
+      "title": "Deposit",
+      "submit": "Deposit",
+      "success": "Deposit added successfully"
+    },
+    "withdraw": {
+      "title": "Withdraw",
+      "submit": "Withdraw",
+      "success": "Withdrawal completed successfully"
+    },
+    "complete": {
+      "title": "Mark goal as complete",
+      "submit": "Mark complete",
+      "success": "Goal marked as complete"
+    },
+    "archive": {
+      "title": "Archive goal",
+      "submit": "Archive",
+      "success": "Goal archived successfully"
+    },
+    "deleteAction": {
+      "title": "Delete goal",
+      "submit": "Delete",
+      "success": "Goal deleted successfully",
+      "confirmNoBalance": "Are you sure you want to delete this goal? This cannot be undone."
+    },
+    "actionModal": {
+      "amountLabel": "Amount",
+      "maxLabel": "max",
+      "accountLabel": "Account",
+      "noAccount": "No account (just record the amount)",
+      "chooseAccount": "Choose an account",
+      "dateLabel": "Date",
+      "noteLabel": "Note",
+      "amountRequiredError": "Please enter a valid amount.",
+      "error": "The operation failed. Please try again.",
+      "balanceTransferNote": "The remaining balance ({{amount}} {{currency}}) will be transferred to the account you choose."
+    }
+  },
+  "reports": {
+    "title": "Reports & Analytics",
+    "subtitle": "Detailed financial analysis and insights",
+    "loading": "Loading report...",
+    "loadError": "Could not load this report.",
+    "empty": "No data available for this period.",
+    "period": {
+      "1y": "1Y",
+      "6m": "6M",
+      "3m": "3M",
+      "1m": "1M"
+    },
+    "tabs": {
+      "incomeExpenses": "Income vs Expenses",
+      "categories": "Categories",
+      "cashFlow": "Cash Flow",
+      "savingsRate": "Savings Rate",
+      "netWorth": "Net Worth",
+      "debtProgress": "Debt Progress",
+      "habits": "Spending Habits"
+    },
+    "incomeExpenses": {
+      "avgExpenses": "Avg monthly spend",
+      "netSavings": "Net savings",
+      "totalExpenses": "Total expenses",
+      "totalIncome": "Total income",
+      "chartTitle": "Monthly Comparison"
+    },
+    "categories": {
+      "title": "Expense categories breakdown"
+    },
+    "cashFlow": {
+      "totalIn": "Total in",
+      "totalOut": "Total out",
+      "netFlow": "Net flow",
+      "timelineTitle": "Timeline",
+      "runningBalance": "Running balance"
+    },
+    "savingsRate": {
+      "avgRate": "Average savings rate",
+      "targetNote": "Target: {{rate}}",
+      "avgSavings": "Average monthly savings",
+      "monthlyTitle": "Monthly breakdown"
+    },
+    "netWorth": {
+      "current": "Current net worth",
+      "historyTitle": "Net worth history"
+    },
+    "debtProgress": {
+      "totalPaid": "Total paid",
+      "totalRemaining": "Total remaining",
+      "estPayoff": "Est. payoff"
+    },
+    "habits": {
+      "weekdayTotal": "Weekday spending",
+      "weekendTotal": "Weekend spending",
+      "byDayTitle": "Spending by day of week",
+      "topExpensesTitle": "Top expenses",
+      "topCategoriesTitle": "Top categories",
+      "spikeAlert": "{{category}} spending is up {{pct}} vs the previous period"
+    }
+  },
+  "currencies": {
+    "short": {
+      "EGP": "EGP",
+      "USD": "USD",
+      "EUR": "EUR",
+      "GBP": "GBP",
+      "SAR": "SAR",
+      "AED": "AED"
+    },
+    "name": {
+      "EGP": "Egyptian pound (EGP)",
+      "USD": "US dollar (USD)",
+      "EUR": "Euro (EUR)",
+      "GBP": "British pound (GBP)",
+      "SAR": "Saudi riyal (SAR)",
+      "AED": "UAE dirham (AED)"
+    }
+  },
+  "validation": {
+    "required": "Please fill out this field.",
+    "selectRequired": "Please select an option.",
+    "email": "Please enter a valid email address.",
+    "number": "Please enter a valid number.",
+    "min": "Value must be {{min}} or more.",
+    "max": "Value must be {{max}} or less.",
+    "step": "Please enter a valid value (up to two decimal places).",
+    "pattern": "Please match the requested format.",
+    "invalid": "Invalid value.",
+    "minLength_one": "Must be at least {{count}} character.",
+    "minLength_other": "Must be at least {{count}} characters.",
+    "maxLength_one": "Must be no more than {{count}} character.",
+    "maxLength_other": "Must be no more than {{count}} characters."
+  },
+  "defaultCategories": {
+    "food": "Food",
+    "transport": "Transportation",
+    "rent": "Rent",
+    "bills": "Bills",
+    "health": "Health",
+    "education": "Education",
+    "entertainment": "Entertainment",
+    "other": "Other"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "subscriptionExpired": "Your subscription has expired. Renew it to keep editing your data.",
+    "accounts": {
+      "load": "Couldn't load accounts",
+      "transfer": "Couldn't complete the transfer",
+      "create": "Couldn't add the account",
+      "adjust": "Couldn't adjust the account balance",
+      "archive": "Couldn't archive the account"
+    },
+    "auth": {
+      "register": "Something went wrong while creating your account",
+      "forgot": "Something went wrong while sending the reset link",
+      "reset": "The link is invalid or has expired",
+      "profile": "Couldn't update your details",
+      "avatarUpload": "Couldn't upload the photo",
+      "avatarDelete": "Couldn't delete the photo",
+      "emailCode": "Couldn't send the verification code",
+      "emailConfirm": "The code is incorrect or has expired",
+      "password": "Couldn't change the password",
+      "locale": "Couldn't save the language"
+    },
+    "dashboard": {
+      "load": "Couldn't load the dashboard summary"
+    },
+    "debts": {
+      "load": "Couldn't load debts",
+      "create": "Couldn't add the debt",
+      "update": "Couldn't update the debt",
+      "delete": "Couldn't delete the debt",
+      "status": "Couldn't update the debt status",
+      "payment": "Couldn't record the payment"
+    },
+    "expenses": {
+      "load": "Couldn't load expenses",
+      "create": "Couldn't add the expense",
+      "update": "Couldn't update the expense",
+      "delete": "Couldn't delete the expense"
+    },
+    "income": {
+      "load": "Couldn't load income sources",
+      "create": "Couldn't add the income source",
+      "delete": "Couldn't delete the income source",
+      "summary": "Couldn't load the income summary",
+      "update": "Couldn't update the income source",
+      "recurring": "Couldn't update the recurring income status"
+    },
+    "savings": {
+      "load": "Couldn't load savings goals",
+      "create": "Couldn't create the savings goal",
+      "update": "Couldn't update the savings goal",
+      "delete": "Couldn't delete the savings goal",
+      "deposit": "Couldn't deposit into the goal",
+      "withdraw": "Couldn't withdraw from the goal",
+      "complete": "Couldn't complete the goal",
+      "archive": "Couldn't archive the goal",
+      "transactions": "Couldn't load the goal's transactions"
+    },
+    "server": {
+      "goalNotFound": "Savings goal not found.",
+      "debtNotFound": "Debt not found.",
+      "accountNotFound": "Account not found.",
+      "userNotFound": "User not found.",
+      "transactionNotFound": "Transaction not found.",
+      "incomeNotFound": "Income not found.",
+      "expenseNotFound": "Expense not found.",
+      "categoryNotFound": "Category not found.",
+      "sourceAccountNotFound": "Source account not found.",
+      "destinationAccountNotFound": "Destination account not found.",
+      "amountPositive": "The amount must be greater than zero.",
+      "unauthorized": "Your session has ended. Please log in again.",
+      "forbidden": "You're not allowed to do this.",
+      "trialLimit": "Trial limit reached: maximum {{max}} entries allowed.",
+      "trialOneAccount": "Only 1 account is allowed in trial mode.",
+      "invalidCategory": "This category isn't in your categories list.",
+      "categoryRequired": "Category is required.",
+      "accountNameExists": "An account with this name already exists.",
+      "goalNameExists": "A goal with this name already exists.",
+      "accountArchived": "Account \"{{name}}\" is archived (frozen): you can't deposit into it or withdraw from it.",
+      "insufficientBalance": "Insufficient account balance.",
+      "insufficientBalanceIn": "Insufficient balance — the current balance in \"{{name}}\" is {{balance}} {{currency}}.",
+      "receivedDateInvalid": "The received date is invalid.",
+      "newBalanceRequired": "The new balance is required.",
+      "transferAccountsRequired": "Choose both the source and destination accounts.",
+      "typeRequired": "Type is required and must be daily, fixed, or emergency.",
+      "typeInvalid": "Type is invalid.",
+      "tooManyRequests": "Too many requests, please try again later.",
+      "targetBelowSaved": "Target amount cannot be less than the amount already saved.",
+      "selectAccountBeforeDelete": "Select an account to receive the remaining balance before deleting.",
+      "selectAccountBeforeArchive": "Select an account to receive the balance before archiving.",
+      "onlyActiveGoalsArchive": "Only active goals can be archived.",
+      "noGoalBalance": "No balance in this goal.",
+      "incomeFieldsRequired": "Name, category, amount, currency, and received date are required.",
+      "nameRequired": "Name is required.",
+      "nameEmpty": "Name cannot be empty.",
+      "goalFieldsRequired": "Name and target amount are required.",
+      "resetLinkInvalid": "Invalid or expired reset link.",
+      "invalidLocale": "Unsupported language.",
+      "invalidIncomeCategory": "Invalid income category.",
+      "invalidCredentials": "Incorrect email or password",
+      "goalNotActive": "Goal is not active.",
+      "goalCompleted": "Goal is already completed.",
+      "emailInUse": "Email already in use.",
+      "debtFullyPaid": "Debt is already fully paid.",
+      "debtFieldsRequired": "Creditor and total amount are required.",
+      "withdrawOverBalance": "Cannot withdraw more than the current balance.",
+      "cannotRenameDefault": "Cannot rename a default category.",
+      "cannotEditGoal": "Cannot edit a completed or archived goal.",
+      "cannotChangeDefaultType": "Cannot change the type of a default category.",
+      "accountNameRequired": "Account name is required.",
+      "noImage": "No image was sent.",
+      "passwordMinLength": "Password must be at least {{min}} characters.",
+      "passwordDigit": "Password must contain a number.",
+      "passwordUppercase": "Password must contain an uppercase letter.",
+      "currentPasswordWrong": "The current password is incorrect.",
+      "passwordMismatch": "The new passwords don't match.",
+      "allFieldsRequired": "All fields are required.",
+      "imageFormat": "Unsupported image format (JPG / PNG / WEBP only).",
+      "sameEmail": "This is already your current email.",
+      "imageTooLarge": "The image is too large — maximum {{max}} MB.",
+      "codeExpired": "The code has expired or is invalid. Request a new one.",
+      "codeWrong": "Incorrect code.",
+      "defaultCategoryDelete": "Default categories are required and can't be deleted.",
+      "emailRequired": "Email is required.",
+      "emailTaken": "This email is already in use."
     }
   }
 }

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { formatNumber } from "../../../utils/formatAmount";
 
 function DebtTabs({ activeTab, setActiveTab, activeDebts, completedDebts, debts }) {
   const { t } = useTranslation();
@@ -23,7 +24,7 @@ function DebtTabs({ activeTab, setActiveTab, activeDebts, completedDebts, debts 
               : "bg-slate-100 text-slate-600"
           }`}
         >
-          {activeDebts.length}
+          {formatNumber(activeDebts.length)}
         </span>
       </button>
 
@@ -44,7 +45,7 @@ function DebtTabs({ activeTab, setActiveTab, activeDebts, completedDebts, debts 
               : "bg-slate-100 text-slate-600"
           }`}
         >
-          {completedDebts.length}
+          {formatNumber(completedDebts.length)}
         </span>
       </button>
 
@@ -65,7 +66,7 @@ function DebtTabs({ activeTab, setActiveTab, activeDebts, completedDebts, debts 
               : "bg-slate-100 text-slate-600"
           }`}
         >
-          {debts.length}
+          {formatNumber(debts.length)}
         </span>
       </button>
     </div>

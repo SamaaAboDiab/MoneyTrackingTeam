@@ -38,7 +38,14 @@ function CashPage() {
     () => activeAccounts.filter((account) => account.type === "cash"),
     [activeAccounts]
   );
-  const cashBalance = cashAccounts.reduce((sum, account) => sum + Number(account.balance || 0), 0);
+  // Cash balance per currency (largest first); different currencies are never added together.
+  const cashTotals = Object.entries(
+    cashAccounts.reduce((acc, account) => {
+      const code = account.currency || "EGP";
+      acc[code] = (acc[code] || 0) + Number(account.balance || 0);
+      return acc;
+    }, {})
+  ).sort((a, b) => b[1] - a[1]);
 
   async function handleCreateCashAccount() {
     setFormError("");
@@ -75,10 +82,10 @@ function CashPage() {
 
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-5">
       <CashHeader />
 
-      <CashBalanceCard cashBalance={cashBalance} hasCashAccount={cashAccounts.length > 0} />
+      <CashBalanceCard cashTotals={cashTotals} hasCashAccount={cashAccounts.length > 0} />
 
       {cashAccounts.length === 0 ? (
         <NoCashAccount handleCreateCashAccount={handleCreateCashAccount} createStatus={createStatus} />

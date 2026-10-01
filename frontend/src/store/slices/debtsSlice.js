@@ -9,7 +9,7 @@ export const fetchDebts = createAsyncThunk(
       const res = await debtsApi.getDebts();
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تحميل الديون"));
+      return rejectWithValue(extractError(err, "errors.debts.load"));
     }
   }
 );
@@ -21,7 +21,7 @@ export const createDebtThunk = createAsyncThunk(
       const res = await debtsApi.createDebt(payload);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر إضافة الدين"));
+      return rejectWithValue(extractError(err, "errors.debts.create"));
     }
   }
 );
@@ -33,7 +33,7 @@ export const updateDebtThunk = createAsyncThunk(
       const res = await debtsApi.updateDebt(id, payload);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تعديل الدين"));
+      return rejectWithValue(extractError(err, "errors.debts.update"));
     }
   }
 );
@@ -45,7 +45,7 @@ export const deleteDebtThunk = createAsyncThunk(
       await debtsApi.deleteDebt(id);
       return id;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر حذف الدين"));
+      return rejectWithValue(extractError(err, "errors.debts.delete"));
     }
   }
 );
@@ -57,7 +57,7 @@ export const markDebtPaidThunk = createAsyncThunk(
       const res = await debtsApi.markDebtPaid(id);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تحديث حالة الدين"));
+      return rejectWithValue(extractError(err, "errors.debts.status"));
     }
   }
 );
@@ -69,7 +69,7 @@ export const addDebtPaymentThunk = createAsyncThunk(
       const res = await debtsApi.addDebtPayment(id, payload);
       return res.data.data; // { debt, payment }
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تسجيل الدفعة"));
+      return rejectWithValue(extractError(err, "errors.debts.payment"));
     }
   }
 );

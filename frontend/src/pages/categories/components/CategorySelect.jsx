@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { listCategories, createCategory, deleteCategory } from "../../../api/categoryApi";
+import Select from "../../../components/common/Select";
+import { extractError } from "../../../utils/errorHandler";
 
 const DEFAULT_COLOR = "#6b7280";
 
@@ -10,7 +12,7 @@ const TYPE_OPTIONS = [
   { value: "emergency" },
 ];
 
-import { MANDATORY_CATEGORIES } from "./mandatoryCategories";
+import { MANDATORY_CATEGORIES, categoryLabel } from "./mandatoryCategories";
 
 export default function CategorySelect({
   id = "category",
@@ -19,6 +21,7 @@ export default function CategorySelect({
   onChange,
   expenseType = "daily",
   className,
+  required,
 }) {
   const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
@@ -112,7 +115,7 @@ export default function CategorySelect({
       setNewColor(DEFAULT_COLOR);
     } catch (err) {
       setError(
-        err.response?.data?.message || err.message || t("categoriesPage.createError")
+        extractError(err, t("categoriesPage.createError"))
       );
     } finally {
       setSaving(false);
@@ -135,7 +138,7 @@ export default function CategorySelect({
         onChange?.("");
       }
     } catch (err) {
-      setListError(err.response?.data?.message || t("categoriesPage.deleteError"));
+      setListError(extractError(err, t("categoriesPage.deleteError")));
     } finally {
       setDeletingId(null);
     }
@@ -147,19 +150,36 @@ export default function CategorySelect({
   );
 
   const displayLabel = selectedCategory
-    ? selectedCategory.name
-    : value || t("categoriesPage.select.placeholder");
+    ? categoryLabel(selectedCategory.name)
+    : value
+      ? categoryLabel(value)
+      : t("categoriesPage.select.placeholder");
 
   const defaultButtonClass =
-    "flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-right outline-none transition focus:border-brand-500";
+    "flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-start outline-none transition focus:border-brand-500";
 
   return (
     <div ref={containerRef} className="relative w-full">
-      <input type="hidden" id={id} name={name} value={value || ""} />
+      <input type="hidden" name={name} value={value || ""} />
+      {required && (
+        // Invisible stand-in so the browser's form validation blocks submitting without a category.
+        <input
+          tabIndex={-1}
+          aria-hidden="true"
+          required
+          value={value || ""}
+          onChange={() => {}}
+          data-select-proxy=""
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-px w-full opacity-0"
+        />
+      )}
 
       {/* زر عرض القائمة المنسدلة */}
       <button
         type="button"
+        id={id}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
         onClick={() => {
           setIsOpen(!isOpen);
           setAdding(false);
@@ -230,7 +250,7 @@ export default function CategorySelect({
               />
 
               <div className="mt-2 grid grid-cols-2 gap-2">
-                <select
+                <Select
                   value={newType}
                   onChange={(e) => setNewType(e.target.value)}
                   className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs focus:outline-none"
@@ -238,7 +258,7 @@ export default function CategorySelect({
                   {TYPE_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>{t(`categoriesPage.type.${opt.value}`)}</option>
                   ))}
-                </select>
+                </Select>
 
                 <div className="flex items-center gap-1.5">
                   <input
@@ -298,7 +318,7 @@ export default function CategorySelect({
                             className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full"
                             style={{ backgroundColor: cat.color || "#6b7280" }}
                           />
-                          <span>{cat.name}</span>
+                          <span>{categoryLabel(cat.name)}</span>
                         </div>
 
                         {/* أيقونة الحذف SVG للتصنيفات المخصصة */}

@@ -10,7 +10,7 @@ import {
   fetchIncomes,
   updateIncomeEntry,
 } from "../../store/slices/incomeSlice";
-import { EMPTY_FORM, getCurrentMonth } from "./constants";
+import { EMPTY_FORM, getCurrentMonth, getTodayString } from "./constants";
 import IncomeHeader from "./components/IncomeHeader";
 import IncomeTotalCard from "./components/IncomeTotalCard";
 import IncomeAlerts from "./components/IncomeAlerts";
@@ -49,7 +49,7 @@ function IncomePage() {
     category: "",
     amount: "",
     currency: "EGP",
-    receivedDate: "",
+    receivedDate: getTodayString(),
     recurrence: "once",
     notes: "",
   });
@@ -131,7 +131,7 @@ function IncomePage() {
       currency: income.currency || "EGP",
       receivedDate: income.receivedDate
         ? new Date(income.receivedDate).toISOString().slice(0, 10)
-        : "",
+        : getTodayString(),
       recurrence: income.recurrence || "once",
       status: income.status || "cleared",
       notes: income.notes || "",
@@ -187,7 +187,7 @@ function IncomePage() {
         category: "",
         amount: "",
         currency: "EGP",
-        receivedDate: "",
+        receivedDate: getTodayString(),
         recurrence: "once",
         notes: "",
       });
@@ -239,7 +239,7 @@ function IncomePage() {
 
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl">
       <IncomeHeader />
 
       <IncomeTotalCard

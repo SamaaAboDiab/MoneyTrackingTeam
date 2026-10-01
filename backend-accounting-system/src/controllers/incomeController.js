@@ -1,11 +1,18 @@
 const Income   = require("../models/Income");
 const Expense  = require("../models/Expense");
 const User     = require("../models/User");
+const Account  = require("../models/Account");
 const { recordTxn, reverseTxn, assertAccountsUsable } = require("./accountController");
+
+// Income paid into an account is in that account's currency, whatever the client sent.
+async function accountCurrency(userId, accountId) {
+  if (!accountId) return null;
+  const acc = await Account.findOne({ _id: accountId, user: userId }).select("currency").lean();
+  return acc?.currency || null;
+}
 
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const SUPPORTED_CURRENCIES = ["EGP", "USD", "EUR", "GBP"];
-const RATES_TO_EGP = { EGP: 1, USD: 50, EUR: 55, GBP: 65 };
 
 function contributionForMonth(inc, year, month) {
   const rd = new Date(inc.receivedDate);
@@ -27,12 +34,6 @@ function contributionForMonth(inc, year, month) {
     return inc.amount * count;
   }
   return 0;
-}
-
-function convertAmount(amount, fromCurrency, toCurrency) {
-  const fromRate = RATES_TO_EGP[fromCurrency] || RATES_TO_EGP.EGP;
-  const toRate = RATES_TO_EGP[toCurrency] || RATES_TO_EGP.EGP;
-  return (amount * fromRate) / toRate;
 }
 
 // GET /api/income
@@ -82,7 +83,7 @@ exports.create = async (req, res, next) => {
       user: req.userId,
       name: name.trim(), category,
       amount: parsedAmount,
-      currency: currency || "EGP",
+      currency: (await accountCurrency(req.userId, accountId)) || currency || "EGP",
       receivedDate: parsedDate, recurrence: recurrence || "once",
       status: status || "cleared", notes,
       account: accountId || null,
@@ -115,7 +116,7 @@ exports.update = async (req, res, next) => {
       {
         name, category,
         amount: parseFloat(amount),
-        currency: currency || old.currency,
+        currency: (await accountCurrency(req.userId, accountId)) || currency || old.currency,
         receivedDate, recurrence, status, notes,
         account: accountId || null,
       },
@@ -172,7 +173,10 @@ exports.summary = async (req, res, next) => {
       const selectedMonth = Number.isInteger(month) && month >= 0 && month <= 11 ? month : now.getMonth();
       const requestedCurrency = String(req.query.currency || "EGP").toUpperCase();
       const currency = SUPPORTED_CURRENCIES.includes(requestedCurrency) ? requestedCurrency : "EGP";
-      const allIncomes = await Income.find({ user: req.userId }).sort({ receivedDate: -1 });
+      // Only incomes in the selected currency (no conversion: the fixed rates were not real
+      // exchange rates). Incomes saved before currency existed count as EGP.
+      const currencyFilter = currency === "EGP" ? { $in: ["EGP", null] } : currency;
+      const allIncomes = await Income.find({ user: req.userId, currency: currencyFilter }).sort({ receivedDate: -1 });
 
       const items = allIncomes
         .map((inc) => {
@@ -180,7 +184,7 @@ exports.summary = async (req, res, next) => {
           return {
             ...inc.toObject(),
             monthlyAmount: amount,
-            convertedAmount: convertAmount(amount, inc.currency, currency),
+            convertedAmount: amount, // same currency; field kept for the client
           };
         })
         .filter((inc) => inc.monthlyAmount > 0);

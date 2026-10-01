@@ -1,4 +1,16 @@
-import { LayoutDashboard, Wallet, ArrowLeftRight, TrendingUp, TrendingDown, UserRound } from "lucide-react";
+import {
+  LayoutDashboard,
+  Wallet,
+  ArrowLeftRight,
+  TrendingUp,
+  TrendingDown,
+  UserRound,
+  Banknote,
+  CreditCard,
+  PiggyBank,
+  BarChart3,
+  Tags,
+} from "lucide-react";
 
 const BREADCRUMB_ITEMS = [
   { match: "/dashboard", key: "dashboard.title", icon: LayoutDashboard },
@@ -6,6 +18,11 @@ const BREADCRUMB_ITEMS = [
   { match: "/accounts", key: "accounts.title", icon: Wallet },
   { match: "/income", key: "nav.income", icon: TrendingUp },
   { match: "/expenses", key: "nav.expenses", icon: TrendingDown },
+  { match: "/categories", key: "nav.categories", icon: Tags },
+  { match: "/cash", key: "nav.cash", icon: Banknote },
+  { match: "/debts", key: "nav.debts", icon: CreditCard },
+  { match: "/savings", key: "nav.savings", icon: PiggyBank },
+  { match: "/reports", key: "nav.reports", icon: BarChart3 },
   { match: "/profile", key: "profile.title", icon: UserRound },
 ];
 
@@ -18,9 +35,9 @@ function Breadcrumb({ pathname, t }) {
   const Icon = breadcrumb.icon;
 
   return (
-    <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
-      <Icon size={16} className="text-slate-400" />
-      {t(breadcrumb.key)}
+    <div className="flex min-w-0 items-center gap-2 text-sm font-bold text-slate-900">
+      <Icon size={16} className="shrink-0 text-slate-400" />
+      <span className="truncate">{t(breadcrumb.key)}</span>
     </div>
   );
 }

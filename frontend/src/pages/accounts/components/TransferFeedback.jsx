@@ -1,3 +1,5 @@
+import { formatNumber, currencyLabel } from "../../../utils/formatAmount";
+
 function TransferFeedback({ status, error, formError, lastTransfer, t }) {
   if (formError || error) {
     return (
@@ -12,11 +14,11 @@ function TransferFeedback({ status, error, formError, lastTransfer, t }) {
     <p className="mb-4 rounded-xl bg-income-soft px-4 py-2.5 text-sm font-medium text-income">
       {t("transfer.successMessage", {
         fromName: lastTransfer.from.name,
-        fromBalance: lastTransfer.from.balance.toLocaleString(),
-        fromCurrency: lastTransfer.from.currency,
+        fromBalance: formatNumber(lastTransfer.from.balance),
+        fromCurrency: currencyLabel(lastTransfer.from.currency),
         toName: lastTransfer.to.name,
-        toBalance: lastTransfer.to.balance.toLocaleString(),
-        toCurrency: lastTransfer.to.currency,
+        toBalance: formatNumber(lastTransfer.to.balance),
+        toCurrency: currencyLabel(lastTransfer.to.currency),
       })}
     </p>
   );

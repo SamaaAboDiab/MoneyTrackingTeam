@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { CreditCard, AlertCircle, CheckCircle2, ChevronLeft } from "lucide-react";
-import { formatAmount } from "../../../utils/formatAmount";
+import { formatAmount, formatDate, currencyLabel } from "../../../utils/formatAmount";
 
 function getDaysUntilDue(dateString) {
   const today = new Date();
@@ -11,7 +11,7 @@ function getDaysUntilDue(dateString) {
   return Math.ceil((dueDate - today) / 86400000);
 }
 
-function DashboardDebtsCard({ debts = [], debtSummary, status = "idle" }) {
+function DashboardDebtsCard({ debts = [], debtSummary, currency: summaryCurrency, status = "idle" }) {
   const { t } = useTranslation();
 
   const getDueSoonMessage = (days) => {
@@ -45,14 +45,15 @@ function DashboardDebtsCard({ debts = [], debtSummary, status = "idle" }) {
     return daysUntilDue >= 0 && daysUntilDue <= 7;
   });
 
-  const currency = debts[0]?.currency || "EGP";
+  // The summary's remaining total is computed for the dashboard's selected currency.
+  const currency = (debtSummary && summaryCurrency) || debts[0]?.currency || "EGP";
   const nearestDue = debtSummary?.nearestDue;
   const forecast = debtSummary?.forecast;
 
   return (
     <Link
       to="/debts"
-      className="mt-6 block rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 transition hover:ring-brand-200"
+      className="block h-full rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6 transition hover:ring-brand-300"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
         <div className="flex items-center gap-2.5">
@@ -76,12 +77,12 @@ function DashboardDebtsCard({ debts = [], debtSummary, status = "idle" }) {
       </div>
 
       {activeDebts.length > 0 && (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
           <div className="rounded-xl bg-slate-50 px-4 py-3">
             <p className="text-xs font-medium text-slate-500">{t("dashboard.debtsCard.nearestDue")}</p>
             <p className="mt-1 text-sm font-bold text-slate-800">
               {nearestDue?.dueDate
-                ? new Date(nearestDue.dueDate).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" })
+                ? formatDate(nearestDue.dueDate)
                 : t("dashboard.debtsCard.noDueDate")}
             </p>
           </div>
@@ -89,7 +90,7 @@ function DashboardDebtsCard({ debts = [], debtSummary, status = "idle" }) {
             <p className="text-xs font-medium text-slate-500">{t("dashboard.debtsCard.payoffForecast")}</p>
             <p className="mt-1 text-sm font-bold text-slate-800">
               {forecast?.estimatedPayoffDate
-                ? new Date(forecast.estimatedPayoffDate).toLocaleDateString("ar-EG", { year: "numeric", month: "long" })
+                ? formatDate(forecast.estimatedPayoffDate, { year: "numeric", month: "long" })
                 : t("dashboard.debtsCard.forecastUnavailable")}
             </p>
           </div>
@@ -101,11 +102,14 @@ function DashboardDebtsCard({ debts = [], debtSummary, status = "idle" }) {
           <p className="text-xs font-medium text-slate-500">{t("dashboard.debtsCard.remaining")}</p>
           <p className="mt-1 text-2xl font-extrabold text-slate-900 sm:text-3xl">
             {status === "loading" ? (
-              <span className="text-slate-400 text-lg">{t("dashboard.debtsCard.calculating")}</span>
+              <span role="status" className="block">
+                <span className="sr-only">{t("dashboard.debtsCard.calculating")}</span>
+                <span aria-hidden="true" className="skeleton mt-1 block h-8 w-40" />
+              </span>
             ) : (
               <>
                 {formatAmount(totalRemaining)}{" "}
-                <span className="text-base font-bold text-slate-600">{currency}</span>
+                <span className="text-base font-bold text-slate-600">{currencyLabel(currency)}</span>
               </>
             )}
           </p>

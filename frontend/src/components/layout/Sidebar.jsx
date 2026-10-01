@@ -25,7 +25,7 @@ function Sidebar() {
 
   return (
     <aside
-      className={`sticky top-0 hidden h-screen shrink-0 flex-col overflow-y-auto border-e border-slate-200 bg-white transition-all duration-200 sm:flex ${
+      className={`sticky top-0 hidden h-screen shrink-0 flex-col overflow-y-auto border-e border-slate-200 bg-white transition-all duration-200 lg:flex ${
         collapsed ? "w-24" : "w-64"
       }`}
     >
