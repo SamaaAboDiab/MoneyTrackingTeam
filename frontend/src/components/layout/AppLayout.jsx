@@ -7,7 +7,6 @@ import LanguageSwitcher from "../common/LanguageSwitcher";
 import Sidebar from "./Sidebar";
 import Breadcrumb from "./appLayout/Breadcrumb";
 import DateBadge from "./appLayout/DateBadge";
-import NotificationsButton from "./appLayout/NotificationsButton";
 import UserMenu from "./appLayout/UserMenu";
 import MobileNav from "./MobileNav";
 import QuickAddButton from "./QuickAddButton";
@@ -36,7 +35,6 @@ function AppLayout() {
             <div className="ms-auto flex items-center gap-2 sm:gap-3">
               <DateBadge />
               <LanguageSwitcher />
-              <NotificationsButton t={t} />
 
               <Link
                 to="/accounts/transfer"

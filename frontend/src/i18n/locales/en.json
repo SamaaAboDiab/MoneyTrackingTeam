@@ -174,7 +174,8 @@
     }
   },
   "layout": {
-    "brand": "Money Tracker",
+    "brand": "Mali",
+    "tagline": "Personal Finance",
     "logout": "Log out",
     "logoutConfirmTitle": "Log Out?",
     "logoutConfirmMessage": "Are you sure you want to log out of your account? You'll need to sign in again to access your data.",
