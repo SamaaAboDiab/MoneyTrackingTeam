@@ -27,7 +27,7 @@
     "cash": "الكاش",
     "debts": "الديون",
     "categories": "التصنيفات",
-    "savings": "أهداف الادخار",
+    "savings": "الادخار",
     "reports": "التقارير",
     "settings": "الإعدادات"
   },
@@ -189,7 +189,10 @@
       "accounts_few": "{{count}} حسابات",
       "accounts_many": "{{count}} حسابًا",
       "accounts_other": "{{count}} حساب",
-      "net": "الصافي"
+      "net": "الصافي",
+      "income": "الدخل",
+      "expenses": "المصروفات",
+      "trend": "آخر 6 شهور"
     },
     "cash": {
       "shareOfWealth": "نسبته من إجمالي ثروتك",
@@ -241,7 +244,7 @@
   },
   "accounts": {
     "backToDashboard": "الرجوع للوحة التحكم",
-    "title": "حساباتي",
+    "title": "الحسابات",
     "formDescription": "أضف حساباتك البنكية ومحافظك النقدية وتابع أرصدتها من مكان واحد.",
     "nameLabel": "اسم الحساب",
     "namePlaceholder": "مثال: حساب البنك الأهلي",
@@ -331,6 +334,8 @@
       "cleared": "مستلمة",
       "pending": "قيد الانتظار"
     },
+    "accountLabel": "إيداع في حساب (اختياري)",
+    "noAccountOption": "بدون حساب",
     "notesLabel": "ملاحظات (اختياري)",
     "notesPlaceholder": "أضف أي تفاصيل تساعدك لاحقاً",
     "submit": "إضافة مصدر الدخل",
@@ -458,6 +463,12 @@
       "updated": "تم تحديث المصروف وتحديث رصيد الحساب بنجاح",
       "deleted": "تم حذف المصروف واسترجاع الرصيد للحساب بنجاح"
     },
+    "insufficientBalance": {
+      "title": "الرصيد غير كافٍ",
+      "message": "حساب \"{{account}}\" فيه {{balance}} بس، والمصروف ده {{amount}}. الحساب هيبقى بالسالب. تحب تكمل؟",
+      "cancel": "إلغاء",
+      "confirm": "أكمل على أي حال"
+    },
     "validation": {
       "typeAndCategoryRequired": "يرجى اختيار نوع المصروف والتصنيف."
     },
@@ -488,6 +499,12 @@
     "internalTransfer": "تحويل داخلي",
     "widgetLabel": "رصيد الكاش",
     "widgetNoAccount": "مفيش حساب كاش لسه",
+    "insufficientBalance": {
+      "title": "الرصيد غير كافٍ",
+      "message": "حساب \"{{account}}\" فيه {{balance}} بس، والسحب ده {{amount}}. الحساب هيبقى بالسالب. تحب تكمل؟",
+      "cancel": "إلغاء",
+      "confirm": "أكمل على أي حال"
+    },
     "expenses": {
       "title": "مصروفات الكاش",
       "subtitle": "كل المصروفات اللي دفعتها كاش في الفترة المختارة.",
@@ -523,6 +540,12 @@
     "paymentSuccess": "تم تسجيل الدفعة بنجاح",
     "paymentError": "تعذر تسجيل الدفعة.",
     "historyFetchError": "تعذّر تحميل سجل الدفعات.",
+    "insufficientBalance": {
+      "title": "الرصيد غير كافٍ",
+      "message": "حساب \"{{account}}\" فيه {{balance}} بس، والدفعة دي {{amount}}. الحساب هيبقى بالسالب. تحب تكمل؟",
+      "cancel": "إلغاء",
+      "confirm": "أكمل على أي حال"
+    },
     "form": {
       "title": "تسجيل دين جديد",
       "requiredNote": "جميع الحقول بعلامة (*) إلزامية",
@@ -822,6 +845,12 @@
       "amountRequiredError": "من فضلك أدخل مبلغ صحيح.",
       "error": "العملية فشلت. حاول تاني.",
       "balanceTransferNote": "المبلغ المتبقي ({{amount}} {{currency}}) هيتحول للحساب اللي هتختاره."
+    },
+    "insufficientBalance": {
+      "title": "الرصيد غير كافٍ",
+      "message": "حساب \"{{account}}\" فيه {{balance}} بس، والإيداع ده {{amount}}. الحساب هيبقى بالسالب. تحب تكمل؟",
+      "cancel": "إلغاء",
+      "confirm": "أكمل على أي حال"
     }
   },
   "reports": {

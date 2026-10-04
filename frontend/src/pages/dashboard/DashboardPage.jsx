@@ -13,7 +13,6 @@ import DashboardDebtsCard from "./components/DashboardDebtsCard";
 import MonthlySummaryCard from "./components/MonthlySummaryCard";
 import ExpenseCategoryChart from "./components/ExpenseCategoryChart";
 import CashBalanceWidget from "./components/CashBalanceWidget";
-import QuickAddButton from "../../components/layout/QuickAddButton";
 import { Skeleton } from "../../components/common/Skeleton";
 
 function DashboardPage() {
@@ -72,6 +71,8 @@ function DashboardPage() {
             periodIncome={summaryData?.income?.total}
             periodExpenses={summaryData?.expenses?.total}
             periodLabel={period === "custom" ? t("dashboard.period.custom") : t(`dashboard.period.${period}`)}
+            currencies={summaryCurrencies}
+            onCurrencyChange={setCurrency}
             t={t}
           />
         </div>
@@ -101,8 +102,6 @@ function DashboardPage() {
             onFromChange={setFrom}
             onToChange={setTo}
             currency={summaryCurrency}
-            currencies={summaryCurrencies}
-            onCurrencyChange={setCurrency}
             t={t}
           />
         </div>
@@ -122,8 +121,6 @@ function DashboardPage() {
           <AccountsPreview status={status} accounts={activeAccounts} t={t} />
         </div>
       </div>
-
-      <QuickAddButton />
     </div>
   );
 }

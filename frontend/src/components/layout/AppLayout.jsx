@@ -10,6 +10,7 @@ import DateBadge from "./appLayout/DateBadge";
 import NotificationsButton from "./appLayout/NotificationsButton";
 import UserMenu from "./appLayout/UserMenu";
 import MobileNav from "./MobileNav";
+import QuickAddButton from "./QuickAddButton";
 import useRevealCards from "./appLayout/useRevealCards";
 
 function AppLayout() {
@@ -56,6 +57,7 @@ function AppLayout() {
             </div>
           </main>
           <MobileNav />
+          <QuickAddButton />
         </div>
       </div>
     </div>

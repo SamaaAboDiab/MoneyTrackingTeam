@@ -6,7 +6,7 @@ import NumberInput from "../../../components/common/NumberInput";
 import { currencyName } from "../../../utils/formatAmount";
 import { INCOME_CURRENCIES } from "../constants";
 
-function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handleFormChange, updateStatus }) {
+function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handleFormChange, updateStatus, availableAccounts = [] }) {
   const { t } = useTranslation();
 
   return (
@@ -176,6 +176,31 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
               >
                 <option value="cleared">{t("income.status.cleared")}</option>
                 <option value="pending">{t("income.status.pending")}</option>
+              </Select>
+            </div>
+
+            {/* Account */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="accountId"
+                className={labelClass}
+              >
+                {t("income.accountLabel")}
+              </label>
+
+              <Select
+                id="accountId"
+                name="accountId"
+                value={form.accountId || ""}
+                onChange={handleFormChange}
+                className={inputClass}
+              >
+                <option value="">{t("income.noAccountOption")}</option>
+                {availableAccounts.map((acc) => (
+                  <option key={acc._id} value={acc._id}>
+                    {acc.name}
+                  </option>
+                ))}
               </Select>
             </div>
 

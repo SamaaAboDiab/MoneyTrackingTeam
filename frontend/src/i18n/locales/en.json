@@ -27,7 +27,7 @@
     "cash": "Cash",
     "debts": "Debts",
     "categories": "Categories",
-    "savings": "Savings Goals",
+    "savings": "Savings",
     "reports": "Reports",
     "settings": "Settings"
   },
@@ -161,7 +161,10 @@
     "wealth": {
       "accounts_one": "{{count}} account",
       "accounts_other": "{{count}} accounts",
-      "net": "Net"
+      "net": "Net",
+      "income": "Income",
+      "expenses": "Expenses",
+      "trend": "Last 6 months"
     },
     "cash": {
       "shareOfWealth": "Share of your total wealth",
@@ -213,7 +216,7 @@
   },
   "accounts": {
     "backToDashboard": "Back to dashboard",
-    "title": "My accounts and wallets",
+    "title": "Accounts",
     "formDescription": "Add your bank accounts and wallets, then track every balance in one place.",
     "nameLabel": "Account name",
     "namePlaceholder": "e.g. National Bank account",
@@ -303,6 +306,8 @@
       "cleared": "Cleared",
       "pending": "Pending"
     },
+    "accountLabel": "Deposit to account (optional)",
+    "noAccountOption": "No account",
     "notesLabel": "Notes (optional)",
     "notesPlaceholder": "Add any useful details",
     "submit": "Add income source",
@@ -430,6 +435,12 @@
       "updated": "Expense updated and account balance adjusted successfully",
       "deleted": "Expense deleted and balance refunded to the account successfully"
     },
+    "insufficientBalance": {
+      "title": "Insufficient balance",
+      "message": "\"{{account}}\" only has {{balance}}, but this expense is {{amount}}. The account will go negative. Continue anyway?",
+      "cancel": "Cancel",
+      "confirm": "Continue anyway"
+    },
     "validation": {
       "typeAndCategoryRequired": "Please select the expense type and category."
     },
@@ -460,6 +471,12 @@
     "internalTransfer": "Internal transfer",
     "widgetLabel": "Cash balance",
     "widgetNoAccount": "No cash account yet",
+    "insufficientBalance": {
+      "title": "Insufficient balance",
+      "message": "\"{{account}}\" only has {{balance}}, but this withdrawal is {{amount}}. The account will go negative. Continue anyway?",
+      "cancel": "Cancel",
+      "confirm": "Continue anyway"
+    },
     "expenses": {
       "title": "Cash expenses",
       "subtitle": "Every expense you paid in cash during the selected period.",
@@ -495,6 +512,12 @@
     "paymentSuccess": "Payment recorded successfully",
     "paymentError": "Unable to record the payment.",
     "historyFetchError": "Unable to load the payment history.",
+    "insufficientBalance": {
+      "title": "Insufficient balance",
+      "message": "\"{{account}}\" only has {{balance}}, but this payment is {{amount}}. The account will go negative. Continue anyway?",
+      "cancel": "Cancel",
+      "confirm": "Continue anyway"
+    },
     "form": {
       "title": "Register a new debt",
       "requiredNote": "All fields marked (*) are required",
@@ -790,6 +813,12 @@
       "amountRequiredError": "Please enter a valid amount.",
       "error": "The operation failed. Please try again.",
       "balanceTransferNote": "The remaining balance ({{amount}} {{currency}}) will be transferred to the account you choose."
+    },
+    "insufficientBalance": {
+      "title": "Insufficient balance",
+      "message": "\"{{account}}\" only has {{balance}}, but this deposit is {{amount}}. The account will go negative. Continue anyway?",
+      "cancel": "Cancel",
+      "confirm": "Continue anyway"
     }
   },
   "reports": {

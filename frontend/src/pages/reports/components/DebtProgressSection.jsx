@@ -21,13 +21,13 @@ function DebtProgressSection({ data, loading }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl bg-income-soft/40 p-5">
-          <p className="text-xs font-semibold text-income">{t("reports.debtProgress.totalPaid")}</p>
-          <p className="tabular-amount mt-2 text-xl font-extrabold text-slate-900">{formatMoney(totalPaid)}</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-5">
+          <p className="text-xs font-semibold text-slate-500">{t("reports.debtProgress.totalPaid")}</p>
+          <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-income">{formatMoney(totalPaid)}</p>
         </div>
-        <div className="rounded-2xl bg-expense-soft/40 p-5">
-          <p className="text-xs font-semibold text-expense">{t("reports.debtProgress.totalRemaining")}</p>
-          <p className="tabular-amount mt-2 text-xl font-extrabold text-slate-900">{formatMoney(totalRemaining)}</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-5">
+          <p className="text-xs font-semibold text-slate-500">{t("reports.debtProgress.totalRemaining")}</p>
+          <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-expense">{formatMoney(totalRemaining)}</p>
         </div>
       </div>
 

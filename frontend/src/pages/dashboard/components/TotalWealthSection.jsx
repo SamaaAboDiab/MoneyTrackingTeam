@@ -1,7 +1,20 @@
 import TotalWealthCard from "../../../components/dashboard/TotalWealthCard";
 
 
-function TotalWealthSection({ status, totalCurrencies, accountsCount, trendData, onOpenAccounts, periodIncome, periodExpenses, periodLabel, summaryCurrency = "EGP", t }) {
+function TotalWealthSection({
+  status,
+  totalCurrencies,
+  accountsCount,
+  trendData,
+  onOpenAccounts,
+  periodIncome,
+  periodExpenses,
+  periodLabel,
+  summaryCurrency = "EGP",
+  currencies = [],
+  onCurrencyChange,
+  t,
+}) {
   if (status === "loading") {
     return (
       <div role="status" aria-live="polite" className="h-full rounded-3xl bg-brand-600 p-6 text-white sm:p-8">
@@ -28,26 +41,25 @@ function TotalWealthSection({ status, totalCurrencies, accountsCount, trendData,
     );
   }
 
+  // Show one card for the active currency; the switcher inside it drives both this card and the summary below.
+  const activeEntry = totalCurrencies.find(([code]) => code === summaryCurrency) || totalCurrencies[0];
+  const [currency, total] = activeEntry;
+
   return (
-    <div className="flex h-full flex-col gap-4">
-      {totalCurrencies.map(([currency, total]) => (
-        <div
-          key={currency}
-          className="block w-full flex-1 text-start"
-        >
-          <TotalWealthCard
-            label={t("accounts.totalWealth")}
-            amount={total}
-            currency={currency}
-            onOpenAccounts={onOpenAccounts}
-            showAriaLabel={t("common.showAmount")}
-            hideAriaLabel={t("common.hideAmount")}
-            accountsCount={accountsCount}
-            trendData={trendData}
-            {...(currency === summaryCurrency ? { periodIncome, periodExpenses, periodLabel } : {})}
-          />
-        </div>
-      ))}
+    <div className="h-full">
+      <TotalWealthCard
+        label={t("accounts.totalWealth")}
+        amount={total}
+        currency={currency}
+        onOpenAccounts={onOpenAccounts}
+        accountsCount={accountsCount}
+        trendData={trendData}
+        periodIncome={periodIncome}
+        periodExpenses={periodExpenses}
+        periodLabel={periodLabel}
+        currencies={currencies}
+        onCurrencyChange={onCurrencyChange}
+      />
     </div>
   );
 }

@@ -12,17 +12,19 @@ function CashFlowSection({ data, loading }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl bg-income-soft/40 p-5">
-          <p className="text-xs font-semibold text-income">{t("reports.cashFlow.totalIn")}</p>
-          <p className="tabular-amount mt-2 text-xl font-extrabold text-slate-900">{formatMoney(totalIn)}</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-5">
+          <p className="text-xs font-semibold text-slate-500">{t("reports.cashFlow.totalIn")}</p>
+          <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-slate-900">{formatMoney(totalIn)}</p>
         </div>
-        <div className="rounded-2xl bg-expense-soft/40 p-5">
-          <p className="text-xs font-semibold text-expense">{t("reports.cashFlow.totalOut")}</p>
-          <p className="tabular-amount mt-2 text-xl font-extrabold text-slate-900">{formatMoney(totalOut)}</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-5">
+          <p className="text-xs font-semibold text-slate-500">{t("reports.cashFlow.totalOut")}</p>
+          <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-slate-900">{formatMoney(totalOut)}</p>
         </div>
-        <div className={`rounded-2xl p-5 ${netFlow >= 0 ? "bg-income-soft/40" : "bg-expense-soft/40"}`}>
-          <p className={`text-xs font-semibold ${netFlow >= 0 ? "text-income" : "text-expense"}`}>{t("reports.cashFlow.netFlow")}</p>
-          <p className="tabular-amount mt-2 text-xl font-extrabold text-slate-900">{formatMoney(netFlow)}</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-5">
+          <p className="text-xs font-semibold text-slate-500">{t("reports.cashFlow.netFlow")}</p>
+          <p className={`tabular-amount mt-1.5 text-2xl font-extrabold ${netFlow >= 0 ? "text-income" : "text-expense"}`}>
+            {formatMoney(netFlow)}
+          </p>
         </div>
       </div>
 

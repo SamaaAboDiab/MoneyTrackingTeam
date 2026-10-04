@@ -15,6 +15,7 @@ import {
   fetchGoalTransactionsThunk,
 } from "../../store/slices/savingsSlice";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { formatMoney } from "../../utils/formatAmount";
 import { getTodayString, EMPTY_GOAL_FORM } from "./constants";
 import { getErrorMessage } from "./utils";
 import GoalForm from "./components/GoalForm";
@@ -131,6 +132,23 @@ function SavingsPage() {
       setError(t("savings.actionModal.amountRequiredError"));
       return;
     }
+
+    if (actionModal.mode === "deposit" && actionForm.accountId) {
+      const account = activeAccounts.find(
+        (acc) => String(acc._id) === String(actionForm.accountId)
+      );
+      if (account && amt > Number(account.balance)) {
+        setError(
+          t("savings.insufficientBalance.message", {
+            account: account.name,
+            balance: formatMoney(account.balance, account.currency),
+            amount: formatMoney(amt, account.currency),
+          })
+        );
+        return;
+      }
+    }
+
     setActionSaving(true);
     setError("");
     try {

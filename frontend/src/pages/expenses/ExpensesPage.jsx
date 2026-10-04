@@ -12,7 +12,7 @@ import {
 import { getAccounts } from "../../api/accountsApi";
 import { listCategories } from "../../api/categoryApi";
 import { EMPTY_FORM, EMPTY_FILTERS, FALLBACK_CATEGORY_COLORS } from "./constants";
-import { todayISODate } from "../../utils/formatAmount";
+import { todayISODate, formatMoney } from "../../utils/formatAmount";
 import ExpenseToast from "./components/ExpenseToast";
 import ExpensesSummary from "./components/ExpensesSummary";
 import ExpenseForm from "./components/ExpenseForm";
@@ -21,7 +21,8 @@ import ExpensesList from "./components/ExpensesList";
 import EditExpenseModal from "./components/EditExpenseModal";
 import DeleteExpenseModal from "./components/DeleteExpenseModal";
 import PageHeader from "../../components/common/PageHeader";
-import { TrendingDown } from "lucide-react";
+import ConfirmModal from "../../components/common/ConfirmModal";
+import { TrendingDown, AlertTriangle } from "lucide-react";
 
 function ExpensesPage() {
   const { t } = useTranslation();
@@ -49,6 +50,13 @@ function ExpensesPage() {
   const [deleteError, setDeleteError] = useState("");
 
   const [toastMessage, setToastMessage] = useState("");
+
+  // US-303: when the chosen account's real (backend) balance can't cover the amount,
+  // confirm before going negative instead of silently allowing or blocking it.
+  const [balanceWarning, setBalanceWarning] = useState(null); // "create" | "edit" | null
+
+  const findAccount = (accountId) =>
+    accountId ? availableAccounts.find((acc) => String(acc._id) === String(accountId)) : null;
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -183,13 +191,7 @@ function ExpensesPage() {
     filters.account !== "all";
 
   // إضافة مصروف جديد
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    if (!form.expenseType || !form.category) {
-      return;
-    }
-
+  const performCreate = async () => {
     // التأكد من إرسال اسم التصنيف وليس ID
     const catName = getCategoryName(form.category);
 
@@ -220,6 +222,22 @@ function ExpensesPage() {
     }
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!form.expenseType || !form.category) {
+      return;
+    }
+
+    const account = findAccount(form.accountId);
+    if (account && Number(form.amount) > Number(account.balance)) {
+      setBalanceWarning("create");
+      return;
+    }
+
+    await performCreate();
+  };
+
   // فتح فورم التعديل بالبيانات القديمة
   const openEditModal = (expense) => {
     setEditingExpense(expense);
@@ -238,14 +256,7 @@ function ExpensesPage() {
   };
 
   // إرسال التعديل
-  const handleEditSubmit = async (event) => {
-    event.preventDefault();
-
-    if (!editForm.expenseType || !editForm.category) {
-      setEditError(t("expenses.validation.typeAndCategoryRequired"));
-      return;
-    }
-
+  const performEditSubmit = async () => {
     setEditSaving(true);
     setEditError("");
 
@@ -278,6 +289,23 @@ function ExpensesPage() {
       setEditError(result.payload || t("expenses.errors.updateFailed"));
     }
     setEditSaving(false);
+  };
+
+  const handleEditSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!editForm.expenseType || !editForm.category) {
+      setEditError(t("expenses.validation.typeAndCategoryRequired"));
+      return;
+    }
+
+    const account = findAccount(editForm.accountId);
+    if (account && Number(editForm.amount) > Number(account.balance)) {
+      setBalanceWarning("edit");
+      return;
+    }
+
+    await performEditSubmit();
   };
 
   // تأكيد الحذف
@@ -362,6 +390,32 @@ function ExpensesPage() {
         deleteError={deleteError}
         handleConfirmDelete={handleConfirmDelete}
         getCategoryName={getCategoryName}
+      />
+
+      <ConfirmModal
+        isOpen={Boolean(balanceWarning)}
+        onClose={() => setBalanceWarning(null)}
+        onConfirm={async () => {
+          const pending = balanceWarning;
+          setBalanceWarning(null);
+          if (pending === "create") await performCreate();
+          if (pending === "edit") await performEditSubmit();
+        }}
+        icon={AlertTriangle}
+        confirmVariant="destructive"
+        title={t("expenses.insufficientBalance.title")}
+        description={(() => {
+          const account = findAccount(balanceWarning === "edit" ? editForm.accountId : form.accountId);
+          const amount = Number(balanceWarning === "edit" ? editForm.amount : form.amount);
+          if (!account) return "";
+          return t("expenses.insufficientBalance.message", {
+            account: account.name,
+            balance: formatMoney(account.balance, account.currency),
+            amount: formatMoney(amount, account.currency),
+          });
+        })()}
+        cancelLabel={t("expenses.insufficientBalance.cancel")}
+        confirmLabel={t("expenses.insufficientBalance.confirm")}
       />
     </div>
   );

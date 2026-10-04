@@ -6,6 +6,7 @@ import {
   fetchAccounts,
   transferFunds,
 } from "../../store/slices/accountsSlice";
+import { formatMoney } from "../../utils/formatAmount";
 import CashHeader from "./components/CashHeader";
 import CashBalanceCard from "./components/CashBalanceCard";
 import NoCashAccount from "./components/NoCashAccount";
@@ -69,6 +70,19 @@ function CashPage() {
       setFormError(t("cash.amountPositiveError"));
       return;
     }
+
+    const fromAccount = sourceAccounts.find((account) => String(account._id) === String(fromId));
+    if (fromAccount && amountNumber > Number(fromAccount.balance)) {
+      setFormError(
+        t("cash.insufficientBalance.message", {
+          account: fromAccount.name,
+          balance: formatMoney(fromAccount.balance, fromAccount.currency),
+          amount: formatMoney(amountNumber, fromAccount.currency),
+        })
+      );
+      return;
+    }
+
     try {
       await dispatch(transferFunds({ fromId, toId, amount: amountNumber, description: t("cash.internalTransfer") })).unwrap();
       setAmount("");

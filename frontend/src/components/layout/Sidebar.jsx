@@ -6,7 +6,6 @@ import { logout } from "../../store/slices/authSlice";
 import ConfirmModal from "../common/ConfirmModal";
 import SidebarHeader from "./sidebar/SidebarHeader";
 import SidebarNav from "./sidebar/SidebarNav";
-import SidebarUpgradeCard from "./sidebar/SidebarUpgradeCard";
 import SidebarUserSection from "./sidebar/SidebarUserSection";
 
 function Sidebar() {
@@ -36,7 +35,6 @@ function Sidebar() {
       <SidebarNav collapsed={collapsed} pathname={pathname} t={t} />
 
       <div className="p-3">
-        <SidebarUpgradeCard collapsed={collapsed} t={t} />
         <SidebarUserSection
           collapsed={collapsed}
           user={user}

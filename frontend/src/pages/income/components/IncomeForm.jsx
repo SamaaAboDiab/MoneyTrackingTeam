@@ -8,7 +8,7 @@ const inputClass =
   "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500";
 const labelClass = "text-sm font-semibold text-slate-700";
 
-function IncomeForm({ form, createStatus, createError, onChange, onSubmit, t }) {
+function IncomeForm({ form, createStatus, createError, onChange, onSubmit, availableAccounts = [], t }) {
   return (
     <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
       <h2 className="text-lg font-bold text-slate-900">{t("income.formTitle")}</h2>
@@ -114,6 +114,26 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, t }) 
             {["once", "weekly", "monthly", "yearly"].map((key) => (
               <option key={key} value={key}>
                 {t(`income.recurrence.${key}`)}
+              </option>
+            ))}
+          </Select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="income-account" className={labelClass}>
+            {t("income.accountLabel")}
+          </label>
+          <Select
+            id="income-account"
+            name="accountId"
+            value={form.accountId || ""}
+            onChange={onChange}
+            className={inputClass}
+          >
+            <option value="">{t("income.noAccountOption")}</option>
+            {availableAccounts.map((acc) => (
+              <option key={acc._id} value={acc._id}>
+                {acc.name}
               </option>
             ))}
           </Select>

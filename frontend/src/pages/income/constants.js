@@ -12,6 +12,7 @@ export const EMPTY_FORM = {
   receivedDate: getTodayString(),
   recurrence: "once",
   status: "cleared",
+  accountId: "",
   notes: "",
 };
 

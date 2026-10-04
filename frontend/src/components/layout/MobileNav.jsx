@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { LayoutGrid, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { NAV_ITEMS, MOBILE_PRIMARY_PATHS, isNavItemActive } from "./sidebar/navItems";
 
 const SHORT_LABEL_KEYS = {
@@ -12,16 +12,44 @@ const SHORT_LABEL_KEYS = {
 const PRIMARY_ITEMS = NAV_ITEMS.filter((item) => MOBILE_PRIMARY_PATHS.includes(item.to));
 const MORE_ITEMS = NAV_ITEMS.filter((item) => !MOBILE_PRIMARY_PATHS.includes(item.to));
 
+const ANIMATION_MS = 220;
+
 function MobileNav() {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
   const moreActive = MORE_ITEMS.some(({ to }) => isNavItemActive(to, pathname));
+
+  function openMore() {
+    setMounted(true);
+    setMoreOpen(true);
+  }
+
+  function closeMore() {
+    setVisible(false);
+    setMoreOpen(false);
+  }
+
+  // Flip `visible` a frame after mounting so the enter transition actually animates.
+  useEffect(() => {
+    if (!moreOpen) return undefined;
+    const frame = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(frame);
+  }, [moreOpen]);
+
+  // Keep it mounted until the exit transition finishes so it slides out instead of vanishing.
+  useEffect(() => {
+    if (moreOpen || !mounted) return undefined;
+    const timeout = setTimeout(() => setMounted(false), ANIMATION_MS);
+    return () => clearTimeout(timeout);
+  }, [moreOpen, mounted]);
 
   // The sheet closes when a link in it is chosen (see NavLink onClick) and on Escape.
   useEffect(() => {
     if (!moreOpen) return undefined;
-    const onKey = (event) => event.key === "Escape" && setMoreOpen(false);
+    const onKey = (event) => event.key === "Escape" && closeMore();
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [moreOpen]);
@@ -35,42 +63,47 @@ function MobileNav() {
 
   return (
     <>
-      {moreOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden" onClick={() => setMoreOpen(false)}>
-          <div className="absolute inset-0 bg-slate-900/40" />
+      {mounted && (
+        <div className="fixed inset-0 z-40 lg:hidden" onClick={closeMore}>
+          <div
+            className={`absolute inset-0 bg-slate-900/40 transition-opacity ease-out ${
+              visible ? "opacity-100 duration-200" : "opacity-0 duration-150"
+            }`}
+          />
           <div
             role="dialog"
             aria-modal="true"
             aria-label={t("layout.mobileNav.more")}
             onClick={(event) => event.stopPropagation()}
-            className="absolute inset-x-0 bottom-0 rounded-t-3xl bg-white px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] pt-3 shadow-2xl"
+            className={`absolute inset-y-0 inset-e-0 flex w-72 max-w-[80vw] flex-col bg-white px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] pt-4 shadow-2xl transition-transform ease-out ${
+              visible ? "translate-x-0 duration-200" : "translate-x-full rtl:-translate-x-full duration-150"
+            }`}
           >
-            <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-slate-200" />
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-base font-bold text-slate-900">{t("layout.mobileNav.more")}</h2>
               <button
                 type="button"
-                onClick={() => setMoreOpen(false)}
+                onClick={closeMore}
                 aria-label={t("common.close")}
                 className="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
               >
                 <X size={18} />
               </button>
             </div>
-            <ul className="mx-auto grid max-w-xl grid-cols-3 gap-2 sm:grid-cols-4">
+            <ul className="flex flex-1 flex-col gap-1 overflow-y-auto">
               {MORE_ITEMS.map(({ to, key, icon: Icon }) => {
                 const active = isNavItemActive(to, pathname);
                 return (
                   <li key={to}>
                     <NavLink
                       to={to}
-                      onClick={() => setMoreOpen(false)}
-                      className={`flex flex-col items-center gap-2 rounded-2xl p-3 text-center text-xs font-semibold transition ${
-                        active ? "bg-brand-600 text-white" : "bg-slate-50 text-slate-700 hover:bg-slate-100"
+                      onClick={closeMore}
+                      className={`flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold transition ${
+                        active ? "bg-brand-600 text-white" : "text-slate-700 hover:bg-slate-50"
                       }`}
                     >
-                      <Icon size={20} />
-                      <span className="leading-tight">{t(key)}</span>
+                      <Icon size={19} />
+                      <span>{t(key)}</span>
                     </NavLink>
                   </li>
                 );
@@ -101,13 +134,13 @@ function MobileNav() {
           <li>
             <button
               type="button"
-              onClick={() => setMoreOpen((prev) => !prev)}
+              onClick={() => (moreOpen ? closeMore() : openMore())}
               aria-expanded={moreOpen}
               aria-haspopup="dialog"
               className={`w-full ${tabClass(moreActive || moreOpen)}`}
             >
               <span className={iconWrap(moreActive || moreOpen)}>
-                <LayoutGrid size={19} strokeWidth={moreActive || moreOpen ? 2.4 : 2} />
+                <Menu size={19} strokeWidth={moreActive || moreOpen ? 2.4 : 2} />
               </span>
               <span className="max-w-full truncate">{t("layout.mobileNav.more")}</span>
             </button>

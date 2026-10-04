@@ -5,7 +5,7 @@ import {
   TrendingDown,
   CreditCard,
   Banknote,
-  PiggyBank,
+  Coins,
   BarChart3,
   Settings,
   Tags,
@@ -19,7 +19,7 @@ export const NAV_ITEMS = [
   { to: "/accounts", key: "accounts.title", icon: Wallet },
   { to: "/cash", key: "nav.cash", icon: Banknote },
   { to: "/debts", key: "nav.debts", icon: CreditCard },
-  { to: "/savings", key: "nav.savings", icon: PiggyBank },
+  { to: "/savings", key: "nav.savings", icon: Coins },
   { to: "/reports", key: "nav.reports", icon: BarChart3 },
   { to: "/profile", key: "nav.settings", icon: Settings },
 ];

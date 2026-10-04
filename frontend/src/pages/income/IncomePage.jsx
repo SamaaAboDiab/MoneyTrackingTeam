@@ -11,6 +11,7 @@ import {
   updateIncomeEntry,
 } from "../../store/slices/incomeSlice";
 import { EMPTY_FORM, getCurrentMonth, getTodayString } from "./constants";
+import { getAccounts } from "../../api/accountsApi";
 import IncomeHeader from "./components/IncomeHeader";
 import IncomeTotalCard from "./components/IncomeTotalCard";
 import IncomeAlerts from "./components/IncomeAlerts";
@@ -51,13 +52,32 @@ function IncomePage() {
     currency: "EGP",
     receivedDate: getTodayString(),
     recurrence: "once",
+    accountId: "",
     notes: "",
   });
+
+  const [availableAccounts, setAvailableAccounts] = useState([]);
 
   // Fetch all incomes
   useEffect(() => {
     dispatch(fetchIncomes());
   }, [dispatch]);
+
+  // Fetch accounts so income can optionally credit one of them
+  const loadAccounts = () => {
+    getAccounts()
+      .then((res) => {
+        const accs = res.data?.data || res.data || [];
+        setAvailableAccounts(
+          Array.isArray(accs) ? accs.filter((acc) => !acc.isArchived && acc.isActive !== false) : []
+        );
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    loadAccounts();
+  }, []);
 
   // Fetch monthly income summary
   useEffect(() => {
@@ -134,6 +154,7 @@ function IncomePage() {
         : getTodayString(),
       recurrence: income.recurrence || "once",
       status: income.status || "cleared",
+      accountId: income.account?._id || income.account || "",
       notes: income.notes || "",
     });
 
@@ -189,11 +210,13 @@ function IncomePage() {
         currency: "EGP",
         receivedDate: getTodayString(),
         recurrence: "once",
+        accountId: "",
         notes: "",
       });
 
       dispatch(fetchIncomes());
       refreshSummary();
+      loadAccounts();
     }
   };
 
@@ -209,6 +232,7 @@ function IncomePage() {
       receivedDate: form.receivedDate,
       recurrence: form.recurrence,
       status: form.status,
+      accountId: form.accountId || null,
       notes: form.notes.trim(),
     };
 
@@ -226,6 +250,7 @@ function IncomePage() {
 
       dispatch(fetchIncomes());
       refreshSummary();
+      loadAccounts();
     }
   };
 
@@ -235,6 +260,7 @@ function IncomePage() {
 
     dispatch(fetchIncomes());
     refreshSummary();
+    loadAccounts();
   };
 
 
@@ -257,6 +283,7 @@ function IncomePage() {
         createError={createError}
         onChange={handleCreateChange}
         onSubmit={handleCreateSubmit}
+        availableAccounts={availableAccounts}
         t={t}
       />
 
@@ -288,6 +315,7 @@ function IncomePage() {
         form={form}
         handleFormChange={handleFormChange}
         updateStatus={updateStatus}
+        availableAccounts={availableAccounts}
       />
     </div>
   );
