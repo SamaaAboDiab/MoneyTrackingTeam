@@ -6,7 +6,6 @@ import { logout } from "../../store/slices/authSlice";
 import ConfirmModal from "../common/ConfirmModal";
 import SidebarHeader from "./sidebar/SidebarHeader";
 import SidebarNav from "./sidebar/SidebarNav";
-import SidebarUpgradeCard from "./sidebar/SidebarUpgradeCard";
 import SidebarUserSection from "./sidebar/SidebarUserSection";
 
 function Sidebar() {
@@ -25,7 +24,7 @@ function Sidebar() {
 
   return (
     <aside
-      className={`sticky top-0 hidden h-screen shrink-0 flex-col overflow-y-auto border-e border-slate-200 bg-white transition-all duration-200 sm:flex ${
+      className={`sticky top-0 hidden h-screen shrink-0 flex-col overflow-y-auto border-e border-slate-200 bg-white transition-all duration-200 lg:flex ${
         collapsed ? "w-24" : "w-64"
       }`}
     >
@@ -36,7 +35,6 @@ function Sidebar() {
       <SidebarNav collapsed={collapsed} pathname={pathname} t={t} />
 
       <div className="p-3">
-        <SidebarUpgradeCard collapsed={collapsed} t={t} />
         <SidebarUserSection
           collapsed={collapsed}
           user={user}

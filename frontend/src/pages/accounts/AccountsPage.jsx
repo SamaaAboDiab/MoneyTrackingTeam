@@ -13,8 +13,10 @@ import {
 import AccountForm from "./components/AccountForm";
 import AccountsList from "./components/AccountsList";
 import WealthSummary from "./components/WealthSummary";
+import PageHeader from "../../components/common/PageHeader";
+import { Wallet, ArrowLeftRight } from "lucide-react";
 
-const DEFAULT_COLOR = "#4f46e5";
+const DEFAULT_COLOR = "#334155";
 const emptyForm = {
   name: "",
   type: "",
@@ -60,16 +62,18 @@ function AccountsPage() {
   const displayedAccounts = items.filter((account) => Boolean(account.isArchived) === showArchived);
 
   return (
-    <div className="mx-auto max-w-5xl">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">{t("accounts.title")}</h1>
-          <p className="mt-1 text-slate-500">{t("accounts.formDescription")}</p>
-        </div>
-        <Link to="/dashboard" className="font-semibold text-brand-700 hover:underline">
-          {t("common.backToDashboard")}
-        </Link>
-      </div>
+    <div className="mx-auto max-w-6xl">
+      <PageHeader
+        icon={Wallet}
+        title={t("accounts.title")}
+        subtitle={t("accounts.formDescription")}
+        actions={
+          <Link to="/accounts/transfer" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700">
+            <ArrowLeftRight size={16} />
+            {t("layout.quickActionLabel")}
+          </Link>
+        }
+      />
 
       <AccountForm form={form} createStatus={createStatus} createError={createError} onChange={handleChange} onSubmit={handleSubmit} t={t} />
       <WealthSummary accounts={items} t={t} />

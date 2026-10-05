@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateProfile, clearProfileError } from "../../../store/slices/authSlice";
+import { localizeDigits, normalizeDigits } from "../../../utils/formatAmount";
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500";
@@ -16,7 +17,8 @@ function ProfileForm({ user, t }) {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    // Phone digits are stored as Western digits whatever keyboard the user typed them with.
+    setForm((prev) => ({ ...prev, [name]: name === "phone" ? normalizeDigits(value) : value }));
     setSaved(false);
   };
 
@@ -57,7 +59,7 @@ function ProfileForm({ user, t }) {
             id="phone"
             name="phone"
             type="tel"
-            value={form.phone}
+            value={localizeDigits(form.phone)}
             onChange={handleChange}
             placeholder={t("profile.phonePlaceholder")}
             className={inputClass}
@@ -65,9 +67,11 @@ function ProfileForm({ user, t }) {
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label className={labelClass}>{t("profile.emailLabel")}</label>
+          <label htmlFor="profile-email" className={labelClass}>{t("profile.emailLabel")}</label>
           <input
+            id="profile-email"
             type="email"
+            dir="ltr"
             value={user?.email || ""}
             disabled
             className={`${inputClass} cursor-not-allowed bg-slate-50 text-slate-400`}

@@ -1,5 +1,6 @@
 import AccountSelect from "./AccountSelect";
 import TransferFeedback from "./TransferFeedback";
+import NumberInput from "../../../components/common/NumberInput";
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500";
@@ -8,12 +9,10 @@ const labelClass = "mb-1.5 mt-4 block text-sm font-semibold text-slate-700";
 function TransferForm({ form, accounts, status, error, formError, lastTransfer, transferStatus, onChange, onSubmit, t }) {
   return (
     <form
-      className="mt-4 mx-auto max-w-lg rounded-3xl bg-white p-8 shadow-sm shadow-slate-200 ring-1 ring-slate-100"
+      className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-8"
       onSubmit={onSubmit}
     >
-      <h1 className="text-2xl font-extrabold text-slate-900">{t("transfer.title")}</h1>
-
-      {status === "loading" && <p className="mt-3 text-slate-500">{t("transfer.loadingAccounts")}</p>}
+      {status === "loading" && <p className="text-slate-500">{t("transfer.loadingAccounts")}</p>}
       {status === "succeeded" && accounts.length < 2 && (
         <p className="mt-3 rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense">
           {t("transfer.needTwoAccounts")}
@@ -46,10 +45,9 @@ function TransferForm({ form, accounts, status, error, formError, lastTransfer, 
       <label htmlFor="amount" className={labelClass}>
         {t("transfer.amountLabel")}
       </label>
-      <input
+      <NumberInput
         id="amount"
         name="amount"
-        type="number"
         min="0.01"
         step="0.01"
         value={form.amount}

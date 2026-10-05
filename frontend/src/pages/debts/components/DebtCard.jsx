@@ -1,26 +1,16 @@
 import { useTranslation } from "react-i18next";
 import { Plus, Trash2, CheckCircle2, AlertCircle, Clock, History, ChevronDown, ChevronUp, Wallet, Calendar, Check } from "lucide-react";
 import { inputClass, labelClass } from "../constants";
-import { formatAmount } from "../../../utils/formatAmount";
+import { formatMoney, formatDate as formatLocalDate, formatPercent } from "../../../utils/formatAmount";
 import { isOverdue, isDueSoon, getDaysUntilDue } from "../utils";
+import DatePicker from "../../../components/common/DatePicker";
+import { ListSkeleton } from "../../../components/common/Skeleton";
 
 function DebtCard({ debt, expandedHistoryDebtId, paymentHistory, loadingHistoryDebtId, activeAccounts, editingDueDateId, setEditingDueDateId, editingDueDate, setEditingDueDate, savingDueDate, handleUpdateDueDate, openPaymentModal, handleMarkPaid, handleDeleteDebt, toggleHistory }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   function formatDate(dateString) {
-    if (!dateString) return "—";
-    try {
-      const d = new Date(dateString);
-      return Number.isNaN(d.getTime())
-        ? dateString
-        : d.toLocaleDateString(i18n.language, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          });
-    } catch {
-      return dateString;
-    }
+    return formatLocalDate(dateString, { year: "numeric", month: "short", day: "numeric" }) || "—";
   }
 
   function getDueSoonMessage(dateString) {
@@ -144,14 +134,14 @@ function DebtCard({ debt, expandedHistoryDebtId, paymentHistory, loadingHistoryD
                         isPaid ? "text-slate-400 line-through" : "text-slate-900"
                       }`}
                     >
-                      {formatAmount(debt.totalAmount)} {debt.currency}
+                      {formatMoney(debt.totalAmount, debt.currency)}
                     </p>
                   </div>
 
                   <div>
                     <p className="text-xs text-slate-500">{t("debts.amounts.paid")}</p>
                     <p className="mt-0.5 text-sm font-bold text-emerald-600 sm:text-base">
-                      {formatAmount(debt.paidAmount || (isPaid ? debt.totalAmount : 0))} {debt.currency}
+                      {formatMoney(debt.paidAmount || (isPaid ? debt.totalAmount : 0), debt.currency)}
                     </p>
                   </div>
 
@@ -166,7 +156,7 @@ function DebtCard({ debt, expandedHistoryDebtId, paymentHistory, loadingHistoryD
                           : "text-amber-600"
                       }`}
                     >
-                      {formatAmount(remaining)} {debt.currency}
+                      {formatMoney(remaining, debt.currency)}
                     </p>
                   </div>
                 </div>
@@ -176,7 +166,7 @@ function DebtCard({ debt, expandedHistoryDebtId, paymentHistory, loadingHistoryD
                   <div className="mb-1.5 flex justify-between text-xs font-semibold text-slate-600">
                     <span>{t("debts.progressLabel")}</span>
                     <span className={isPaid ? "text-emerald-700 font-bold" : ""}>
-                      {isPaid ? t("debts.progressComplete") : `${Math.round(progress)}%`}
+                      {isPaid ? t("debts.progressComplete") : formatPercent(progress)}
                     </span>
                   </div>
                   <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
@@ -224,12 +214,12 @@ function DebtCard({ debt, expandedHistoryDebtId, paymentHistory, loadingHistoryD
                   {editingDueDateId === debt._id ? (
                     <form onSubmit={(event) => handleUpdateDueDate(debt, event)} className="flex flex-wrap items-end gap-2">
                       <div>
-                        <label className={labelClass}>{t("debts.editDueDate")}</label>
-                        <input
+                        <label htmlFor={`due-date-${debt._id}`} className={labelClass}>{t("debts.editDueDate")}</label>
+                        <DatePicker
+                          id={`due-date-${debt._id}`}
                           required
-                          type="date"
                           value={editingDueDate}
-                          onChange={(event) => setEditingDueDate(event.target.value)}
+                          onChange={setEditingDueDate}
                           className={inputClass}
                         />
                       </div>
@@ -259,10 +249,14 @@ function DebtCard({ debt, expandedHistoryDebtId, paymentHistory, loadingHistoryD
                   <div className="mt-3 rounded-xl bg-brand-50 px-3.5 py-3 text-sm text-brand-800">
                     {debt.paymentForecast?.status === "available" ? (
                       <>
-                        <p className="font-semibold">{debt.paymentForecast.message}</p>
+                        <p className="font-semibold">
+                          {t("debts.forecast.payoffBy", {
+                            date: formatLocalDate(debt.paymentForecast.estimatedPayoffDate, { year: "numeric", month: "long" }),
+                          })}
+                        </p>
                         <p className="mt-1 text-xs text-brand-700">
                           {t("debts.forecast.averageMonthly", {
-                            amount: `${formatAmount(debt.paymentForecast.averageMonthlyPayment)} ${debt.currency}`,
+                            amount: formatMoney(debt.paymentForecast.averageMonthlyPayment, debt.currency),
                           })}
                         </p>
                       </>
@@ -336,9 +330,7 @@ function DebtCard({ debt, expandedHistoryDebtId, paymentHistory, loadingHistoryD
                   </div>
 
                   {loadingHistoryDebtId === debt._id ? (
-                    <p className="py-4 text-center text-xs font-medium text-slate-500">
-                      {t("debts.history.loading")}
-                    </p>
+                    <ListSkeleton rows={2} className="rounded-xl bg-white px-3" label={t("debts.history.loading")} />
                   ) : history.length === 0 ? (
                     <p className="rounded-xl border border-dashed border-slate-200 bg-white py-4 text-center text-xs text-slate-500">
                       {t("debts.history.empty")}
@@ -356,7 +348,7 @@ function DebtCard({ debt, expandedHistoryDebtId, paymentHistory, loadingHistoryD
                             </span>
                             <div>
                               <p className="font-bold text-slate-900">
-                                {formatAmount(payment.amount)} {debt.currency}
+                                {formatMoney(payment.amount, debt.currency)}
                               </p>
                               <p className="text-xs text-slate-500">
                                 {formatDate(payment.date)}

@@ -1,4 +1,6 @@
-export const getTodayString = () => new Date().toISOString().split("T")[0];
+import { todayISODate } from "../../utils/formatAmount";
+
+export const getTodayString = todayISODate;
 
 export const EMPTY_DEBT_FORM = {
   creditor: "",

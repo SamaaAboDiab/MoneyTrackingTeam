@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { AlertCircle, CheckCircle2, X } from "lucide-react";
 
 function DebtNotifications({ error, setError, successMessage, setSuccessMessage }) {
+  const { t } = useTranslation();
   return (
     <>
     {error && (
@@ -12,6 +14,7 @@ function DebtNotifications({ error, setError, successMessage, setSuccessMessage 
         <button
           type="button"
           onClick={() => setError("")}
+          aria-label={t("common.close")}
           className="text-red-500 hover:text-red-700"
         >
           <X size={16} />
@@ -28,6 +31,7 @@ function DebtNotifications({ error, setError, successMessage, setSuccessMessage 
         <button
           type="button"
           onClick={() => setSuccessMessage("")}
+          aria-label={t("common.close")}
           className="text-emerald-600 hover:text-emerald-800"
         >
           <X size={16} />

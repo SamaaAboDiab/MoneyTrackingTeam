@@ -6,6 +6,7 @@ import {
   fetchAccounts,
   transferFunds,
 } from "../../store/slices/accountsSlice";
+import { formatMoney } from "../../utils/formatAmount";
 import CashHeader from "./components/CashHeader";
 import CashBalanceCard from "./components/CashBalanceCard";
 import NoCashAccount from "./components/NoCashAccount";
@@ -38,7 +39,14 @@ function CashPage() {
     () => activeAccounts.filter((account) => account.type === "cash"),
     [activeAccounts]
   );
-  const cashBalance = cashAccounts.reduce((sum, account) => sum + Number(account.balance || 0), 0);
+  // Cash balance per currency (largest first); different currencies are never added together.
+  const cashTotals = Object.entries(
+    cashAccounts.reduce((acc, account) => {
+      const code = account.currency || "EGP";
+      acc[code] = (acc[code] || 0) + Number(account.balance || 0);
+      return acc;
+    }, {})
+  ).sort((a, b) => b[1] - a[1]);
 
   async function handleCreateCashAccount() {
     setFormError("");
@@ -62,6 +70,19 @@ function CashPage() {
       setFormError(t("cash.amountPositiveError"));
       return;
     }
+
+    const fromAccount = sourceAccounts.find((account) => String(account._id) === String(fromId));
+    if (fromAccount && amountNumber > Number(fromAccount.balance)) {
+      setFormError(
+        t("cash.insufficientBalance.message", {
+          account: fromAccount.name,
+          balance: formatMoney(fromAccount.balance, fromAccount.currency),
+          amount: formatMoney(amountNumber, fromAccount.currency),
+        })
+      );
+      return;
+    }
+
     try {
       await dispatch(transferFunds({ fromId, toId, amount: amountNumber, description: t("cash.internalTransfer") })).unwrap();
       setAmount("");
@@ -75,10 +96,10 @@ function CashPage() {
 
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-5">
       <CashHeader />
 
-      <CashBalanceCard cashBalance={cashBalance} hasCashAccount={cashAccounts.length > 0} />
+      <CashBalanceCard cashTotals={cashTotals} hasCashAccount={cashAccounts.length > 0} />
 
       {cashAccounts.length === 0 ? (
         <NoCashAccount handleCreateCashAccount={handleCreateCashAccount} createStatus={createStatus} />

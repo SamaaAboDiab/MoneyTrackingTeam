@@ -17,6 +17,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import AppLayout from "../components/layout/AppLayout";
 import AuthLayout from "../components/layout/AuthLayout";
 import CategoriesPage from "../pages/categories/CategoriesPage";
+import SavingsPage from "../pages/savings/SavingsPage";
+import ReportsPage from "../pages/reports/ReportsPage";
 function AppRoutes() {
   return (
     <Routes>
@@ -41,6 +43,8 @@ function AppRoutes() {
           <Route path="/cash" element={<CashPage />} />
           <Route path="/cash/expenses" element={<CashExpensesPage />} />
           <Route path="/debts" element={<DebtsPage />} />
+          <Route path="/savings" element={<SavingsPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>

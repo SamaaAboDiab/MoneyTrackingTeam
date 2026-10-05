@@ -1,15 +1,17 @@
 import { useTranslation } from "react-i18next";
-import { formatAmount } from "../../../utils/formatAmount";
+import { formatMoney, formatDate } from "../../../utils/formatAmount";
+import { categoryLabel } from "../../categories/components/mandatoryCategories";
 import { TYPE_PILL_STYLES } from "../constants";
+import { ListSkeleton } from "../../../components/common/Skeleton";
 
 function ExpensesList({ items, status, isFiltered, resetFilters, getCategoryName, getCategoryColor, openEditModal, setDeletingExpense, setDeleteError }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <>
       {/* عرض المصروفات */}
       {status === "loading" ? (
-        <p className="mt-6 text-center text-sm text-slate-500">{t("expenses.loading")}</p>
+        <ListSkeleton rows={5} className="mt-4" label={t("expenses.loading")} />
       ) : items.length === 0 ? (
         <div className="mt-6 rounded-xl border border-dashed border-slate-200 p-8 text-center">
           <p className="text-sm font-medium text-slate-600">
@@ -29,7 +31,7 @@ function ExpensesList({ items, status, isFiltered, resetFilters, getCategoryName
         <div className="mt-4 flex flex-col divide-y divide-slate-100">
           {items.map((expense) => {
             const pillClass = TYPE_PILL_STYLES[expense.expenseType] || TYPE_PILL_STYLES.fixed;
-            const displayCategoryName = getCategoryName(expense.category);
+            const displayCategoryName = categoryLabel(getCategoryName(expense.category));
             const displayCategoryColor = getCategoryColor(expense.category);
 
             return (
@@ -75,14 +77,14 @@ function ExpensesList({ items, status, isFiltered, resetFilters, getCategoryName
                 <div className="md:col-span-2">
                   <span className="block text-xs font-medium text-slate-400">{t("expenses.fields.amount")}</span>
                   <span className="tabular-amount text-sm font-bold text-expense">
-                    {formatAmount(expense.amount)} {expense.currency || "EGP"}
+                    {formatMoney(expense.amount, expense.currency)}
                   </span>
                 </div>
 
                 <div className="md:col-span-1">
                   <span className="block text-xs font-medium text-slate-400">{t("expenses.fields.date")}</span>
                   <span className="text-xs text-slate-600">
-                    {new Date(expense.date).toLocaleDateString(i18n.language)}
+                    {formatDate(expense.date)}
                   </span>
                 </div>
 

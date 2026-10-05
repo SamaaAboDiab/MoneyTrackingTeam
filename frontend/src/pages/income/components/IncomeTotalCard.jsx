@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { formatAmount } from "../../../utils/formatAmount";
+import { formatAmount, currencyLabel } from "../../../utils/formatAmount";
 import { errorClass } from "../constants";
 
 function IncomeTotalCard({ displayedTotal, summaryCurrency, summaryStatus, summaryError }) {
@@ -20,7 +20,7 @@ function IncomeTotalCard({ displayedTotal, summaryCurrency, summaryStatus, summa
             </strong>
 
             <span className="text-sm font-medium text-slate-500">
-              {summaryCurrency}
+              {currencyLabel(summaryCurrency)}
             </span>
           </div>
         </div>

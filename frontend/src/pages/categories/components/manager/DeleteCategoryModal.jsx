@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { categoryLabel } from "../mandatoryCategories";
 
 function DeleteCategoryModal({ deleteTarget, setDeleteTarget, deleting, handleDelete }) {
   const { t } = useTranslation();
@@ -15,7 +16,7 @@ function DeleteCategoryModal({ deleteTarget, setDeleteTarget, deleting, handleDe
         >
           <h2 className="text-base font-semibold text-slate-900">{t("categoriesPage.deleteConfirmTitle")}</h2>
           <p className="mt-2 text-sm text-slate-600">
-            {t("categoriesPage.deleteConfirmMessage", { name: deleteTarget.name })}
+            {t("categoriesPage.deleteConfirmMessage", { name: categoryLabel(deleteTarget.name) })}
           </p>
           <div className="mt-5 flex justify-end gap-2">
             <button

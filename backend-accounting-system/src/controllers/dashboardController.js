@@ -89,8 +89,29 @@ exports.getDashboard = async (req, res, next) => {
     const userId = new mongoose.Types.ObjectId(req.userId);
     const { period = "month", from, to } = req.query;
 
+    /* Amounts are never summed across currencies: the summary is computed for one currency at a
+       time (?currency=, default EGP or the user's first currency), and the list of currencies the
+       user actually has is returned so the client can switch between them. */
+    const distinctCurrencies = await Promise.all([
+      Account.distinct("currency", { user: userId, isActive: true }),
+      Income.distinct("currency", { user: userId }),
+      Expense.distinct("currency", { user: userId }),
+      Debt.distinct("currency", { userId }),
+    ]);
+    const currencies = [...new Set(distinctCurrencies.flat().map((c) => c || "EGP"))].sort((a, b) =>
+      a === "EGP" ? -1 : b === "EGP" ? 1 : a.localeCompare(b)
+    );
+    const requestedCurrency = String(req.query.currency || "").toUpperCase();
+    const currency = currencies.includes(requestedCurrency) ? requestedCurrency : currencies[0] || "EGP";
+    // Documents saved before currency existed count as EGP (the schema default).
+    const cur = currency === "EGP" ? { currency: { $in: ["EGP", null] } } : { currency };
+
     const { start, end } = periodBounds(period, from, to);
     const { prevStart, prevEnd } = prevPeriod(start, end);
+
+    /* trailing 6 calendar months, independent of the period filter — used for the wealth trend sparkline */
+    const now = new Date();
+    const trendStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
     /* ── parallel queries ─────────────────────────── */
     const [
@@ -105,29 +126,31 @@ exports.getDashboard = async (req, res, next) => {
       recentExpenses,
       chartIncome,
       chartExpenses,
+      trendIncome,
+      trendExpenses,
     ] = await Promise.all([
 
       /* current period income */
       Income.aggregate([
-        { $match: { user: userId, receivedDate: { $gte: start, $lte: end } } },
+        { $match: { user: userId, ...cur, receivedDate: { $gte: start, $lte: end } } },
         { $group: { _id: null, total: { $sum: "$amount" }, count: { $sum: 1 } } },
       ]),
 
       /* previous period income */
       Income.aggregate([
-        { $match: { user: userId, receivedDate: { $gte: prevStart, $lte: prevEnd } } },
+        { $match: { user: userId, ...cur, receivedDate: { $gte: prevStart, $lte: prevEnd } } },
         { $group: { _id: null, total: { $sum: "$amount" } } },
       ]),
 
       /* current period expenses */
       Expense.aggregate([
-        { $match: { user: userId, date: { $gte: start, $lte: end } } },
+        { $match: { user: userId, ...cur, date: { $gte: start, $lte: end } } },
         { $group: { _id: null, total: { $sum: "$amount" }, count: { $sum: 1 } } },
       ]),
 
       /* previous period expenses */
       Expense.aggregate([
-        { $match: { user: userId, date: { $gte: prevStart, $lte: prevEnd } } },
+        { $match: { user: userId, ...cur, date: { $gte: prevStart, $lte: prevEnd } } },
         { $group: { _id: null, total: { $sum: "$amount" } } },
       ]),
 
@@ -135,7 +158,7 @@ exports.getDashboard = async (req, res, next) => {
       Account.find({ user: userId, isActive: true }).lean(),
 
       /* debts (userId stored as ObjectId, userId var is already ObjectId) */
-      Debt.find({ userId, status: { $in: ["active", "overdue"] } })
+      Debt.find({ userId, ...cur, status: { $in: ["active", "overdue"] } })
         .sort({ dueDate: 1 })
         .lean(),
 
@@ -143,7 +166,7 @@ exports.getDashboard = async (req, res, next) => {
 
       /* expense categories breakdown (current period, top 6) */
       Expense.aggregate([
-        { $match: { user: userId, date: { $gte: start, $lte: end } } },
+        { $match: { user: userId, ...cur, date: { $gte: start, $lte: end } } },
         { $group: { _id: "$category", total: { $sum: "$amount" }, count: { $sum: 1 } } },
         { $sort: { total: -1 } },
         { $limit: 6 },
@@ -153,13 +176,13 @@ exports.getDashboard = async (req, res, next) => {
       ExpenseCategory.find({ user: userId }).lean(),
 
       /* recent income */
-      Income.find({ user: userId, receivedDate: { $gte: start, $lte: end } })
+      Income.find({ user: userId, ...cur, receivedDate: { $gte: start, $lte: end } })
         .sort({ receivedDate: -1 })
         .limit(10)
         .lean(),
 
       /* recent expenses */
-      Expense.find({ user: userId, date: { $gte: start, $lte: end } })
+      Expense.find({ user: userId, ...cur, date: { $gte: start, $lte: end } })
         .sort({ date: -1 })
         .limit(10)
         .lean(),
@@ -169,6 +192,7 @@ exports.getDashboard = async (req, res, next) => {
         {
           $match: {
             user: userId,
+            ...cur,
             receivedDate: { $gte: start, $lte: end },
           },
         },
@@ -186,6 +210,7 @@ exports.getDashboard = async (req, res, next) => {
         {
           $match: {
             user: userId,
+            ...cur,
             date: { $gte: start, $lte: end },
           },
         },
@@ -196,6 +221,28 @@ exports.getDashboard = async (req, res, next) => {
           },
         },
         { $sort: { "_id.year": 1, "_id.month": 1 } },
+      ]),
+
+      /* trailing 6-month wealth trend — income */
+      Income.aggregate([
+        { $match: { user: userId, ...cur, receivedDate: { $gte: trendStart } } },
+        {
+          $group: {
+            _id: { year: { $year: "$receivedDate" }, month: { $month: "$receivedDate" } },
+            total: { $sum: "$amount" },
+          },
+        },
+      ]),
+
+      /* trailing 6-month wealth trend — expenses */
+      Expense.aggregate([
+        { $match: { user: userId, ...cur, date: { $gte: trendStart } } },
+        {
+          $group: {
+            _id: { year: { $year: "$date" }, month: { $month: "$date" } },
+            total: { $sum: "$amount" },
+          },
+        },
       ]),
     ]);
 
@@ -212,7 +259,7 @@ exports.getDashboard = async (req, res, next) => {
       totals[currency] = (totals[currency] || 0) + (account.balance ?? 0);
       return totals;
     }, {});
-    const totalAccountBalance = accountBalancesByCurrency.EGP ?? 0;
+    const totalAccountBalance = accountBalancesByCurrency[currency] ?? 0;
 
     /* ── debts ───────────────────────────────────── */
     const totalDebtRemaining = debts.reduce((s, d) => s + Math.max(0, d.totalAmount - d.paidAmount), 0);
@@ -246,6 +293,22 @@ exports.getDashboard = async (req, res, next) => {
       chartData.push({ month: d.getMonth(), year: y, income: inc, expenses: exp });
     }
 
+    /* ── wealth trend (trailing 6 months, relative cumulative net) ── */
+    const monthlyNet = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const y = d.getFullYear(), m = d.getMonth() + 1;
+      const inc = trendIncome.find((r) => r._id.year === y && r._id.month === m)?.total ?? 0;
+      const exp = trendExpenses.find((r) => r._id.year === y && r._id.month === m)?.total ?? 0;
+      monthlyNet.push(inc - exp);
+    }
+    const cumulativeNet = monthlyNet.reduce((acc, net) => {
+      acc.push((acc[acc.length - 1] ?? 0) + net);
+      return acc;
+    }, []);
+    const minCumulative = Math.min(...cumulativeNet, 0);
+    const wealthTrend = cumulativeNet.map((value) => value - minCumulative + 1);
+
     /* ── recent activity ─────────────────────────── */
     const activity = [
       ...recentIncome.map((x) => ({
@@ -268,6 +331,8 @@ exports.getDashboard = async (req, res, next) => {
       success: true,
       data: {
         period: { start, end },
+        currency,
+        currencies,
         income:   { total: totalIncome,   count: incomeAgg[0]?.count ?? 0 },
         expenses: { total: totalExpenses, count: expenseAgg[0]?.count ?? 0 },
         netBalance,
@@ -299,6 +364,7 @@ exports.getDashboard = async (req, res, next) => {
         },
         expenseCategories,
         chartData,
+        wealthTrend,
         recentActivity: activity,
       },
     });

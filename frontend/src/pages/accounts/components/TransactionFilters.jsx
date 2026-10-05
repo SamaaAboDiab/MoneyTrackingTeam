@@ -1,5 +1,7 @@
+import DatePicker from "../../../components/common/DatePicker";
+
 const inputClass =
-  "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500";
+  "flex w-full items-center justify-between gap-2 rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500";
 const labelClass = "text-sm font-semibold text-slate-700";
 
 function TransactionFilters({ start, end, onStartChange, onEndChange, onSubmit, t }) {
@@ -9,23 +11,13 @@ function TransactionFilters({ start, end, onStartChange, onEndChange, onSubmit, 
       onSubmit={onSubmit}
     >
       <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>{t("accounts.transactions.startDate")}</label>
-        <input
-          type="date"
-          value={start}
-          onChange={(event) => onStartChange(event.target.value)}
-          className={inputClass}
-        />
+        <label htmlFor="history-start" className={labelClass}>{t("accounts.transactions.startDate")}</label>
+        <DatePicker id="history-start" value={start} max={end || undefined} onChange={onStartChange} className={inputClass} />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>{t("accounts.transactions.endDate")}</label>
-        <input
-          type="date"
-          value={end}
-          onChange={(event) => onEndChange(event.target.value)}
-          className={inputClass}
-        />
+        <label htmlFor="history-end" className={labelClass}>{t("accounts.transactions.endDate")}</label>
+        <DatePicker id="history-end" value={end} min={start || undefined} onChange={onEndChange} className={inputClass} />
       </div>
 
       <button

@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Plus, X } from "lucide-react";
 import { fetchAccounts } from "../../store/slices/accountsSlice";
+import Select from "../common/Select";
+import NumberInput from "../common/NumberInput";
 import { createExpense } from "../../api/expenseApi";
 import { listCategories } from "../../api/categoryApi";
 import { extractError } from "../../utils/errorHandler";
+import { todayISODate } from "../../utils/formatAmount";
+import { categoryLabel } from "../../pages/categories/components/mandatoryCategories";
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-brand-500";
@@ -57,7 +62,7 @@ function QuickAddButton() {
       await createExpense({
         amount: value,
         description: description.trim() || t("quickAdd.defaultDescription"),
-        date: new Date().toISOString().slice(0, 10),
+        date: todayISODate(),
         paymentMethod: "cash",
         expenseType: "daily",
         category,
@@ -79,20 +84,20 @@ function QuickAddButton() {
     }
   };
 
-  return (
+  return createPortal(
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
         title={t("quickAdd.button")}
         aria-label={t("quickAdd.button")}
-        className="fixed bottom-20 inset-e-4 z-40 sm:bottom-6 sm:inset-e-6 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg shadow-brand-600/30 transition hover:bg-brand-700"
+        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] inset-e-4 z-30 lg:bottom-6 lg:inset-e-6 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white ring-4 ring-white shadow-lg shadow-brand-600/30 transition hover:bg-brand-700"
       >
         <Plus size={26} />
       </button>
 
       {toast && (
-        <div className="fixed bottom-36 inset-e-4 z-50 sm:bottom-24 sm:inset-e-6 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-2xl">
+        <div className="fixed bottom-[calc(9.5rem+env(safe-area-inset-bottom,0px))] inset-e-4 z-50 lg:bottom-24 lg:inset-e-6 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-2xl">
           {toast}
         </div>
       )}
@@ -109,16 +114,16 @@ function QuickAddButton() {
           >
             <div className="flex items-center justify-between">
               <h2 className="text-base font-bold text-slate-900">{t("quickAdd.title")}</h2>
-              <button type="button" onClick={close} className="rounded p-1 text-slate-400 hover:bg-slate-100">
+              <button type="button" onClick={close} aria-label={t("quickAdd.cancel")} className="rounded p-1 text-slate-400 hover:bg-slate-100">
                 <X size={16} />
               </button>
             </div>
 
             <label className="block text-sm font-semibold text-slate-700">
               {t("quickAdd.amount")}
-              <input
+              <NumberInput
                 autoFocus
-                type="number"
+                required
                 min="0.01"
                 step="0.01"
                 value={amount}
@@ -130,14 +135,14 @@ function QuickAddButton() {
 
             <label className="block text-sm font-semibold text-slate-700">
               {t("quickAdd.category")}
-              <select value={category} onChange={(event) => setCategory(event.target.value)} className={inputClass}>
+              <Select required value={category} onChange={(event) => setCategory(event.target.value)} className={inputClass}>
                 <option value="">{t("quickAdd.selectCategory")}</option>
                 {categories.map((cat) => (
                   <option key={cat._id || cat.name} value={cat.name}>
-                    {cat.name}
+                    {categoryLabel(cat.name)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
 
             <label className="block text-sm font-semibold text-slate-700">
@@ -158,7 +163,8 @@ function QuickAddButton() {
           </form>
         </div>
       )}
-    </>
+    </>,
+    document.body
   );
 }
 

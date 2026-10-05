@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, ArrowUp, ArrowDown } from "lucide-react";
-import { formatAmount } from "../../utils/formatAmount";
+import { useTranslation } from "react-i18next";
+import { ArrowUpRight, ArrowDownRight, Wallet, Scale } from "lucide-react";
+import { formatMoney, currencyName } from "../../utils/formatAmount";
 
 function TotalWealthCard({
   label,
   amount,
   currency,
   onOpenAccounts,
-  trend = "up",
   trendData = [],
-  maskedText = "••••••",
-  showAriaLabel,
-  hideAriaLabel,
+  accountsCount,
+  periodIncome,
+  periodExpenses,
+  periodLabel,
+  currencies = [],
+  onCurrencyChange,
 }) {
-  const [hidden, setHidden] = useState(false);
+  const { t } = useTranslation();
   const [grown, setGrown] = useState(false);
 
   useEffect(() => {
@@ -21,14 +24,20 @@ function TotalWealthCard({
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  const isUp = trend !== "down";
-  const capsuleClass = isUp ? "bg-income" : "bg-expense";
-  const TrendIcon = isUp ? ArrowUp : ArrowDown;
-
   const maxTrendValue = trendData.length ? Math.max(...trendData, 1) : 0;
+  const showPeriod = Number.isFinite(periodIncome) || Number.isFinite(periodExpenses);
+  const net = Number(periodIncome || 0) - Number(periodExpenses || 0);
+
+  // text-income/text-expense are tuned for white cards; on this dark card they read as dull/washed
+  // out, so the brighter dark-mode-friendly tints below are used here instead.
+  const stats = [
+    { key: "income", icon: ArrowUpRight, tone: "text-emerald-400", label: t("dashboard.wealth.income"), value: periodIncome },
+    { key: "expenses", icon: ArrowDownRight, tone: "text-rose-400", label: t("dashboard.wealth.expenses"), value: periodExpenses },
+    { key: "net", icon: Scale, tone: net >= 0 ? "text-emerald-400" : "text-rose-400", label: t("dashboard.wealth.net"), value: net },
+  ];
 
   return (
-    <div className="relative">
+    <div className="relative h-full">
       <div
         role="button"
         tabIndex={0}
@@ -36,71 +45,101 @@ function TotalWealthCard({
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") onOpenAccounts();
         }}
-        className={`relative overflow-hidden rounded-3xl bg-brand-600 p-6 transition-all duration-300 ease-out sm:p-8 ${
+        className={`relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-3xl bg-brand-600 p-6 text-white transition-all duration-300 ease-out sm:p-7 ${
           grown ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
       >
-        {/* Top row */}
-        <div className="flex items-center justify-between">
+        {/* Top row: label, currency switcher + accounts count on the other side.
+            Wraps to its own line on narrow screens instead of squeezing everything into one row. */}
+        <div className="relative flex flex-wrap items-center justify-between gap-y-2 gap-x-3">
           <span className="text-sm font-medium text-white/80">{label}</span>
 
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              setHidden((prev) => !prev);
-            }}
-            aria-label={hidden ? showAriaLabel : hideAriaLabel}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"
-          >
-            {hidden ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {currencies.length > 1 && (
+              <div
+                role="group"
+                aria-label={t("dashboard.summary.currency")}
+                onClick={(event) => event.stopPropagation()}
+                className="inline-flex rounded-full bg-white/10 p-1"
+              >
+                {currencies.map((code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => onCurrencyChange?.(code)}
+                    aria-pressed={code === currency}
+                    title={currencyName(code)}
+                    className={`rounded-full px-2.5 py-1 text-[11px] font-bold transition ${
+                      code === currency ? "bg-white text-brand-700" : "text-white/70 hover:text-white"
+                    }`}
+                  >
+                    {code}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {Number.isFinite(accountsCount) && accountsCount > 0 && (
+              <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold text-white/70">
+                <Wallet size={13} />
+                {t("dashboard.wealth.accounts", { count: accountsCount })}
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Main row */}
-        <div className="mt-6 flex items-end justify-between gap-4">
-          <div
-            className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 transition-all duration-300 ease-out ${capsuleClass} ${
-              grown ? "scale-100 opacity-100 delay-150" : "scale-90 opacity-0"
-            }`}
-          >
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/25">
-              <TrendIcon size={13} strokeWidth={2.5} className="text-white" />
-            </span>
-            <span className="relative grid font-bold text-white">
-              <span
-                className={`tabular-amount col-start-1 row-start-1 transition-opacity duration-200 ${
-                  hidden ? "opacity-0" : "opacity-100"
-                }`}
-              >
-                {currency} {formatAmount(amount)}
-              </span>
-              <span
-                className={`col-start-1 row-start-1 tracking-widest transition-opacity duration-200 ${
-                  hidden ? "opacity-100" : "opacity-0"
-                }`}
-                aria-hidden={!hidden}
-              >
-                {maskedText}
-              </span>
-            </span>
-          </div>
+        {/* Amount */}
+        <div className="relative">
+          <span className="tabular-amount block text-3xl font-extrabold tracking-tight sm:text-4xl">
+            {formatMoney(amount, currency)}
+          </span>
+        </div>
+
+        {/* Period income / expenses / net + trend bars */}
+        <div className="relative flex flex-wrap items-end justify-between gap-4">
+          {showPeriod && (
+            <div className="min-w-0 flex-1">
+              {periodLabel && <p className="mb-2 text-sm font-semibold text-white/80">{periodLabel}</p>}
+              <div className="grid grid-cols-3 gap-3 sm:flex sm:flex-wrap sm:gap-0">
+                {stats.map(({ key, icon: Icon, tone, label: statLabel, value }, index) => (
+                  <div
+                    key={key}
+                    className={`min-w-0 ${index > 0 ? "sm:border-s sm:border-white/15 sm:ps-5 sm:ms-5" : ""}`}
+                  >
+                    <div className="flex min-w-0 items-center gap-1 text-white/60">
+                      <Icon size={11} strokeWidth={2.5} className={`shrink-0 rtl:-scale-x-100 ${tone}`} />
+                      <span className="truncate text-[10px] font-medium sm:text-[11px]">{statLabel}</span>
+                    </div>
+                    <div className="mt-0.5 min-w-0">
+                      <span className={`tabular-amount block truncate text-sm font-bold sm:text-base ${tone}`} dir="ltr">
+                        {key === "net" && value > 0 ? "+" : ""}
+                        {formatMoney(value || 0, currency)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {trendData.length > 0 && (
-            <div className="flex h-16 flex-1 items-end justify-end gap-1">
-              {trendData.map((value, index) => {
-                const heightPct = Math.max((value / maxTrendValue) * 100, 6);
-                return (
-                  <div
-                    key={index}
-                    className="w-1.5 rounded-full bg-white/25 transition-all duration-500 ease-out"
-                    style={{
-                      height: grown ? `${heightPct}%` : "0%",
-                      transitionDelay: `${150 + index * 40}ms`,
-                    }}
-                  />
-                );
-              })}
+            <div className="ms-auto hidden flex-col items-end gap-1.5 sm:flex">
+              <span className="text-[10px] font-medium text-white/45">{t("dashboard.wealth.trend")}</span>
+              <div aria-hidden="true" className="flex h-14 w-40 items-end justify-end gap-1">
+                {trendData.map((value, index) => {
+                  const heightPct = Math.max((value / maxTrendValue) * 100, 8);
+                  return (
+                    <div
+                      key={index}
+                      className="w-1.5 rounded-full bg-white/30 transition-all duration-500 ease-out"
+                      style={{
+                        height: grown ? `${heightPct}%` : "0%",
+                        transitionDelay: `${150 + index * 40}ms`,
+                      }}
+                    />
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

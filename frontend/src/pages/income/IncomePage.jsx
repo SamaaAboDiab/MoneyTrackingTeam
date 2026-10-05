@@ -10,7 +10,8 @@ import {
   fetchIncomes,
   updateIncomeEntry,
 } from "../../store/slices/incomeSlice";
-import { EMPTY_FORM, getCurrentMonth } from "./constants";
+import { EMPTY_FORM, getCurrentMonth, getTodayString } from "./constants";
+import { getAccounts } from "../../api/accountsApi";
 import IncomeHeader from "./components/IncomeHeader";
 import IncomeTotalCard from "./components/IncomeTotalCard";
 import IncomeAlerts from "./components/IncomeAlerts";
@@ -49,15 +50,34 @@ function IncomePage() {
     category: "",
     amount: "",
     currency: "EGP",
-    receivedDate: "",
+    receivedDate: getTodayString(),
     recurrence: "once",
+    accountId: "",
     notes: "",
   });
+
+  const [availableAccounts, setAvailableAccounts] = useState([]);
 
   // Fetch all incomes
   useEffect(() => {
     dispatch(fetchIncomes());
   }, [dispatch]);
+
+  // Fetch accounts so income can optionally credit one of them
+  const loadAccounts = () => {
+    getAccounts()
+      .then((res) => {
+        const accs = res.data?.data || res.data || [];
+        setAvailableAccounts(
+          Array.isArray(accs) ? accs.filter((acc) => !acc.isArchived && acc.isActive !== false) : []
+        );
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    loadAccounts();
+  }, []);
 
   // Fetch monthly income summary
   useEffect(() => {
@@ -131,9 +151,10 @@ function IncomePage() {
       currency: income.currency || "EGP",
       receivedDate: income.receivedDate
         ? new Date(income.receivedDate).toISOString().slice(0, 10)
-        : "",
+        : getTodayString(),
       recurrence: income.recurrence || "once",
       status: income.status || "cleared",
+      accountId: income.account?._id || income.account || "",
       notes: income.notes || "",
     });
 
@@ -187,13 +208,15 @@ function IncomePage() {
         category: "",
         amount: "",
         currency: "EGP",
-        receivedDate: "",
+        receivedDate: getTodayString(),
         recurrence: "once",
+        accountId: "",
         notes: "",
       });
 
       dispatch(fetchIncomes());
       refreshSummary();
+      loadAccounts();
     }
   };
 
@@ -209,6 +232,7 @@ function IncomePage() {
       receivedDate: form.receivedDate,
       recurrence: form.recurrence,
       status: form.status,
+      accountId: form.accountId || null,
       notes: form.notes.trim(),
     };
 
@@ -226,6 +250,7 @@ function IncomePage() {
 
       dispatch(fetchIncomes());
       refreshSummary();
+      loadAccounts();
     }
   };
 
@@ -235,11 +260,12 @@ function IncomePage() {
 
     dispatch(fetchIncomes());
     refreshSummary();
+    loadAccounts();
   };
 
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl">
       <IncomeHeader />
 
       <IncomeTotalCard
@@ -257,6 +283,7 @@ function IncomePage() {
         createError={createError}
         onChange={handleCreateChange}
         onSubmit={handleCreateSubmit}
+        availableAccounts={availableAccounts}
         t={t}
       />
 
@@ -288,6 +315,7 @@ function IncomePage() {
         form={form}
         handleFormChange={handleFormChange}
         updateStatus={updateStatus}
+        availableAccounts={availableAccounts}
       />
     </div>
   );

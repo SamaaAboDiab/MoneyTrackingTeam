@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { formatAmount } from "../../../utils/formatAmount";
+import { formatMoney } from "../../../utils/formatAmount";
+import NumberInput from "../../../components/common/NumberInput";
+import { extractError } from "../../../utils/errorHandler";
 
 export default function AdjustBalanceButton({ account, onSubmit, onUpdated }) {
   const { t } = useTranslation();
@@ -49,29 +51,22 @@ export default function AdjustBalanceButton({ account, onSubmit, onUpdated }) {
       onUpdated?.(updatedAccount);
       resetAndClose();
     } catch (err) {
-      setError(
-        typeof err === "string"
-          ? err
-          : err.message || t("accounts.adjustBalance.genericError")
-      );
+      setError(extractError(err, t("accounts.adjustBalance.genericError")));
       setSaving(false);
     }
   }
 
   const diff = Number(newBalance) - (account?.balance ?? 0);
-  const diffLabel =
-    !isNaN(diff) && diff !== 0
-      ? `${diff > 0 ? "+" : ""}${formatAmount(diff)}`
-      : "";
+  const diffLabel = !isNaN(diff) && diff !== 0 ? formatMoney(diff, currency, { signDisplay: "exceptZero" }) : "";
 
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 w-[150px] rounded-lg border border-slate-200 px-3 py-1.5 text-base font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+        className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition hover:border-brand-300 hover:bg-slate-50"
       >
-        <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 text-slate-500">
+        <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 shrink-0 text-slate-500">
           <path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-8.5 8.5a2 2 0 0 1-.878.507l-3 .8a.5.5 0 0 1-.612-.612l.8-3a2 2 0 0 1 .507-.878l8.5-8.5Z" />
         </svg>
         {t("accounts.adjustBalance.trigger")}
@@ -93,17 +88,16 @@ export default function AdjustBalanceButton({ account, onSubmit, onUpdated }) {
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
                   {t("accounts.adjustBalance.currentBalance")}:{" "}
-                  <span className="font-medium text-slate-700">
-                    {formatAmount(account?.balance)} {currency}
-                  </span>
+                  <span className="font-medium text-slate-700">{formatMoney(account?.balance, currency)}</span>
                 </p>
 
-                <label className="mt-4 block text-sm font-medium text-slate-700">
+                <label htmlFor={`new-balance-${account._id}`} className="mt-4 block text-sm font-medium text-slate-700">
                   {t("accounts.adjustBalance.newBalanceLabel")}
                 </label>
-                <input
-                  type="number"
-                  step="any"
+                <NumberInput
+                  id={`new-balance-${account._id}`}
+                  step="0.01"
+                  required
                   autoFocus
                   value={newBalance}
                   onChange={(e) => setNewBalance(e.target.value)}
@@ -111,10 +105,11 @@ export default function AdjustBalanceButton({ account, onSubmit, onUpdated }) {
                   className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-600 focus:outline-none"
                 />
 
-                <label className="mt-3 block text-sm font-medium text-slate-700">
+                <label htmlFor={`adjust-notes-${account._id}`} className="mt-3 block text-sm font-medium text-slate-700">
                   {t("accounts.adjustBalance.notesLabel")}
                 </label>
                 <textarea
+                  id={`adjust-notes-${account._id}`}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder={t("accounts.adjustBalance.notesPlaceholder")}
@@ -154,20 +149,16 @@ export default function AdjustBalanceButton({ account, onSubmit, onUpdated }) {
                 <div className="mt-4 rounded-xl bg-slate-50 p-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-slate-500">{t("accounts.adjustBalance.currentBalance")}</span>
-                    <span className="font-medium text-slate-700">
-                      {formatAmount(account?.balance)} {currency}
-                    </span>
+                    <span className="font-medium text-slate-700">{formatMoney(account?.balance, currency)}</span>
                   </div>
                   <div className="mt-2 flex items-center justify-between text-sm">
                     <span className="text-slate-500">{t("accounts.adjustBalance.newBalanceLabel")}</span>
-                    <span className="font-semibold text-brand-700">
-                      {formatAmount(newBalance)} {currency}
-                    </span>
+                    <span className="font-semibold text-brand-700">{formatMoney(newBalance, currency)}</span>
                   </div>
                   <div className="mt-2 flex items-center justify-between border-t border-slate-200 pt-2 text-sm">
                     <span className="text-slate-500">{t("accounts.adjustBalance.difference")}</span>
                     <span className={diff >= 0 ? "font-medium text-income" : "font-medium text-expense"}>
-                      {diffLabel} {currency}
+                      {diffLabel}
                     </span>
                   </div>
                   {notes.trim() && (

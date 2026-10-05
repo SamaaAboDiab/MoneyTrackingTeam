@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import Select from "../../../../components/common/Select";
+import { categoryLabel } from "../mandatoryCategories";
 
 function CategoryFormModal({ formOpen, closeForm, handleSave, editingId, editingCat, name, setName, type, setType, color, setColor, formError, saving, TYPE_OPTIONS }) {
   const { t } = useTranslation();
@@ -19,12 +21,15 @@ function CategoryFormModal({ formOpen, closeForm, handleSave, editingId, editing
           </h2>
 
           {/* اسم التصنيف — معطّل للـ defaults */}
-          <label className="mt-4 block text-sm font-medium text-slate-700">{t("categoriesPage.nameLabel")}</label>
+          <label htmlFor="category-name" className="mt-4 block text-sm font-medium text-slate-700">{t("categoriesPage.nameLabel")}</label>
           <input
+            id="category-name"
             type="text"
             autoFocus
+            required
+            maxLength={50}
             placeholder={t("categoriesPage.namePlaceholder")}
-            value={name}
+            value={editingCat?.isDefault ? categoryLabel(name) : name}
             onChange={(e) => setName(e.target.value)}
             disabled={editingCat?.isDefault}
             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-400"
@@ -34,8 +39,9 @@ function CategoryFormModal({ formOpen, closeForm, handleSave, editingId, editing
           )}
 
           {/* نوع التصنيف — Fix #2 & #3 — معطّل للـ defaults */}
-          <label className="mt-3 block text-sm font-medium text-slate-700">{t("categoriesPage.typeLabel")}</label>
-          <select
+          <label htmlFor="category-type" className="mt-3 block text-sm font-medium text-slate-700">{t("categoriesPage.typeLabel")}</label>
+          <Select
+            id="category-type"
             value={type}
             onChange={(e) => setType(e.target.value)}
             disabled={editingCat?.isDefault}
@@ -44,14 +50,15 @@ function CategoryFormModal({ formOpen, closeForm, handleSave, editingId, editing
             {TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
-          </select>
+          </Select>
           {editingCat?.isDefault && (
             <p className="mt-1 text-xs text-slate-400">{t("categoriesPage.typeLocked")}</p>
           )}
 
           {/* اللون — متاح للكل حتى الـ defaults */}
-          <label className="mt-3 block text-sm font-medium text-slate-700">{t("categoriesPage.colorLabel")}</label>
+          <label htmlFor="category-color" className="mt-3 block text-sm font-medium text-slate-700">{t("categoriesPage.colorLabel")}</label>
           <input
+            id="category-color"
             type="color"
             value={color}
             onChange={(e) => setColor(e.target.value)}

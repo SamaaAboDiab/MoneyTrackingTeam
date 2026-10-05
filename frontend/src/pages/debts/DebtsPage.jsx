@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { Trash2, CheckCircle2 } from "lucide-react";
+import { Trash2, CheckCircle2, AlertTriangle } from "lucide-react";
 import { getDebtPayments } from "../../api/debtsApi";
 import { fetchAccounts } from "../../store/slices/accountsSlice";
 import {
@@ -12,7 +12,7 @@ import {
   markDebtPaidThunk,
   addDebtPaymentThunk,
 } from "../../store/slices/debtsSlice";
-import { formatAmount } from "../../utils/formatAmount";
+import { formatAmount, formatMoney, currencyLabel } from "../../utils/formatAmount";
 import ConfirmModal from "../../components/common/ConfirmModal";
 import { getTodayString, EMPTY_DEBT_FORM } from "./constants";
 import { getErrorMessage } from "./utils";
@@ -53,6 +53,7 @@ function DebtsPage() {
     notes: "",
   });
   const [savingPayment, setSavingPayment] = useState(false);
+  const [balanceWarning, setBalanceWarning] = useState(false);
 
   // Expanded History state (debtId -> boolean) & history data (debtId -> array)
   const [expandedHistoryDebtId, setExpandedHistoryDebtId] = useState(null);
@@ -233,7 +234,7 @@ function DebtsPage() {
       setError(
         t("debts.paymentExceedsRemainingError", {
           remaining: formatAmount(remaining),
-          currency: paymentModalDebt.currency,
+          currency: currencyLabel(paymentModalDebt.currency),
         })
       );
       return;
@@ -246,6 +247,21 @@ function DebtsPage() {
       setError(t("debts.paymentDateRequiredError"));
       return;
     }
+
+    const account = activeAccounts.find(
+      (acc) => String(acc._id) === String(paymentForm.accountId)
+    );
+    if (account && amountNum > Number(account.balance)) {
+      setBalanceWarning(true);
+      return;
+    }
+
+    await performPayment();
+  }
+
+  // Actually submit the debt payment (after validations and balance confirmation)
+  async function performPayment() {
+    const amountNum = Number(paymentForm.amount);
 
     setSavingPayment(true);
     setError("");
@@ -302,7 +318,7 @@ function DebtsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-5">
       <DebtsHeader
         showAddForm={showAddForm}
         setShowAddForm={setShowAddForm}
@@ -381,6 +397,31 @@ function DebtsPage() {
           confirmAction?.type === "paid" ? t("debts.actions.markPaid") : t("debts.actions.delete")
         }
         confirmVariant={confirmAction?.type === "delete" ? "destructive" : "primary"}
+      />
+
+      <ConfirmModal
+        isOpen={balanceWarning}
+        onClose={() => setBalanceWarning(false)}
+        onConfirm={async () => {
+          setBalanceWarning(false);
+          await performPayment();
+        }}
+        icon={AlertTriangle}
+        confirmVariant="destructive"
+        title={t("debts.insufficientBalance.title")}
+        description={(() => {
+          const account = activeAccounts.find(
+            (acc) => String(acc._id) === String(paymentForm.accountId)
+          );
+          if (!account) return "";
+          return t("debts.insufficientBalance.message", {
+            account: account.name,
+            balance: formatMoney(account.balance, account.currency),
+            amount: formatMoney(Number(paymentForm.amount), account.currency),
+          });
+        })()}
+        cancelLabel={t("debts.insufficientBalance.cancel")}
+        confirmLabel={t("debts.insufficientBalance.confirm")}
       />
 
     </div>

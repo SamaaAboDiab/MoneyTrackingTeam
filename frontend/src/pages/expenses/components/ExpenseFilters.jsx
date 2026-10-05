@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import DatePicker from "../../../components/common/DatePicker";
+import Select from "../../../components/common/Select";
+import { categoryLabel } from "../../categories/components/mandatoryCategories";
 
 
 function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, resetFilters, availableAccounts, availableCategories, getCategoryName, getCategoryColor }) {
@@ -47,36 +50,36 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
         {/* فلتر الفترة الزمنية */}
         <div className="flex flex-col gap-1">
           <label htmlFor="filter-period" className="text-xs font-semibold text-slate-600">{t("expenses.filters.periodLabel")}</label>
-          <select
+          <Select
             id="filter-period"
             name="period"
             value={filters.period}
             onChange={handleFilterChange}
-            className="rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500"
+            className="w-full bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700"
           >
             <option value="all">{t("expenses.filters.period.all")}</option>
             <option value="day">{t("expenses.filters.period.day")}</option>
             <option value="week">{t("expenses.filters.period.week")}</option>
             <option value="month">{t("expenses.filters.period.month")}</option>
             <option value="custom">{t("expenses.filters.period.custom")}</option>
-          </select>
+          </Select>
         </div>
 
         {/* فلتر النوع */}
         <div className="flex flex-col gap-1">
           <label htmlFor="filter-type" className="text-xs font-semibold text-slate-600">{t("expenses.filters.typeLabel")}</label>
-          <select
+          <Select
             id="filter-type"
             name="type"
             value={filters.type}
             onChange={handleFilterChange}
-            className="rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500"
+            className="w-full bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700"
           >
             <option value="all">{t("expenses.filters.typeAll")}</option>
             <option value="daily">{t("expenses.expenseType.daily")}</option>
             <option value="fixed">{t("expenses.expenseType.fixed")}</option>
             <option value="emergency">{t("expenses.expenseType.emergency")}</option>
-          </select>
+          </Select>
         </div>
 
         {/* فلتر التصنيف مع نقاط ملونة */}
@@ -84,8 +87,11 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
           <label htmlFor="filter-category" className="text-xs font-semibold text-slate-600">{t("expenses.filters.categoryLabel")}</label>
           <button
             type="button"
+            id="filter-category"
+            aria-haspopup="listbox"
+            aria-expanded={filterCatOpen}
             onClick={() => setFilterCatOpen((prev) => !prev)}
-            className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500 text-right"
+            className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500 text-start"
           >
             <span className="flex items-center gap-1.5">
               {filters.category !== "all" && (
@@ -97,7 +103,7 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
               <span>
                 {filters.category === "all"
                   ? t("expenses.filters.categoryAll")
-                  : getCategoryName(filters.category)}
+                  : categoryLabel(getCategoryName(filters.category))}
               </span>
             </span>
             <svg
@@ -140,7 +146,7 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
                     className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full"
                     style={{ backgroundColor: cat.color || getCategoryColor(cat.name) }}
                   />
-                  <span>{cat.name}</span>
+                  <span>{categoryLabel(cat.name)}</span>
                 </div>
               ))}
             </div>
@@ -150,12 +156,12 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
         {/* فلتر الحساب */}
         <div className="flex flex-col gap-1">
           <label htmlFor="filter-account" className="text-xs font-semibold text-slate-600">{t("expenses.filters.accountLabel")}</label>
-          <select
+          <Select
             id="filter-account"
             name="account"
             value={filters.account}
             onChange={handleFilterChange}
-            className="rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500"
+            className="w-full bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700"
           >
             <option value="all">{t("expenses.filters.accountAll")}</option>
             {availableAccounts.map((acc) => (
@@ -163,7 +169,7 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
                 {acc.name}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -172,23 +178,21 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
         <div className="mt-3 grid grid-cols-1 gap-3 rounded-xl bg-slate-50 p-3 sm:grid-cols-2">
           <div className="flex flex-col gap-1">
             <label htmlFor="filter-startDate" className="text-xs font-semibold text-slate-600">{t("expenses.filters.startDate")}</label>
-            <input
+            <DatePicker
               id="filter-startDate"
-              name="startDate"
-              type="date"
               value={filters.startDate}
-              onChange={handleFilterChange}
+              max={filters.endDate || undefined}
+              onChange={(value) => handleFilterChange({ target: { name: "startDate", value } })}
               className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 outline-none focus:border-brand-500"
             />
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="filter-endDate" className="text-xs font-semibold text-slate-600">{t("expenses.filters.endDate")}</label>
-            <input
+            <DatePicker
               id="filter-endDate"
-              name="endDate"
-              type="date"
               value={filters.endDate}
-              onChange={handleFilterChange}
+              min={filters.startDate || undefined}
+              onChange={(value) => handleFilterChange({ target: { name: "endDate", value } })}
               className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 outline-none focus:border-brand-500"
             />
           </div>

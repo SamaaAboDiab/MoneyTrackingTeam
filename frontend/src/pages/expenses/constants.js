@@ -1,7 +1,9 @@
+import { todayISODate } from "../../utils/formatAmount";
+
 const EMPTY_FORM = {
   description: "",
   amount: "",
-  date: new Date().toISOString().slice(0, 10),
+  date: todayISODate(),
   paymentMethod: "cash",
   expenseType: "",
   category: "",

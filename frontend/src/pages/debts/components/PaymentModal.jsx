@@ -1,7 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { inputClass, labelClass } from "../constants";
-import { formatAmount } from "../../../utils/formatAmount";
+import { formatAmount, formatMoney, currencyLabel } from "../../../utils/formatAmount";
+import NumberInput from "../../../components/common/NumberInput";
+import DatePicker from "../../../components/common/DatePicker";
+import Select from "../../../components/common/Select";
 
 function PaymentModal({ paymentModalDebt, setPaymentModalDebt, handleSavePayment, paymentForm, setPaymentForm, activeAccounts, savingPayment }) {
   const { t } = useTranslation();
@@ -21,6 +24,7 @@ function PaymentModal({ paymentModalDebt, setPaymentModalDebt, handleSavePayment
             <button
               type="button"
               onClick={() => setPaymentModalDebt(null)}
+              aria-label={t("common.close")}
               className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
             >
               <X size={18} />
@@ -30,22 +34,22 @@ function PaymentModal({ paymentModalDebt, setPaymentModalDebt, handleSavePayment
           <div className="mb-4 rounded-xl bg-amber-50 p-3 text-xs font-medium text-amber-800">
             {t("debts.paymentModal.remainingLabel")}{" "}
             <strong>
-              {formatAmount(
-                paymentModalDebt.remainingAmount ??
-                  paymentModalDebt.totalAmount - paymentModalDebt.paidAmount
-              )}{" "}
-              {paymentModalDebt.currency}
+              {formatMoney(
+                paymentModalDebt.remainingAmount ?? paymentModalDebt.totalAmount - paymentModalDebt.paidAmount,
+                paymentModalDebt.currency
+              )}
             </strong>
           </div>
 
           <form onSubmit={handleSavePayment} className="space-y-4">
             <div>
-              <label className={labelClass}>
+              <label htmlFor="payment-amount" className={labelClass}>
                 {t("debts.paymentModal.amountLabel")} <span className="text-red-500">*</span>
               </label>
-              <input
+              <NumberInput
+                id="payment-amount"
+                autoFocus
                 required
-                type="number"
                 min="0.01"
                 step="0.01"
                 max={Number(
@@ -62,25 +66,26 @@ function PaymentModal({ paymentModalDebt, setPaymentModalDebt, handleSavePayment
             </div>
 
             <div>
-              <label className={labelClass}>
+              <label htmlFor="payment-date" className={labelClass}>
                 {t("debts.paymentModal.dateLabel")} <span className="text-red-500">*</span>
               </label>
-              <input
+              <DatePicker
+                id="payment-date"
                 required
-                type="date"
                 value={paymentForm.date}
-                onChange={(e) =>
-                  setPaymentForm((prev) => ({ ...prev, date: e.target.value }))
+                onChange={(value) =>
+                  setPaymentForm((prev) => ({ ...prev, date: value }))
                 }
                 className={inputClass}
               />
             </div>
 
             <div>
-              <label className={labelClass}>
+              <label htmlFor="payment-account" className={labelClass}>
                 {t("debts.paymentModal.accountLabel")} <span className="text-red-500">*</span>
               </label>
-              <select
+              <Select
+                id="payment-account"
                 required
                 value={paymentForm.accountId}
                 onChange={(e) =>
@@ -94,19 +99,20 @@ function PaymentModal({ paymentModalDebt, setPaymentModalDebt, handleSavePayment
                     {t("debts.paymentModal.accountOption", {
                       name: account.name,
                       balance: formatAmount(account.balance || 0),
-                      currency: account.currency,
+                      currency: currencyLabel(account.currency),
                     })}
                   </option>
                 ))}
-              </select>
+              </Select>
               <p className="mt-1 text-xs text-slate-500">
                 {t("debts.paymentModal.accountHint")}
               </p>
             </div>
 
             <div>
-              <label className={labelClass}>{t("debts.paymentModal.notesLabel")}</label>
+              <label htmlFor="payment-notes" className={labelClass}>{t("debts.paymentModal.notesLabel")}</label>
               <input
+                id="payment-notes"
                 type="text"
                 placeholder={t("debts.paymentModal.notesPlaceholder")}
                 value={paymentForm.notes}

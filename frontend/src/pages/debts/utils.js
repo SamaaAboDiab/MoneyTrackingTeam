@@ -1,5 +1,7 @@
+import { extractError } from "../../utils/errorHandler";
+
 export function getErrorMessage(error, fallback) {
-  return error?.response?.data?.message || error?.message || fallback;
+  return extractError(error, fallback);
 }
 
 export function isOverdue(debt) {

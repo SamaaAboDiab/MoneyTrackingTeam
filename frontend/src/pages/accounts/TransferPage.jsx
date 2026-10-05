@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   fetchAccounts,
@@ -9,6 +8,8 @@ import {
   resetTransferStatus,
 } from "../../store/slices/accountsSlice";
 import TransferForm from "./components/TransferForm";
+import PageHeader from "../../components/common/PageHeader";
+import { ArrowLeftRight } from "lucide-react";
 
 function TransferPage() {
   const { t } = useTranslation();
@@ -104,12 +105,8 @@ function TransferPage() {
   };
 
   return (
-    <div className="mx-auto max-w-lg">
-      <p>
-        <Link to="/dashboard" className="font-semibold text-brand-700 hover:underline">
-          {t("transfer.backToDashboard")}
-        </Link>
-      </p>
+    <div className="mx-auto max-w-xl">
+      <PageHeader backTo="/accounts" backLabel={t("accounts.transactions.back")} icon={ArrowLeftRight} title={t("transfer.title")} />
       <TransferForm form={form} accounts={activeAccounts} status={status} error={transferError || error} formError={formError} lastTransfer={lastTransfer} transferStatus={transferStatus} onChange={handleChange} onSubmit={handleSubmit} t={t} />
     </div>
   );

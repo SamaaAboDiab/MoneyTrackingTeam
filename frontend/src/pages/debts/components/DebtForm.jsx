@@ -1,6 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { inputClass, labelClass } from "../constants";
 import { CATEGORY_KEYS, CURRENCY_KEYS } from "../constants";
+import DatePicker from "../../../components/common/DatePicker";
+import Select from "../../../components/common/Select";
+import NumberInput from "../../../components/common/NumberInput";
+import { currencyName } from "../../../utils/formatAmount";
 
 function DebtForm({ showAddForm, setShowAddForm, debtForm, handleDebtFormChange, handleCreateDebt, savingDebt }) {
   const { t } = useTranslation();
@@ -21,10 +25,11 @@ function DebtForm({ showAddForm, setShowAddForm, debtForm, handleDebtFormChange,
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className={labelClass}>
+            <label htmlFor="debt-creditor" className={labelClass}>
               {t("debts.form.creditorLabel")} <span className="text-red-500">*</span>
             </label>
             <input
+              id="debt-creditor"
               required
               name="creditor"
               placeholder={t("debts.form.creditorPlaceholder")}
@@ -35,14 +40,14 @@ function DebtForm({ showAddForm, setShowAddForm, debtForm, handleDebtFormChange,
           </div>
 
           <div>
-            <label className={labelClass}>
+            <label htmlFor="debt-amount" className={labelClass}>
               {t("debts.form.totalAmountLabel")} <span className="text-red-500">*</span>
             </label>
-            <input
+            <NumberInput
+              id="debt-amount"
               required
               min="0.01"
               step="0.01"
-              type="number"
               name="totalAmount"
               placeholder="0.00"
               value={debtForm.totalAmount}
@@ -52,10 +57,11 @@ function DebtForm({ showAddForm, setShowAddForm, debtForm, handleDebtFormChange,
           </div>
 
           <div>
-            <label className={labelClass}>
+            <label htmlFor="debt-currency" className={labelClass}>
               {t("debts.form.currencyLabel")} <span className="text-red-500">*</span>
             </label>
-            <select
+            <Select
+              id="debt-currency"
               required
               name="currency"
               value={debtForm.currency}
@@ -63,16 +69,17 @@ function DebtForm({ showAddForm, setShowAddForm, debtForm, handleDebtFormChange,
               className={inputClass}
             >
               {CURRENCY_KEYS.map((code) => (
-                <option key={code} value={code}>{t(`debts.currencyOptions.${code}`)}</option>
+                <option key={code} value={code}>{currencyName(code)}</option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>
-            <label className={labelClass}>
+            <label htmlFor="debt-category" className={labelClass}>
               {t("debts.form.categoryLabel")}
             </label>
-            <select
+            <Select
+              id="debt-category"
               name="category"
               value={debtForm.category}
               onChange={handleDebtFormChange}
@@ -81,40 +88,41 @@ function DebtForm({ showAddForm, setShowAddForm, debtForm, handleDebtFormChange,
               {CATEGORY_KEYS.map((key) => (
                 <option key={key} value={key}>{categoryLabel(key)}</option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>
-            <label className={labelClass}>
+            <label htmlFor="debt-start" className={labelClass}>
               {t("debts.form.startDateLabel")} <span className="text-red-500">*</span>
             </label>
-            <input
+            <DatePicker
+              id="debt-start"
               required
-              type="date"
-              name="startDate"
               value={debtForm.startDate}
-              onChange={handleDebtFormChange}
+              max={debtForm.dueDate || undefined}
+              onChange={(value) => handleDebtFormChange({ target: { name: "startDate", value } })}
               className={inputClass}
             />
           </div>
 
           <div>
-            <label className={labelClass}>
+            <label htmlFor="debt-due" className={labelClass}>
               {t("debts.form.dueDateLabel")} <span className="text-red-500">*</span>
             </label>
-            <input
+            <DatePicker
+              id="debt-due"
               required
-              type="date"
-              name="dueDate"
               value={debtForm.dueDate}
-              onChange={handleDebtFormChange}
+              min={debtForm.startDate || undefined}
+              onChange={(value) => handleDebtFormChange({ target: { name: "dueDate", value } })}
               className={inputClass}
             />
           </div>
 
           <div className="sm:col-span-2">
-            <label className={labelClass}>{t("debts.form.notesLabel")}</label>
+            <label htmlFor="debt-notes" className={labelClass}>{t("debts.form.notesLabel")}</label>
             <textarea
+              id="debt-notes"
               name="description"
               rows={2}
               placeholder={t("debts.form.notesPlaceholder")}

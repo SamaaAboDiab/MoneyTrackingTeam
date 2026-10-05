@@ -1,4 +1,5 @@
 import AccountCard from "./AccountCard";
+import { CardGridSkeleton } from "../../../components/common/Skeleton";
 
 function AccountsList({ accounts, showArchived, status, error, adjustStatus, onToggleView, onAdjust, onToggleArchive, t }) {
   return (
@@ -20,7 +21,7 @@ function AccountsList({ accounts, showArchived, status, error, adjustStatus, onT
         </button>
       </div>
 
-      {status === "loading" && <p className="mt-4 text-slate-500">{t("accounts.loading")}</p>}
+      {status === "loading" && <CardGridSkeleton cards={3} className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" label={t("accounts.loading")} />}
       {error && (
         <p className="mt-4 rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense">{error}</p>
       )}

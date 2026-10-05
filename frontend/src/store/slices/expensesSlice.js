@@ -9,7 +9,7 @@ export const fetchExpenses = createAsyncThunk(
       const res = await expenseApi.getExpenses(filters);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تحميل المصروفات"));
+      return rejectWithValue(extractError(err, "errors.expenses.load"));
     }
   }
 );
@@ -21,7 +21,7 @@ export const createExpenseEntry = createAsyncThunk(
       const res = await expenseApi.createExpense(payload);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر إضافة المصروف"));
+      return rejectWithValue(extractError(err, "errors.expenses.create"));
     }
   }
 );
@@ -34,7 +34,7 @@ export const updateExpenseEntry = createAsyncThunk(
       const res = await expenseApi.updateExpense(id, payload);
       return res.data.data;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر تعديل المصروف"));
+      return rejectWithValue(extractError(err, "errors.expenses.update"));
     }
   }
 );
@@ -47,7 +47,7 @@ export const deleteExpenseEntry = createAsyncThunk(
       await expenseApi.deleteExpense(id);
       return id;
     } catch (err) {
-      return rejectWithValue(extractError(err, "تعذّر حذف المصروف"));
+      return rejectWithValue(extractError(err, "errors.expenses.delete"));
     }
   }
 );

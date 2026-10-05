@@ -1,11 +1,18 @@
+import { todayISODate } from "../../utils/formatAmount";
+
+export const getTodayString = todayISODate;
+
+export const INCOME_CURRENCIES = ["EGP", "USD", "EUR", "GBP"];
+
 export const EMPTY_FORM = {
   name: "",
   category: "salary",
   amount: "",
   currency: "EGP",
-  receivedDate: "",
+  receivedDate: getTodayString(),
   recurrence: "once",
   status: "cleared",
+  accountId: "",
   notes: "",
 };
 

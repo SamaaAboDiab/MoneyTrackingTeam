@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Outlet, useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -6,16 +7,21 @@ import LanguageSwitcher from "../common/LanguageSwitcher";
 import Sidebar from "./Sidebar";
 import Breadcrumb from "./appLayout/Breadcrumb";
 import DateBadge from "./appLayout/DateBadge";
-import NotificationsButton from "./appLayout/NotificationsButton";
-import UserAvatarLink from "./appLayout/UserAvatarLink";
-import QuickAddButton from "./QuickAddButton";
+import UserMenu from "./appLayout/UserMenu";
 import MobileNav from "./MobileNav";
-import MobileLogoutButton from "./appLayout/MobileLogoutButton";
+import QuickAddButton from "./QuickAddButton";
+import useRevealCards from "./appLayout/useRevealCards";
 
 function AppLayout() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useSelector((state) => state.auth);
   const { pathname } = useLocation();
+  const pageRef = useRef(null);
+  // A new page always opens at the top (SPA navigation would otherwise keep the old scroll position).
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [pathname]);
+  useRevealCards(pageRef, pathname);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -23,32 +29,33 @@ function AppLayout() {
         <Sidebar />
 
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-30 flex flex-wrap items-center gap-4 border-b border-slate-200 bg-white px-4 py-3 sm:px-6 sm:py-3.5">
+          <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
             <Breadcrumb pathname={pathname} t={t} />
 
-            <div className="ms-auto flex items-center gap-3">
-              <DateBadge language={i18n.language} />
+            <div className="ms-auto flex items-center gap-2 sm:gap-3">
+              <DateBadge />
               <LanguageSwitcher />
-              <NotificationsButton t={t} />
 
               <Link
                 to="/accounts/transfer"
-                className="hidden items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700 sm:flex"
+                className="hidden items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700 md:flex"
               >
                 <ArrowLeftRight size={16} />
                 {t("layout.quickActionLabel")}
               </Link>
 
-              <UserAvatarLink user={user} />
-              <MobileLogoutButton />
+              <UserMenu user={user} />
             </div>
           </header>
 
-          <main className="p-4 pb-24 sm:p-6">
-            <Outlet />
+          <main className="px-4 pb-28 pt-5 sm:px-6 sm:pt-6 lg:px-8 lg:pb-10">
+            {/* Re-keyed per route so each page plays the enter animation (cards then reveal in sequence). */}
+            <div key={pathname} ref={pageRef} className="page-enter">
+              <Outlet />
+            </div>
           </main>
-          <QuickAddButton />
           <MobileNav />
+          <QuickAddButton />
         </div>
       </div>
     </div>

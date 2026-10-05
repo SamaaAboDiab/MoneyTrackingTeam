@@ -59,6 +59,8 @@ function LoginPage() {
         id="email"
         name="email"
         type="email"
+        dir="ltr"
+        autoComplete="email"
         value={form.email}
         onChange={handleChange}
         required
