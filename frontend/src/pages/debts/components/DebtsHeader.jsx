@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { CreditCard, Plus } from "lucide-react";
+import { Plus, ReceiptText } from "lucide-react";
 import PageHeader from "../../../components/common/PageHeader";
 
 function DebtsHeader({ showAddForm, setShowAddForm, setError, setSuccessMessage }) {
@@ -7,7 +7,7 @@ function DebtsHeader({ showAddForm, setShowAddForm, setError, setSuccessMessage 
 
   return (
     <PageHeader
-      icon={CreditCard}
+      icon={ReceiptText}
       title={t("nav.debts")}
       subtitle={t("debts.subtitle")}
       actions={

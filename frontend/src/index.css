@@ -49,6 +49,45 @@ body {
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+@keyframes auth-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-panel-content {
+  animation: auth-panel-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (max-width: 639px) {
+  .auth-mobile-form .mb-6 {
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-mobile-form label.mt-3 {
+    margin-top: 0.375rem;
+  }
+
+  .auth-mobile-form p.mt-4,
+  .auth-mobile-form button.mt-4 {
+    margin-top: 0.5rem;
+  }
+
+  .auth-mobile-form .mt-3.flex.items-center.justify-between {
+    margin-top: 0.5rem;
+  }
+
+  .auth-mobile-form .mt-4.text-center {
+    margin-top: 0.625rem;
+  }
+}
+
 /* Page enter: a quick fade of the page; the cards inside then reveal one by one. */
 @keyframes page-enter {
   from {
@@ -89,6 +128,11 @@ body {
   ::view-transition-new(root) {
     animation: none;
   }
+
+  .auth-panel-content {
+    animation: none;
+  }
+
 }
 
 /* Loading indicators: the spinner only rotates; skeletons shimmer softly. */
@@ -131,12 +175,28 @@ html[dir="rtl"] .skeleton::after {
   }
 }
 
-/* No focus ring/outline on form fields anywhere in the app. */
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  box-shadow: none;
+@layer base {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="range"]):not([type="hidden"]):not([data-select-proxy]),
+  select {
+    min-height: 2.75rem;
+    box-sizing: border-box;
+  }
+
+  textarea {
+    min-height: 5.5rem;
+    box-sizing: border-box;
+  }
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+form button[type="submit"] {
+  min-height: 2.75rem;
 }
 
 /* Custom select arrow, shifted in from the edge instead of flush against it. */

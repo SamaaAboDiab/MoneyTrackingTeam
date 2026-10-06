@@ -9,7 +9,7 @@ const labelClass = "mb-1.5 mt-4 block text-sm font-semibold text-slate-700";
 function TransferForm({ form, accounts, status, error, formError, lastTransfer, transferStatus, onChange, onSubmit, t }) {
   return (
     <form
-      className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-8"
+      className="rounded-2xl bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6"
       onSubmit={onSubmit}
     >
       {status === "loading" && <p className="text-slate-500">{t("transfer.loadingAccounts")}</p>}
@@ -70,7 +70,7 @@ function TransferForm({ form, accounts, status, error, formError, lastTransfer, 
       <button
         type="submit"
         disabled={transferStatus === "loading"}
-        className="mt-6 w-full rounded-xl bg-brand-600 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 min-h-11 w-full rounded-xl bg-brand-600 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {transferStatus === "loading" ? t("transfer.submitting") : t("transfer.submit")}
       </button>

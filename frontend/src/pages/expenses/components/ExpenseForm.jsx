@@ -12,7 +12,7 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
 
   return (
     <>
-    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+    <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6">
       <h2 className="text-lg font-bold text-slate-900">{t("expenses.addFormTitle")}</h2>
 
       <form onSubmit={handleSubmit} className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -144,7 +144,7 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
           <button
             type="submit"
             disabled={createStatus === "loading"}
-            className="ms-auto rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65"
+            className="ms-auto min-h-11 w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65 sm:w-auto"
           >
             {createStatus === "loading" ? t("expenses.submitting") : t("expenses.submit")}
           </button>

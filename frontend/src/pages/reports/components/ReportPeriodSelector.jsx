@@ -16,7 +16,7 @@ function ReportPeriodSelector({ months, onChange }) {
           key={key}
           type="button"
           onClick={() => onChange(value)}
-          className={`px-3.5 py-2 text-xs font-bold transition-colors ${
+          className={`min-h-11 px-3.5 py-2 text-xs font-bold transition-colors ${
             months === value ? "bg-brand-600 text-white" : "text-slate-600 hover:bg-slate-50"
           }`}
         >

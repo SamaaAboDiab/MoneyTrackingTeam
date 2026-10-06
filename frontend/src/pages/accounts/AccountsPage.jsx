@@ -75,8 +75,8 @@ function AccountsPage() {
         }
       />
 
-      <AccountForm form={form} createStatus={createStatus} createError={createError} onChange={handleChange} onSubmit={handleSubmit} t={t} />
       <WealthSummary accounts={items} t={t} />
+      <AccountForm form={form} createStatus={createStatus} createError={createError} onChange={handleChange} onSubmit={handleSubmit} t={t} />
       <AccountsList
         accounts={displayedAccounts}
         showArchived={showArchived}

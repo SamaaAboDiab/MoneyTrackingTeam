@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { Banknote } from "lucide-react";
+import { WalletCards } from "lucide-react";
 import { fetchAccounts } from "../../store/slices/accountsSlice";
 import { getExpenses } from "../../api/expenseApi";
 import { listCategories } from "../../api/categoryApi";
@@ -77,7 +77,7 @@ function CashExpensesPage() {
       <PageHeader
         backTo="/cash"
         backLabel={t("cash.expenses.back")}
-        icon={Banknote}
+        icon={WalletCards}
         title={t("cash.expenses.title")}
         subtitle={t("cash.expenses.subtitle")}
       />

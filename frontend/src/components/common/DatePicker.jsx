@@ -108,10 +108,10 @@ function DatePicker({ value, onChange, min, max, placeholder, className, id, req
         type="button"
         id={id}
         onClick={toggleOpen}
-        className={
+        className={`min-h-11 ${
           className ||
           "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500"
-        }
+        }`}
       >
         <span className="flex w-full items-center justify-between gap-2">
           <span className={displayValue ? "text-slate-700" : "text-slate-400"}>

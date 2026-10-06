@@ -15,8 +15,7 @@ const DEFAULT_SWATCHES = [
   "#7c3aed",
 ];
 
-// Preset swatches + a custom-color button (opens the native picker) + the current hex code,
-// laid out inside a field that matches the app's other inputs.
+// Preset swatches and a custom-color button (opens the native picker).
 function ColorPicker({ id, name, value, onChange, swatches = DEFAULT_SWATCHES, labelledBy }) {
   const { t } = useTranslation();
   const generatedId = useId();
@@ -27,9 +26,13 @@ function ColorPicker({ id, name, value, onChange, swatches = DEFAULT_SWATCHES, l
   const emit = (color) => onChange?.({ target: { name, value: color } });
 
   return (
-    <div className="flex min-h-[46px] flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2">
-      <div role="radiogroup" aria-labelledby={labelledBy} className="flex flex-wrap items-center gap-2">
-        {swatches.map((color) => {
+    <div className="flex min-h-[46px] flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-2 py-2 sm:gap-3 sm:px-3">
+      <div
+        role="radiogroup"
+        aria-labelledby={labelledBy}
+        className="grid w-full grid-cols-7 items-center gap-y-2 sm:grid-cols-11"
+      >
+        {swatches.map((color, index) => {
           const selected = current === color;
           return (
             <button
@@ -40,19 +43,21 @@ function ColorPicker({ id, name, value, onChange, swatches = DEFAULT_SWATCHES, l
               aria-label={color}
               title={color.toUpperCase()}
               onClick={() => emit(color)}
-              className={`flex h-7 w-7 items-center justify-center rounded-full transition hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 ${
+              className={`flex h-6 w-6 items-center justify-center justify-self-center rounded-full transition hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 sm:h-7 sm:w-7 ${
+                index >= 6 && !selected ? "hidden sm:flex" : ""
+              } ${
                 selected ? "ring-2 ring-slate-900/15 ring-offset-2" : ""
               }`}
               style={{ backgroundColor: color, outlineColor: color }}
             >
-              {selected && <Check size={14} strokeWidth={3} className="text-white" />}
+              {selected && <Check size={14} strokeWidth={3} className="text-white drop-shadow-sm" />}
             </button>
           );
         })}
 
         {/* Custom color: the native input sits on top of the button so a click opens the picker. */}
         <span
-          className={`relative flex h-7 w-7 items-center justify-center rounded-full transition hover:scale-110 ${
+          className={`relative flex h-6 w-6 items-center justify-center justify-self-center rounded-full transition hover:scale-110 sm:h-7 sm:w-7 ${
             isCustom ? "ring-2 ring-slate-900/15 ring-offset-2" : ""
           }`}
           style={{
@@ -63,10 +68,10 @@ function ColorPicker({ id, name, value, onChange, swatches = DEFAULT_SWATCHES, l
           title={t("common.colorPicker.custom")}
         >
           {isCustom ? (
-            <Check size={14} strokeWidth={3} className="text-white" />
+            <Check size={14} strokeWidth={3} className="text-white drop-shadow-sm" />
           ) : (
-            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-white/90 text-slate-600">
-              <Pipette size={10} strokeWidth={2.5} />
+            <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-sm">
+              <Pipette size={11} strokeWidth={2.5} />
             </span>
           )}
           <input
@@ -80,12 +85,6 @@ function ColorPicker({ id, name, value, onChange, swatches = DEFAULT_SWATCHES, l
         </span>
       </div>
 
-      <span className="ms-auto flex items-center gap-2 rounded-lg bg-slate-50 px-2.5 py-1 ring-1 ring-slate-100">
-        <span className="h-3 w-3 rounded-full ring-1 ring-black/10" style={{ backgroundColor: current || swatches[0] }} />
-        <span dir="ltr" className="font-mono text-xs font-semibold uppercase tracking-wide text-slate-600">
-          {current || swatches[0]}
-        </span>
-      </span>
     </div>
   );
 }

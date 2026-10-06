@@ -1,10 +1,12 @@
 import { NavLink } from "react-router-dom";
 import { NAV_ITEMS, isNavItemActive } from "./navItems";
 
+const DESKTOP_NAV_ITEMS = NAV_ITEMS.filter(({ to }) => to !== "/categories");
+
 function SidebarNav({ collapsed, pathname, t }) {
   return (
     <nav className="flex flex-1 flex-col gap-1 p-3">
-      {NAV_ITEMS.map(({ to, key, icon: Icon }) => {
+      {DESKTOP_NAV_ITEMS.map(({ to, key, icon: Icon }) => {
         const isActive = isNavItemActive(to, pathname);
         return (
           <NavLink

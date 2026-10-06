@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { CreditCard } from "lucide-react";
+import { ReceiptText } from "lucide-react";
 import DebtCard from "./DebtCard";
 import { CardGridSkeleton } from "../../../components/common/Skeleton";
 
@@ -9,10 +9,14 @@ function DebtsList({ debtsLoadingStatus, debts, displayedDebts, activeTab, ...ca
   return (
     <>
     {debtsLoadingStatus === "loading" && debts.length === 0 ? (
-      <CardGridSkeleton cards={2} className="grid gap-5" label={t("debts.loading")} />
+      <CardGridSkeleton
+        cards={2}
+        className="grid items-stretch gap-4 xl:grid-cols-2"
+        label={t("debts.loading")}
+      />
     ) : displayedDebts.length === 0 ? (
       <div className="rounded-2xl bg-white p-12 text-center text-slate-500 shadow-sm ring-1 ring-slate-100">
-        <CreditCard className="mx-auto mb-3 text-slate-300" size={42} />
+        <ReceiptText className="mx-auto mb-3 text-slate-300" size={42} />
         <p className="text-base font-semibold text-slate-700">
           {activeTab === "active"
             ? t("debts.empty.activeTitle")
@@ -27,9 +31,11 @@ function DebtsList({ debtsLoadingStatus, debts, displayedDebts, activeTab, ...ca
         </p>
       </div>
     ) : (
-        <div className="grid gap-5">
+        <div className="grid items-stretch gap-4 xl:grid-cols-2">
           {displayedDebts.map((debt) => (
-            <DebtCard key={debt._id} debt={debt} {...cardProps} />
+            <div key={debt._id} className="min-w-0">
+              <DebtCard debt={debt} {...cardProps} />
+            </div>
           ))}
         </div>
       )}

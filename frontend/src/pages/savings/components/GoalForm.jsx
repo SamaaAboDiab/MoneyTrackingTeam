@@ -14,7 +14,7 @@ function GoalForm({ show, onClose, form, onChange, onSubmit, saving, isEdit }) {
       {show && (
         <form
           onSubmit={onSubmit}
-          className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80"
+          className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200/80 sm:p-6"
         >
           <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
             <h2 className="text-lg font-bold text-slate-900">
@@ -35,7 +35,7 @@ function GoalForm({ show, onClose, form, onChange, onSubmit, saving, isEdit }) {
                       type="button"
                       onClick={() => onChange({ target: { name: "emoji", value: key } })}
                       aria-pressed={form.emoji === key}
-                      className={`flex h-10 w-10 items-center justify-center rounded-xl border transition ${
+                      className={`flex h-11 w-11 items-center justify-center rounded-xl border transition ${
                         form.emoji === key
                           ? "border-brand-500 bg-brand-50 text-brand-600"
                           : "border-slate-200 text-slate-500 hover:bg-slate-50"
@@ -122,18 +122,18 @@ function GoalForm({ show, onClose, form, onChange, onSubmit, saving, isEdit }) {
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end gap-3">
+          <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end sm:gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+              className="min-h-11 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 sm:w-auto"
             >
               {t("savings.cancel")}
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60"
+              className="min-h-11 w-full rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60 sm:w-auto"
             >
               {saving ? t("savings.form.saving") : t("savings.form.save")}
             </button>

@@ -44,16 +44,16 @@ function AvatarSection({ user, t }) {
   };
 
   return (
-    <section className="mt-6 flex flex-col items-center gap-4 rounded-2xl bg-white p-6 text-center shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:flex-row sm:text-start">
+    <section className="mt-6 flex flex-col items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm shadow-slate-200/60 sm:flex-row sm:p-6 sm:text-start">
       <div className="relative shrink-0">
         {user?.avatar ? (
           <img
             src={user.avatar}
             alt={user.name}
-            className="h-20 w-20 rounded-full object-cover ring-1 ring-slate-100"
+            className="h-20 w-20 rounded-full object-cover ring-4 ring-slate-100"
           />
         ) : (
-          <span className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-600 text-2xl font-bold text-white">
+          <span className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-800 text-2xl font-bold text-white ring-4 ring-slate-100">
             {initial}
           </span>
         )}
@@ -75,7 +75,7 @@ function AvatarSection({ user, t }) {
             type="button"
             onClick={handlePickPhoto}
             disabled={avatarBusy}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:border-brand-300 hover:text-brand-700 disabled:opacity-60"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/15 disabled:opacity-60"
           >
             <Camera size={15} />
             {t("profile.changePhoto")}
@@ -85,7 +85,7 @@ function AvatarSection({ user, t }) {
               type="button"
               onClick={handleRemovePhoto}
               disabled={avatarBusy}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:border-expense hover:text-expense disabled:opacity-60"
+              className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-600 transition hover:border-expense hover:bg-expense-soft/40 hover:text-expense focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-expense/15 disabled:opacity-60"
             >
               <Trash2 size={15} />
               {t("profile.removePhoto")}

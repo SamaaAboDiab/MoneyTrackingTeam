@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { Plus, Trash2, PiggyBank } from "lucide-react";
+import { Plus, Trash2, Goal } from "lucide-react";
 import { fetchAccounts } from "../../store/slices/accountsSlice";
 import {
   fetchGoals,
@@ -241,7 +241,7 @@ function SavingsPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-5">
       <PageHeader
-        icon={PiggyBank}
+        icon={Goal}
         title={t("savings.title")}
         subtitle={t("savings.subtitle")}
         actions={

@@ -4,7 +4,7 @@ function SidebarHeader({ collapsed, onToggleCollapsed, t }) {
   if (collapsed) {
     return (
       <div className="flex items-center justify-center gap-1.5 px-3 py-3.5">
-        <img src="/logo-icon.png" alt="" className="h-9 w-9 shrink-0 rounded-xl" />
+        <img src="/favicon.svg" alt="" className="h-9 w-9 shrink-0 rounded-xl" />
         <button
           type="button"
           onClick={onToggleCollapsed}
@@ -20,7 +20,7 @@ function SidebarHeader({ collapsed, onToggleCollapsed, t }) {
   return (
     <div className="flex items-center justify-between gap-1.5 px-3 py-3.5">
       <div className="flex min-w-0 items-center gap-2">
-        <img src="/logo-icon.png" alt="" className="h-9 w-9 shrink-0 rounded-xl" />
+        <img src="/favicon.svg" alt="" className="h-9 w-9 shrink-0 rounded-xl" />
         <span className="flex min-w-0 flex-col leading-tight">
           <span className="truncate text-base font-extrabold text-slate-900">
             {t("layout.brand")}
