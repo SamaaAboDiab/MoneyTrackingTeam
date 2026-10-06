@@ -34,7 +34,7 @@ const labelClass = "text-sm font-semibold text-slate-700";
 export { EMPTY_FORM, EMPTY_FILTERS, TYPE_PILL_STYLES, inputClass, labelClass };
 
 export const FALLBACK_CATEGORY_COLORS = {
-    "أكل": "#f97316",
+    "أكل": "#ff9b51",
     "مواصلات": "#3b82f6",
     "إيجار": "#f59e0b",
     "فواتير": "#8b5cf6",

@@ -8,12 +8,26 @@
   /* Primary brand color is slate gray. */
   --color-brand-50: #f8fafc;
   --color-brand-100: #f1f5f9;
+  --color-brand-200: #e2e8f0;
   --color-brand-300: #cbd5e1;
+  --color-brand-400: #94a3b8;
   --color-brand-500: #64748b;
   --color-brand-600: #334155;
   --color-brand-700: #1e293b;
   --color-brand-800: #0f172a;
   --color-brand-900: #0f172a;
+
+  /* Deep blue #03346E: the logo color, also used for the icon on orange fills. */
+  --color-navy: #03346e;
+
+  /* Accent: orange #FF9B51 (= accent-500). Text/icons on orange fills use navy (white fails contrast);
+     orange text on white uses accent-700. */
+  --color-accent-50: #fff4ec;
+  --color-accent-100: #ffe6d3;
+  --color-accent-300: #ffc497;
+  --color-accent-500: #ff9b51;
+  --color-accent-600: #f0802e;
+  --color-accent-700: #a8561a;
 
   --color-income: #15803d;
   --color-income-soft: #dcfce7;
@@ -31,7 +45,7 @@ html[lang="ar"] {
 body {
   margin: 0;
   color: var(--color-ink-900);
-  background: #f8fafc;
+  background: var(--color-slate-50);
   font-family: var(--font-sans);
 }
 
@@ -151,7 +165,7 @@ body {
 .skeleton {
   position: relative;
   overflow: hidden;
-  background-color: #e2e8f0;
+  background-color: var(--color-slate-200);
   border-radius: 0.5rem;
 }
 

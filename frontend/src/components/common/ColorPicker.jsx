@@ -4,6 +4,7 @@ import { Check, Pipette } from "lucide-react";
 
 const DEFAULT_SWATCHES = [
   "#334155",
+  "#ff9b51",
   "#4f46e5",
   "#2563eb",
   "#0891b2",

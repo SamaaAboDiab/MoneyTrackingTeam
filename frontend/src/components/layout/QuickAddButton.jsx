@@ -91,7 +91,7 @@ function QuickAddButton() {
         onClick={() => setOpen(true)}
         title={t("quickAdd.button")}
         aria-label={t("quickAdd.button")}
-        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] inset-e-4 z-30 lg:bottom-6 lg:inset-e-6 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white ring-4 ring-white shadow-lg shadow-brand-600/30 transition hover:bg-brand-700"
+        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] inset-e-4 z-30 lg:bottom-6 lg:inset-e-6 flex h-14 w-14 items-center justify-center rounded-full bg-accent-500 text-navy ring-4 ring-white shadow-lg shadow-accent-500/30 transition hover:bg-accent-600"
       >
         <Plus size={26} />
       </button>
