@@ -139,7 +139,7 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, avail
           </Select>
         </div>
 
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
+        <div className="flex flex-col gap-1.5">
           <label htmlFor="income-notes" className={labelClass}>
             {t("income.notesLabel")}
           </label>
@@ -150,7 +150,7 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, avail
             onChange={onChange}
             placeholder={t("income.notesPlaceholder")}
             maxLength={500}
-            rows="3"
+            rows="2"
             className={`${inputClass} resize-none`}
           />
         </div>

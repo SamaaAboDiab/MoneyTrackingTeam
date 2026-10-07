@@ -8,17 +8,17 @@ function IncomeList({
   error,
   displayCurrency,
   totalAmount,
+  totalsByCurrency,
   onEdit,
   onDeleted,
   onToggled,
   t,
 }) {
-  const calculatedTotal = items.reduce(
-    (sum, income) => sum + Number(income.convertedAmount ?? income.amount ?? 0),
-    0
-  );
-  const total = totalAmount ?? calculatedTotal;
-
+  const calculatedTotal = items.reduce((sum, income) => {
+    const currency = income.currency || "EGP";
+    sum[currency] = (sum[currency] || 0) + Number(income.monthlyAmount ?? income.amount ?? 0);
+    return sum;
+  }, {});
   return (
     <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
       <div className="flex items-center justify-between gap-2">
@@ -43,8 +43,9 @@ function IncomeList({
           <IncomeItem
             key={income._id}
             income={income}
-            displayAmount={income.convertedAmount ?? income.amount}
-            displayCurrency={income.convertedAmount !== undefined ? displayCurrency : income.currency}
+            displayAmount={income.monthlyAmount ?? income.convertedAmount ?? income.amount}
+            displayCurrency={displayCurrency === "ALL" ? income.currency || "EGP" : displayCurrency}
+            amountLabel={displayCurrency === "ALL" ? "income.fields.amount" : "income.fields.amountConverted"}
             onEdit={onEdit}
             onDeleted={onDeleted}
             onToggled={onToggled}
@@ -52,11 +53,26 @@ function IncomeList({
         ))}
       </div>
 
-      <div className="mt-5 flex items-center justify-between border-t border-slate-200 pt-4">
-        <span className="font-bold text-slate-700">{t("income.totalConvertedLabel")}</span>
-        <strong className="tabular-amount text-xl font-extrabold text-income">
-          {formatMoney(total, displayCurrency, { minimumFractionDigits: 2 })}
-        </strong>
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4">
+        <span className="font-bold text-slate-700">
+          {t(displayCurrency === "ALL" ? "income.totalByCurrencyLabel" : "income.totalConvertedLabel")}
+        </span>
+        <div className="flex flex-wrap justify-end gap-x-4 gap-y-2">
+          {displayCurrency === "ALL"
+            ? Object.entries(totalsByCurrency || calculatedTotal).map(([currency, total]) => (
+              <strong key={currency} className="tabular-amount text-lg font-extrabold text-income">
+                {formatMoney(total, currency, { minimumFractionDigits: 2 })}
+              </strong>
+            ))
+            : (
+              <strong className="tabular-amount text-xl font-extrabold text-income">
+                {formatMoney(totalAmount ?? Object.values(calculatedTotal).reduce((sum, total) => sum + total, 0), displayCurrency, { minimumFractionDigits: 2 })}
+              </strong>
+            )}
+          {displayCurrency === "ALL" && Object.keys(totalsByCurrency || calculatedTotal).length === 0 && (
+            <strong className="tabular-amount text-lg font-extrabold text-income">{formatMoney(0, "EGP")}</strong>
+          )}
+        </div>
       </div>
     </section>
   );

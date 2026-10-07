@@ -171,12 +171,24 @@ exports.summary = async (req, res, next) => {
       const year = Number.parseInt(req.query.year, 10) || now.getFullYear();
       const month = Number.parseInt(req.query.month, 10);
       const selectedMonth = Number.isInteger(month) && month >= 0 && month <= 11 ? month : now.getMonth();
-      const requestedCurrency = String(req.query.currency || "EGP").toUpperCase();
-      const currency = SUPPORTED_CURRENCIES.includes(requestedCurrency) ? requestedCurrency : "EGP";
+      const requestedCurrency = String(req.query.currency || "ALL").toUpperCase();
+      const currency =
+        requestedCurrency === "ALL"
+          ? "ALL"
+          : SUPPORTED_CURRENCIES.includes(requestedCurrency)
+            ? requestedCurrency
+            : "EGP";
       // Only incomes in the selected currency (no conversion: the fixed rates were not real
       // exchange rates). Incomes saved before currency existed count as EGP.
-      const currencyFilter = currency === "EGP" ? { $in: ["EGP", null] } : currency;
-      const allIncomes = await Income.find({ user: req.userId, currency: currencyFilter }).sort({ receivedDate: -1 });
+      const currencyFilter =
+        currency === "ALL"
+          ? undefined
+          : currency === "EGP"
+            ? { $in: ["EGP", null] }
+            : currency;
+      const query = { user: req.userId };
+      if (currencyFilter !== undefined) query.currency = currencyFilter;
+      const allIncomes = await Income.find(query).sort({ receivedDate: -1 });
 
       const items = allIncomes
         .map((inc) => {
@@ -189,10 +201,17 @@ exports.summary = async (req, res, next) => {
         })
         .filter((inc) => inc.monthlyAmount > 0);
 
-      const total = items.reduce((sum, inc) => sum + inc.convertedAmount, 0);
+      const totalsByCurrency = items.reduce((totals, inc) => {
+        const itemCurrency = inc.currency || "EGP";
+        totals[itemCurrency] = (totals[itemCurrency] || 0) + inc.convertedAmount;
+        return totals;
+      }, {});
+      const total = currency === "ALL"
+        ? null
+        : totalsByCurrency[currency] || 0;
       return res.json({
         success: true,
-        data: { year, month: selectedMonth, currency, total, items },
+        data: { year, month: selectedMonth, currency, total, totalsByCurrency, items },
       });
     }
 

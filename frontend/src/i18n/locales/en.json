@@ -285,6 +285,7 @@
     "title": "Income sources",
     "description": "Record every income source and keep it organized in one list.",
     "totalLabel": "Total income",
+    "totalByCurrencyLabel": "Total by currency",
     "summaryUpdating": "Updating income summary...",
     "formTitle": "Add income source",
     "editTitle": "Edit income source",
@@ -324,11 +325,13 @@
     "filter": {
       "title": "Filter income summary",
       "monthYearLabel": "Month and year",
-      "baseCurrencyLabel": "Currency"
+      "baseCurrencyLabel": "Currency",
+      "allCurrencies": "All currencies"
     },
     "fields": {
       "name": "Source name",
       "category": "Income type",
+      "amount": "Amount",
       "amountConverted": "Amount in selected currency",
       "originalPrefix": "Original:",
       "date": "Date"

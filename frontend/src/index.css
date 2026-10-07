@@ -79,6 +79,23 @@ body {
   animation: auth-panel-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+@keyframes auth-clock-turn {
+  from {
+    transform: rotate(-45deg);
+  }
+
+  to {
+    transform: rotate(0);
+  }
+}
+
+@media (min-width: 768px) {
+  .auth-clock-turn {
+    animation: auth-clock-turn 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    transform-origin: center;
+  }
+}
+
 @media (max-width: 639px) {
   .auth-mobile-form .mb-6 {
     margin-bottom: 0.5rem;

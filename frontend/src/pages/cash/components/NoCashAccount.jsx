@@ -12,9 +12,9 @@ function NoCashAccount({ handleCreateCashAccount, createStatus }) {
           type="button"
           onClick={handleCreateCashAccount}
           disabled={createStatus === "loading"}
-          className="mt-3 flex items-center gap-2 rounded-xl bg-amber-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          className="mt-3 flex w-fit items-center gap-1.5 rounded-xl bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
         >
-          <Plus size={16} /> {t("cash.createAccount")}
+          <Plus size={14} /> {t("cash.createAccount")}
         </button>
       </div>
     </>

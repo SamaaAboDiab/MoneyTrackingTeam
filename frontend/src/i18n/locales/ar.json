@@ -313,6 +313,7 @@
     "title": "مصادر الدخل",
     "description": "سجّل كل مصادر دخلك وتابعها في قائمة واحدة.",
     "totalLabel": "إجمالي الدخل",
+    "totalByCurrencyLabel": "الإجمالي حسب العملة",
     "summaryUpdating": "جارٍ تحديث ملخص الدخل...",
     "formTitle": "إضافة مصدر دخل",
     "editTitle": "تعديل مصدر الدخل",
@@ -352,11 +353,13 @@
     "filter": {
       "title": "فلترة ملخص الدخل",
       "monthYearLabel": "الشهر والسنة",
-      "baseCurrencyLabel": "العملة"
+      "baseCurrencyLabel": "العملة",
+      "allCurrencies": "كل العملات"
     },
     "fields": {
       "name": "اسم المصدر",
       "category": "نوع الدخل",
+      "amount": "المبلغ",
       "amountConverted": "المبلغ بالعملة المختارة",
       "originalPrefix": "الأصل:",
       "date": "التاريخ"

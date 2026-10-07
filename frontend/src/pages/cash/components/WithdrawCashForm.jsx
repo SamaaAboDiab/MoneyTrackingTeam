@@ -60,7 +60,7 @@ function WithdrawCashForm({ handleSubmit, fromId, setFromId, toId, setToId, amou
         <button
           type="submit"
           disabled={transferStatus === "loading" || status === "loading"}
-          className="min-h-11 w-full rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white disabled:opacity-60"
+          className="mx-auto block min-h-11 w-full max-w-xs rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white disabled:opacity-60"
         >
           {transferStatus === "loading" ? t("cash.submitting") : t("cash.confirmWithdraw")}
         </button>

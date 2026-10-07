@@ -37,6 +37,7 @@ function IncomeSummaryFilter({ selectedMonth, setSelectedMonth, summaryCurrency,
             }
             className={inputClass}
           >
+            <option value="ALL">{t("income.filter.allCurrencies")}</option>
             {INCOME_CURRENCIES.map((code) => (
               <option key={code} value={code}>
                 {currencyName(code)}
