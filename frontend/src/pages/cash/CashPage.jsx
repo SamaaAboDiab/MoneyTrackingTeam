@@ -96,7 +96,7 @@ function CashPage() {
 
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5">
+    <div className="mx-auto max-w-6xl space-y-5">
       <CashHeader />
 
       <CashBalanceCard cashTotals={cashTotals} hasCashAccount={cashAccounts.length > 0} />

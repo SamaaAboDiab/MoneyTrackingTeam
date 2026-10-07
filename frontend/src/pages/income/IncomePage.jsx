@@ -12,6 +12,7 @@ import {
 } from "../../store/slices/incomeSlice";
 import { EMPTY_FORM, getCurrentMonth, getTodayString } from "./constants";
 import { getAccounts } from "../../api/accountsApi";
+import { convertAmount } from "../../utils/currencyConverter";
 import IncomeHeader from "./components/IncomeHeader";
 import IncomeTotalCard from "./components/IncomeTotalCard";
 import IncomeAlerts from "./components/IncomeAlerts";
@@ -43,7 +44,7 @@ function IncomePage() {
   const [successMessage, setSuccessMessage] = useState("");
 
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
-  const [summaryCurrency, setSummaryCurrency] = useState("EGP");
+  const [summaryCurrency, setSummaryCurrency] = useState("ALL");
 
   const [createForm, setCreateForm] = useState({
     name: "",
@@ -79,7 +80,8 @@ function IncomePage() {
     loadAccounts();
   }, []);
 
-  // Fetch monthly income summary
+  // Fetch monthly income summary — always request ALL currencies so we can
+  // convert on the client side when the user picks a specific display currency.
   useEffect(() => {
     const [year, month] = selectedMonth.split("-").map(Number);
 
@@ -87,10 +89,10 @@ function IncomePage() {
       fetchIncomeSummary({
         year,
         month: month - 1,
-        currency: summaryCurrency,
+        currency: "ALL",
       })
     );
-  }, [dispatch, selectedMonth, summaryCurrency]);
+  }, [dispatch, selectedMonth]);
 
   // Clear update error after 3 seconds
   useEffect(() => {
@@ -114,18 +116,44 @@ function IncomePage() {
     return () => clearTimeout(timer);
   }, [createStatus, dispatch]);
 
-  // Calculate total income from all income items
-  const totalIncome = useMemo(
-    () =>
-      items.reduce(
-        (sum, item) => sum + Number(item.amount || 0),
-        0
-      ),
-    [items]
-  );
+  const rawItems = summary?.items || items;
+  const rawTotalsByCurrency = summary?.totalsByCurrency || {};
 
-  const summaryItems = summary?.items || items;
-  const displayedTotal = summary?.total ?? totalIncome;
+  // Derive display data based on the selected currency filter.
+  // When "ALL" → show each currency separately (no conversion).
+  // When a specific currency → convert every item to that currency.
+  const { summaryItems, displayedTotal, totalsByCurrency } = useMemo(() => {
+    if (summaryCurrency === "ALL") {
+      return {
+        summaryItems: rawItems,
+        displayedTotal: null,
+        totalsByCurrency: rawTotalsByCurrency,
+      };
+    }
+
+    const converted = rawItems.map((inc) => {
+      const originalCurrency = inc.currency || "EGP";
+      const monthlyAmt = inc.monthlyAmount ?? inc.amount ?? 0;
+      const convertedAmt = convertAmount(monthlyAmt, originalCurrency, summaryCurrency);
+
+      return {
+        ...inc,
+        monthlyAmount: convertedAmt,
+        convertedAmount: convertedAmt,
+      };
+    });
+
+    const total = converted.reduce(
+      (sum, inc) => sum + (inc.convertedAmount ?? 0),
+      0
+    );
+
+    return {
+      summaryItems: converted,
+      displayedTotal: Math.round(total * 100) / 100,
+      totalsByCurrency: { [summaryCurrency]: Math.round(total * 100) / 100 },
+    };
+  }, [rawItems, rawTotalsByCurrency, summaryCurrency]);
 
   // Refresh summary after create/update/delete
   const refreshSummary = () => {
@@ -135,7 +163,7 @@ function IncomePage() {
       fetchIncomeSummary({
         year,
         month: month - 1,
-        currency: summaryCurrency,
+        currency: "ALL",
       })
     );
   };
@@ -270,6 +298,7 @@ function IncomePage() {
 
       <IncomeTotalCard
         displayedTotal={displayedTotal}
+        totalsByCurrency={totalsByCurrency}
         summaryCurrency={summaryCurrency}
         summaryStatus={summaryStatus}
         summaryError={summaryError}
@@ -301,6 +330,7 @@ function IncomePage() {
         error={error}
         displayCurrency={summaryCurrency}
         totalAmount={displayedTotal}
+        totalsByCurrency={totalsByCurrency}
         onEdit={openEditModal}
         onDeleted={handleDeleteIncome}
         onToggled={refreshSummary}

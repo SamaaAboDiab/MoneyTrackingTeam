@@ -13,11 +13,11 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
     <>
     {isEditing && (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-3 sm:p-4"
         onClick={closeEditModal}
       >
         <div
-          className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl"
+          className="max-h-[calc(100dvh-1.5rem)] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:rounded-3xl sm:p-6"
           onClick={(event) => event.stopPropagation()}
         >
           <h2 className="text-lg font-bold text-slate-900">
@@ -224,11 +224,11 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-3 sm:col-span-2">
+            <div className="flex flex-col-reverse gap-2 sm:col-span-2 sm:flex-row sm:gap-3">
               <button
                 type="submit"
                 disabled={updateStatus === "loading"}
-                className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65"
+                className="min-h-11 w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65 sm:w-auto"
               >
                 {updateStatus === "loading"
                   ? t("income.submitting")
@@ -238,7 +238,7 @@ function EditIncomeModal({ isEditing, closeEditModal, handleSubmit, form, handle
               <button
                 type="button"
                 onClick={closeEditModal}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-brand-300 hover:text-brand-700"
+                className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-brand-300 hover:text-brand-700 sm:w-auto"
               >
                 {t("income.cancel")}
               </button>

@@ -16,7 +16,7 @@ function DebtForm({ showAddForm, setShowAddForm, debtForm, handleDebtFormChange,
     {showAddForm && (
       <form
         onSubmit={handleCreateDebt}
-        className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80"
+        className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200/80 sm:p-6"
       >
         <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
           <h2 className="text-lg font-bold text-slate-900">{t("debts.form.title")}</h2>
@@ -133,18 +133,18 @@ function DebtForm({ showAddForm, setShowAddForm, debtForm, handleDebtFormChange,
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end gap-3">
+        <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end sm:gap-3">
           <button
             type="button"
             onClick={() => setShowAddForm(false)}
-            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+            className="min-h-11 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 sm:w-auto"
           >
             {t("debts.cancel")}
           </button>
           <button
             type="submit"
             disabled={savingDebt}
-            className="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60"
+            className="min-h-11 w-full rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60 sm:w-auto"
           >
             {savingDebt ? t("debts.form.saving") : t("debts.form.save")}
           </button>

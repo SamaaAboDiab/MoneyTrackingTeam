@@ -18,7 +18,7 @@ function EditExpenseModal({ editingExpense, setEditingExpense, editForm, setEdit
         onClick={() => !editSaving && setEditingExpense(null)}
       >
         <div
-          className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
+          className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl sm:p-6"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -161,19 +161,19 @@ function EditExpenseModal({ editingExpense, setEditingExpense, editForm, setEdit
               </p>
             )}
 
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 disabled={editSaving}
                 onClick={() => setEditingExpense(null)}
-                className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100"
+                className="min-h-11 w-full rounded-xl px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 sm:w-auto"
               >
                 {t("expenses.editModal.cancel")}
               </button>
               <button
                 type="submit"
                 disabled={editSaving}
-                className="rounded-xl bg-brand-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60"
+                className="min-h-11 w-full rounded-xl bg-brand-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60 sm:w-auto"
               >
                 {editSaving ? t("expenses.editModal.saving") : t("expenses.editModal.save")}
               </button>

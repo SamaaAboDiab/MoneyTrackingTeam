@@ -285,6 +285,7 @@
     "title": "Income sources",
     "description": "Record every income source and keep it organized in one list.",
     "totalLabel": "Total income",
+    "totalByCurrencyLabel": "Total by currency",
     "summaryUpdating": "Updating income summary...",
     "formTitle": "Add income source",
     "editTitle": "Edit income source",
@@ -324,11 +325,13 @@
     "filter": {
       "title": "Filter income summary",
       "monthYearLabel": "Month and year",
-      "baseCurrencyLabel": "Currency"
+      "baseCurrencyLabel": "Currency",
+      "allCurrencies": "All currencies"
     },
     "fields": {
       "name": "Source name",
       "category": "Income type",
+      "amount": "Amount",
       "amountConverted": "Amount in selected currency",
       "originalPrefix": "Original:",
       "date": "Date"
@@ -440,7 +443,7 @@
       "title": "Insufficient balance",
       "message": "\"{{account}}\" only has {{balance}}, but this expense is {{amount}}. The account will go negative. Continue anyway?",
       "cancel": "Cancel",
-      "confirm": "Continue anyway"
+      "confirm": "Continue Anyway"
     },
     "validation": {
       "typeAndCategoryRequired": "Please select the expense type and category."
@@ -493,7 +496,7 @@
   },
   "debts": {
     "subtitle": "Track your debts, due dates, and payments made to each creditor.",
-    "addNew": "Add new debt",
+    "addNew": "Add New Debt",
     "cancel": "Cancel",
     "createValidationError": "Please fill in all required fields (creditor, amount, currency, start date, due date).",
     "createSuccess": "Debt added successfully",
@@ -520,99 +523,99 @@
       "confirm": "Continue anyway"
     },
     "form": {
-      "title": "Register a new debt",
+      "title": "Register a New Debt",
       "requiredNote": "All fields marked (*) are required",
-      "creditorLabel": "Creditor name",
+      "creditorLabel": "Creditor Name",
       "creditorPlaceholder": "e.g. National Bank, Mohamed Ahmed",
-      "totalAmountLabel": "Total amount",
+      "totalAmountLabel": "Total Amount",
       "currencyLabel": "Currency",
       "categoryLabel": "Category",
-      "startDateLabel": "Debt start date",
-      "dueDateLabel": "Expected due date",
-      "notesLabel": "Notes (optional)",
+      "startDateLabel": "Debt Start Date",
+      "dueDateLabel": "Expected Due Date",
+      "notesLabel": "Notes (Optional)",
       "notesPlaceholder": "Add any other details or payment terms...",
-      "save": "Save debt",
+      "save": "Save Debt",
       "saving": "Saving..."
     },
     "category": {
       "other": "Other",
       "personal": "Personal",
-      "credit_card": "Credit card",
-      "auto_loan": "Auto loan",
+      "credit_card": "Credit Card",
+      "auto_loan": "Auto Loan",
       "mortgage": "Mortgage",
-      "student": "Student loan"
+      "student": "Student Loan"
     },
     "tabs": {
-      "active": "Active debts",
-      "completed": "Completed debts",
+      "active": "Active Debts",
+      "completed": "Completed Debts",
       "all": "All"
     },
-    "loading": "Loading debts...",
+    "loading": "Loading Debts...",
     "empty": {
       "activeTitle": "No active debts right now! Well done",
       "completedTitle": "No fully paid debts yet.",
       "allTitle": "No debts recorded.",
       "activeSubtitle": "All your financial commitments are fully paid.",
-      "otherSubtitle": "Tap \"Add new debt\" to register a new one."
+      "otherSubtitle": "Tap \"Add New Debt\" to register a new one."
     },
     "overdueBanner": "Alert: this debt is past its due date!",
     "status": {
-      "paid": "Paid off",
+      "paid": "Paid Off",
       "overdue": "Overdue",
-      "dueSoon": "Due soon",
+      "dueSoon": "Due Soon",
       "active": "Active"
     },
-    "clickForHistory": "Tap to view payment history",
+    "clickForHistory": "Tap to View Payment History",
     "amounts": {
-      "original": "Original amount",
-      "paid": "Total paid",
+      "original": "Original Amount",
+      "paid": "Total Paid",
       "remaining": "Remaining"
     },
-    "progressLabel": "Repayment progress",
-    "progressComplete": "100% (complete)",
-    "startDatePrefix": "Start date:",
-    "dueDatePrefix": "Expected due date:",
+    "progressLabel": "Repayment Progress",
+    "progressComplete": "100% (Complete)",
+    "startDatePrefix": "Start Date:",
+    "dueDatePrefix": "Expected Due Date:",
     "dueSoonMessage": {
       "today": "Alert: payment due today",
       "tomorrow": "Alert: payment due tomorrow",
       "inDays_one": "Alert: payment due in {{count}} day",
       "inDays_other": "Alert: payment due in {{count}} days"
     },
-    "editDueDate": "Edit due date",
-    "saveDate": "Save date",
+    "editDueDate": "Edit Due Date",
+    "saveDate": "Save Date",
     "forecast": {
       "averageMonthly": "Your average monthly payment: {{amount}}",
       "notEnoughData": "Add more payments to calculate a forecast",
       "payoffBy": "At your current payment rate, you'll pay off this debt by {{date}}"
     },
     "actions": {
-      "addPayment": "Add payment",
-      "markPaid": "Mark as paid",
-      "showHistory": "Payment history",
-      "hideHistory": "Hide history",
+      "addPayment": "Add Payment",
+      "markPaid": "Mark as Paid",
+      "showHistory": "Payment History",
+      "hideHistory": "Hide History",
       "delete": "Delete"
     },
     "history": {
-      "title": "Recorded payments ({{count}})",
-      "addNew": "+ Add new payment",
-      "loading": "Loading payment history...",
+      "title": "Recorded Payments ({{count}})",
+      "addNew": "+ Add New Payment",
+      "loading": "Loading Payment History...",
       "empty": "No payments recorded yet for this debt.",
-      "unknownAccount": "Selected account"
+      "unknownAccount": "Selected Account"
     },
     "paymentModal": {
-      "title": "Record a new payment",
-      "payingFor": "Paying creditor:",
-      "remainingLabel": "Remaining balance on this debt:",
+      "title": "Record a New Payment",
+      "payingFor": "Paying Creditor:",
+      "remainingLabel": "Remaining Balance on This Debt:",
       "amountLabel": "Amount",
       "dateLabel": "Date",
-      "accountLabel": "Account to pay from",
-      "selectAccount": "Select account",
+      "accountLabel": "Account to Pay From",
+      "selectAccount": "Select Account",
       "accountOption": "{{name}} (balance: {{balance}} {{currency}})",
       "accountHint": "The payment amount will be deducted automatically from the selected account's balance.",
       "notesLabel": "Notes (optional)",
       "notesPlaceholder": "e.g. October installment, bank transfer",
       "cancel": "Cancel",
-      "confirm": "Confirm payment",
+      "confirm": "Confirm Payment",
       "saving": "Saving..."
     },
     "confirmTitle": "Are you sure?"
@@ -620,41 +623,67 @@
   "profile": {
     "title": "Profile",
     "subtitle": "View and update your personal information.",
-    "changePhoto": "Change photo",
-    "removePhoto": "Remove photo",
+    "sectionsLabel": "Profile Sections",
+    "tabs": {
+      "information": "Personal Information",
+      "security": "Security"
+    },
+    "changePhoto": "Change Photo",
+    "removePhoto": "Remove Photo",
     "avatarError": "Something went wrong with the photo.",
-    "editTitle": "Personal information",
-    "nameLabel": "Full name",
-    "phoneLabel": "Phone number",
+    "editTitle": "Personal Information",
+    "nameLabel": "Full Name",
+    "editName": "Edit Name",
+    "editEmail": "Edit Email",
+    "editPassword": "Change Password",
+    "phoneLabel": "Phone Number",
+    "editPhone": "Edit Phone",
     "phonePlaceholder": "e.g. 01000000000",
+    "phone": {
+      "sectionTitle": "Phone Number",
+      "description": "Update the phone number associated with your account.",
+      "notSet": "No phone number added",
+      "success": "Phone number updated successfully.",
+      "cancel": "Cancel"
+    },
     "emailLabel": "Email",
-    "save": "Save changes",
+    "save": "Save Changes",
     "saving": "Saving...",
     "saveSuccess": "Your information has been updated.",
+    "security": {
+      "title": "Security",
+      "subtitle": "Manage your sign-in details and help keep your account secure."
+    },
     "email": {
-      "title": "Change email",
+      "sectionTitle": "Email Address",
+      "title": "Change Email",
       "subtitle": "A verification code will be sent to the new email before it's activated.",
-      "newEmailLabel": "New email",
-      "sendCode": "Send verification code",
+      "newEmailLabel": "New Email",
+      "sendCode": "Send Verification Code",
       "sending": "Sending...",
       "codeSentMessage": "A 6-digit code was sent to the new email. It's valid for 15 minutes.",
       "codeLabel": "Verification code",
-      "confirm": "Confirm change",
+      "confirm": "Confirm Change",
       "confirming": "Confirming...",
       "changeSuccess": "Email changed successfully",
-      "changeEmail": "Change email",
-      "cancel": "Cancel"
+      "changeEmail": "Change Email",
+      "cancel": "Cancel",
+      "done": "Done"
     },
     "password": {
+      "sectionTitle": "Password",
+      "hidden": "Password is hidden",
+      "description": "Update your password to help keep your account secure.",
       "title": "Change password",
-      "currentLabel": "Current password",
-      "newLabel": "New password",
-      "confirmLabel": "Confirm new password",
+      "currentLabel": "Current Password",
+      "newLabel": "New Password",
+      "confirmLabel": "Confirm New Password",
       "hint": "At least 8 characters, with an uppercase letter and a digit.",
       "mismatch": "The new password and its confirmation don't match",
-      "submit": "Change password",
+      "submit": "Change Password",
       "submitting": "Changing...",
-      "success": "Password changed successfully"
+      "success": "Password changed successfully",
+      "cancel": "Cancel"
     },
     "locale": {
       "title": "Account language",

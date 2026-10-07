@@ -184,7 +184,7 @@ export default function CategorySelect({
           setIsOpen(!isOpen);
           setAdding(false);
         }}
-        className={className || defaultButtonClass}
+        className={`min-h-11 ${className || defaultButtonClass}`}
       >
         <div className="flex items-center gap-2">
           {selectedCategory || value ? (
@@ -277,7 +277,7 @@ export default function CategorySelect({
                 <button
                   type="button"
                   onClick={() => { setAdding(false); setError(""); }}
-                  className="rounded-md px-2.5 py-1 text-xs font-medium text-slate-500 hover:bg-slate-200"
+                  className="min-h-10 rounded-md px-2.5 py-1 text-xs font-medium text-slate-500 hover:bg-slate-200"
                 >
                   {t("common.cancel")}
                 </button>
@@ -285,7 +285,7 @@ export default function CategorySelect({
                   type="button"
                   onClick={handleCreate}
                   disabled={saving}
-                  className="rounded-md bg-brand-600 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
+                  className="min-h-10 rounded-md bg-brand-600 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
                 >
                   {saving ? t("categoriesPage.select.adding") : t("categoriesPage.select.add")}
                 </button>

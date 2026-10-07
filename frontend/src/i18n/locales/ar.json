@@ -313,6 +313,7 @@
     "title": "مصادر الدخل",
     "description": "سجّل كل مصادر دخلك وتابعها في قائمة واحدة.",
     "totalLabel": "إجمالي الدخل",
+    "totalByCurrencyLabel": "الإجمالي حسب العملة",
     "summaryUpdating": "جارٍ تحديث ملخص الدخل...",
     "formTitle": "إضافة مصدر دخل",
     "editTitle": "تعديل مصدر الدخل",
@@ -352,11 +353,13 @@
     "filter": {
       "title": "فلترة ملخص الدخل",
       "monthYearLabel": "الشهر والسنة",
-      "baseCurrencyLabel": "العملة"
+      "baseCurrencyLabel": "العملة",
+      "allCurrencies": "كل العملات"
     },
     "fields": {
       "name": "اسم المصدر",
       "category": "نوع الدخل",
+      "amount": "المبلغ",
       "amountConverted": "المبلغ بالعملة المختارة",
       "originalPrefix": "الأصل:",
       "date": "التاريخ"
@@ -652,18 +655,39 @@
   "profile": {
     "title": "الملف الشخصي",
     "subtitle": "شوف بياناتك الشخصية وعدّلها.",
+    "sectionsLabel": "أقسام الملف الشخصي",
+    "tabs": {
+      "information": "المعلومات الشخصية",
+      "security": "الأمان"
+    },
     "changePhoto": "تغيير الصورة",
     "removePhoto": "حذف الصورة",
     "avatarError": "حصل خطأ في الصورة.",
     "editTitle": "البيانات الشخصية",
     "nameLabel": "الاسم بالكامل",
+    "editName": "تعديل الاسم",
+    "editEmail": "تعديل البريد",
+    "editPassword": "تغيير كلمة السر",
     "phoneLabel": "رقم الهاتف",
+    "editPhone": "تعديل الرقم",
     "phonePlaceholder": "مثال: ٠١٠٠٠٠٠٠٠٠٠",
+    "phone": {
+      "sectionTitle": "رقم الهاتف",
+      "description": "حدّث رقم الهاتف المرتبط بحسابك.",
+      "notSet": "لم تتم إضافة رقم هاتف",
+      "success": "تم تحديث رقم الهاتف بنجاح.",
+      "cancel": "إلغاء"
+    },
     "emailLabel": "البريد الإلكتروني",
     "save": "حفظ التعديلات",
     "saving": "جارٍ الحفظ...",
     "saveSuccess": "تم تحديث بياناتك بنجاح.",
+    "security": {
+      "title": "الأمان",
+      "subtitle": "إدارة بيانات تسجيل الدخول وحماية الحساب."
+    },
     "email": {
+      "sectionTitle": "البريد الإلكتروني",
       "title": "تغيير البريد الإلكتروني",
       "subtitle": "هيتبعت كود تحقق للبريد الجديد قبل ما نفعّله.",
       "newEmailLabel": "البريد الإلكتروني الجديد",
@@ -675,9 +699,13 @@
       "confirming": "جارٍ التأكيد...",
       "changeSuccess": "تم تغيير البريد الإلكتروني بنجاح",
       "changeEmail": "تغيير البريد",
-      "cancel": "إلغاء"
+      "cancel": "إلغاء",
+      "done": "تم"
     },
     "password": {
+      "sectionTitle": "كلمة السر",
+      "hidden": "كلمة السر مخفية",
+      "description": "حدّث كلمة السر للحفاظ على أمان حسابك.",
       "title": "تغيير كلمة السر",
       "currentLabel": "كلمة السر الحالية",
       "newLabel": "كلمة السر الجديدة",
@@ -686,7 +714,8 @@
       "mismatch": "كلمة السر الجديدة وتأكيدها مش متطابقين",
       "submit": "تغيير كلمة السر",
       "submitting": "جارٍ التغيير...",
-      "success": "تم تغيير كلمة السر بنجاح"
+      "success": "تم تغيير كلمة السر بنجاح",
+      "cancel": "إلغاء"
     },
     "locale": {
       "title": "لغة الحساب",

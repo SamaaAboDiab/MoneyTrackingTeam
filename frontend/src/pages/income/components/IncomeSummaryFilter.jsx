@@ -10,13 +10,13 @@ function IncomeSummaryFilter({ selectedMonth, setSelectedMonth, summaryCurrency,
 
   return (
     <>
-    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+    <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6">
       <h2 className="text-lg font-bold text-slate-900">
         {t("income.filter.title")}
       </h2>
 
-      <div className="mt-4 flex flex-wrap items-end gap-3">
-        <div className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-1.5 text-sm font-semibold text-slate-700">
           <label htmlFor="summary-month">{t("income.filter.monthYearLabel")}</label>
           <MonthYearPicker
             id="summary-month"
@@ -26,7 +26,7 @@ function IncomeSummaryFilter({ selectedMonth, setSelectedMonth, summaryCurrency,
           />
         </div>
 
-        <div className="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+        <div className="flex min-w-0 flex-col gap-1.5 text-sm font-semibold text-slate-700">
           <label htmlFor="summary-currency">{t("income.filter.baseCurrencyLabel")}</label>
 
           <Select
@@ -37,6 +37,7 @@ function IncomeSummaryFilter({ selectedMonth, setSelectedMonth, summaryCurrency,
             }
             className={inputClass}
           >
+            <option value="ALL">{t("income.filter.allCurrencies")}</option>
             {INCOME_CURRENCIES.map((code) => (
               <option key={code} value={code}>
                 {currencyName(code)}

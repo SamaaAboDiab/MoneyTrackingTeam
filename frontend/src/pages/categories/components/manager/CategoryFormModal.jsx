@@ -13,7 +13,7 @@ function CategoryFormModal({ formOpen, closeForm, handleSave, editingId, editing
       >
         <form
           onSubmit={handleSave}
-          className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl"
+          className="max-h-[calc(100dvh-2rem)] w-full max-w-sm overflow-y-auto rounded-2xl bg-white p-4 shadow-xl sm:p-5"
           onClick={(e) => e.stopPropagation()}
         >
           <h2 className="text-base font-semibold text-slate-900">
@@ -67,18 +67,18 @@ function CategoryFormModal({ formOpen, closeForm, handleSave, editingId, editing
 
           {formError && <p className="mt-2 text-sm text-rose-600">{formError}</p>}
 
-          <div className="mt-5 flex justify-end gap-2">
+          <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={closeForm}
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
+              className="min-h-11 w-full rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 sm:w-auto"
             >
               {t("common.cancel")}
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-brand-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60"
+              className="min-h-11 w-full rounded-lg bg-brand-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60 sm:w-auto"
             >
               {saving ? t("categoriesPage.saving") : t("categoriesPage.save")}
             </button>

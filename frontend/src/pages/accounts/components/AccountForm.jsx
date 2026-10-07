@@ -1,6 +1,7 @@
 import Select from "../../../components/common/Select";
 import NumberInput from "../../../components/common/NumberInput";
 import ColorPicker from "../../../components/common/ColorPicker";
+import { Plus } from "lucide-react";
 import { currencyName } from "../../../utils/formatAmount";
 
 const CURRENCIES = ["EGP", "USD", "EUR", "GBP"];
@@ -12,7 +13,7 @@ const errorClass = "rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium t
 
 function AccountForm({ form, createStatus, createError, onChange, onSubmit, t }) {
   return (
-    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+    <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6">
       <h2 className="text-lg font-bold text-slate-900">{t("accounts.submit")}</h2>
 
       <form onSubmit={onSubmit} className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -73,20 +74,21 @@ function AccountForm({ form, createStatus, createError, onChange, onSubmit, t })
           </Select>
         </div>
 
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
+        <div className="flex flex-col gap-1.5">
           <label id="color-label" htmlFor="color" className={labelClass}>
             {t("accounts.colorLabel")}
           </label>
           <ColorPicker id="color" name="color" value={form.color} onChange={onChange} labelledBy="color-label" />
         </div>
 
-        <div className="flex flex-col justify-end gap-3 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
-          {createError && <p className={errorClass}>{createError}</p>}
+        <div className="flex flex-col justify-end gap-3 sm:items-end">
+          {createError && <p role="alert" className={errorClass}>{createError}</p>}
           <button
             type="submit"
             disabled={createStatus === "loading"}
-            className="ms-auto rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65"
+            className="inline-flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 active:scale-[0.99] disabled:cursor-wait disabled:opacity-65 sm:w-auto sm:self-end"
           >
+            {createStatus !== "loading" && <Plus size={17} aria-hidden="true" />}
             {createStatus === "loading" ? t("accounts.submitting") : t("accounts.submit")}
           </button>
         </div>

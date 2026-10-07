@@ -35,7 +35,7 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
           <button
             type="button"
             onClick={resetFilters}
-            className="flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-200"
+            className="flex min-h-10 items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-200"
           >
             <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
               <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
@@ -91,7 +91,7 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
             aria-haspopup="listbox"
             aria-expanded={filterCatOpen}
             onClick={() => setFilterCatOpen((prev) => !prev)}
-            className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500 text-start"
+            className="flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500 text-start"
           >
             <span className="flex items-center gap-1.5">
               {filters.category !== "all" && (
@@ -183,7 +183,7 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
               value={filters.startDate}
               max={filters.endDate || undefined}
               onChange={(value) => handleFilterChange({ target: { name: "startDate", value } })}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 outline-none focus:border-brand-500"
+              className="min-h-11 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 outline-none focus:border-brand-500"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -193,7 +193,7 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
               value={filters.endDate}
               min={filters.startDate || undefined}
               onChange={(value) => handleFilterChange({ target: { name: "endDate", value } })}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 outline-none focus:border-brand-500"
+              className="min-h-11 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 outline-none focus:border-brand-500"
             />
           </div>
         </div>

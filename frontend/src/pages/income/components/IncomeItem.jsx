@@ -4,7 +4,7 @@ import { toggleIncomeRecurrence } from "../../../store/slices/incomeSlice";
 import DeleteIncomeButton from "./DeleteIncomeButton";
 import { formatMoney, formatDate } from "../../../utils/formatAmount";
 
-function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted, onToggled }) {
+function IncomeItem({ income, displayAmount, displayCurrency, amountLabel, onEdit, onDeleted, onToggled }) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const isRecurring = income.recurrence && income.recurrence !== "once";
@@ -58,7 +58,7 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted,
       {/* المبلغ */}
       <div className="flex flex-col items-start">
         <span className="text-xs font-semibold text-slate-400">
-          {t("income.fields.amountConverted")}
+          {t(amountLabel)}
         </span>
 
         <strong className="mt-1 block tabular-amount text-lg font-bold text-income">

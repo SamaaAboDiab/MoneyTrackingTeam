@@ -91,9 +91,9 @@ function QuickAddButton() {
         onClick={() => setOpen(true)}
         title={t("quickAdd.button")}
         aria-label={t("quickAdd.button")}
-        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] inset-e-4 z-30 lg:bottom-6 lg:inset-e-6 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white ring-4 ring-white shadow-lg shadow-brand-600/30 transition hover:bg-brand-700"
+        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] inset-e-2 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-accent-500 text-navy ring-1 ring-white shadow-sm shadow-accent-500/25 transition hover:bg-accent-600 lg:bottom-6 lg:inset-e-3"
       >
-        <Plus size={26} />
+        <Plus size={18} />
       </button>
 
       {toast && (
@@ -110,7 +110,7 @@ function QuickAddButton() {
           <form
             onSubmit={handleSubmit}
             onClick={(event) => event.stopPropagation()}
-            className="w-full max-w-sm space-y-4 rounded-2xl bg-white p-5 shadow-xl"
+            className="max-h-[calc(100dvh-2rem)] w-full max-w-sm space-y-4 overflow-y-auto rounded-2xl bg-white p-4 shadow-xl sm:p-5"
           >
             <div className="flex items-center justify-between">
               <h2 className="text-base font-bold text-slate-900">{t("quickAdd.title")}</h2>
@@ -152,11 +152,11 @@ function QuickAddButton() {
 
             {error && <p className="rounded-xl bg-expense-soft px-3 py-2 text-sm text-expense">{error}</p>}
 
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={close} disabled={saving} className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button type="button" onClick={close} disabled={saving} className="min-h-11 w-full rounded-xl px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 sm:w-auto">
                 {t("quickAdd.cancel")}
               </button>
-              <button type="submit" disabled={saving} className="rounded-xl bg-brand-600 px-5 py-2 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+              <button type="submit" disabled={saving} className="min-h-11 w-full rounded-xl bg-brand-600 px-5 py-2 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-60 sm:w-auto">
                 {saving ? t("quickAdd.submitting") : t("quickAdd.submit")}
               </button>
             </div>

@@ -75,7 +75,7 @@ function MobileNav() {
             aria-modal="true"
             aria-label={t("layout.mobileNav.more")}
             onClick={(event) => event.stopPropagation()}
-            className={`absolute inset-y-0 inset-e-0 flex w-72 max-w-[80vw] flex-col bg-white px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] pt-4 shadow-2xl transition-transform ease-out ${
+            className={`absolute inset-y-0 inset-e-0 flex w-80 max-w-[88vw] flex-col bg-white px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] pt-4 shadow-2xl transition-transform ease-out ${
               visible ? "translate-x-0 duration-200" : "translate-x-full rtl:-translate-x-full duration-150"
             }`}
           >
@@ -98,11 +98,14 @@ function MobileNav() {
                     <NavLink
                       to={to}
                       onClick={closeMore}
-                      className={`flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold transition ${
-                        active ? "bg-brand-600 text-white" : "text-slate-700 hover:bg-slate-50"
+                      aria-current={active ? "page" : undefined}
+                      className={`flex min-h-12 items-center gap-3 rounded-xl px-3.5 py-2.5 text-start text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 ${
+                        active
+                          ? "bg-brand-600 text-white shadow-sm"
+                          : "text-slate-700 hover:bg-slate-100"
                       }`}
                     >
-                      <Icon size={19} />
+                      <Icon size={19} strokeWidth={active ? 2.4 : 2} aria-hidden="true" />
                       <span>{t(key)}</span>
                     </NavLink>
                   </li>

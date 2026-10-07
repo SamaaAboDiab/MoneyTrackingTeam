@@ -5,7 +5,7 @@ import { formatAmount, formatMoney, formatNumber, formatPercent, currencyLabel }
 import { categoryLabel } from "../../categories/components/mandatoryCategories";
 
 const FALLBACK_PALETTE = [
-  "#f97316",
+  "#ff9b51",
   "#3b82f6",
   "#8b5cf6",
   "#10b981",

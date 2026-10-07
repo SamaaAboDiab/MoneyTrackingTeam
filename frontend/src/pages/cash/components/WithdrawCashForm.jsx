@@ -10,7 +10,7 @@ function WithdrawCashForm({ handleSubmit, fromId, setFromId, toId, setToId, amou
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100 sm:p-5">
         <div className="flex items-center gap-2 font-bold text-slate-900">
           <ArrowDownLeft size={18} className="text-brand-600" /> {t("cash.withdrawTitle")}
         </div>
@@ -60,7 +60,7 @@ function WithdrawCashForm({ handleSubmit, fromId, setFromId, toId, setToId, amou
         <button
           type="submit"
           disabled={transferStatus === "loading" || status === "loading"}
-          className="w-full rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white disabled:opacity-60"
+          className="mx-auto block min-h-11 w-full max-w-xs rounded-xl bg-brand-600 px-4 py-2.5 font-semibold text-white disabled:opacity-60"
         >
           {transferStatus === "loading" ? t("cash.submitting") : t("cash.confirmWithdraw")}
         </button>

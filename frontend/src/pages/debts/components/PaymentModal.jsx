@@ -12,8 +12,8 @@ function PaymentModal({ paymentModalDebt, setPaymentModalDebt, handleSavePayment
   return (
     <>
     {paymentModalDebt && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
-        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl ring-1 ring-slate-200">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-3 sm:p-4">
+        <div className="max-h-[calc(100dvh-1.5rem)] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-4 shadow-xl ring-1 ring-slate-200 sm:max-h-[calc(100dvh-2rem)] sm:p-6">
           <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h2 className="text-lg font-bold text-slate-900">{t("debts.paymentModal.title")}</h2>
@@ -123,18 +123,18 @@ function PaymentModal({ paymentModalDebt, setPaymentModalDebt, handleSavePayment
               />
             </div>
 
-            <div className="mt-6 flex justify-end gap-3 pt-2">
+            <div className="mt-6 flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end sm:gap-3">
               <button
                 type="button"
                 onClick={() => setPaymentModalDebt(null)}
-                className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                className="min-h-11 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 sm:w-auto"
               >
                 {t("debts.paymentModal.cancel")}
               </button>
               <button
                 type="submit"
                 disabled={savingPayment}
-                className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60"
+                className="min-h-11 w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60 sm:w-auto"
               >
                 {savingPayment ? t("debts.paymentModal.saving") : t("debts.paymentModal.confirm")}
               </button>
