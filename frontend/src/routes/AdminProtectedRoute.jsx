@@ -28,7 +28,7 @@ function AdminProtectedRoute() {
     return () => window.clearTimeout(timeoutId);
   }, [token, dispatch]);
 
-  if (!token) return <Navigate to="/admin/login" replace />;
+  if (!token) return <Navigate to="/login" replace />;
   if (!checked) return <PageLoader />;
   return <Outlet />;
 }

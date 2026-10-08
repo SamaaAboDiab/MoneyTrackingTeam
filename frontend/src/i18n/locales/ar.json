@@ -62,7 +62,7 @@
       "passwordResetSuccess": "تم تغيير كلمة السر بنجاح، سجّل دخولك بكلمة السر الجديدة",
       "emailLabel": "البريد الإلكتروني",
       "passwordLabel": "كلمة السر",
-      "rememberMe": "تذكرني",
+      "rememberMe": "تذكرني (للمستخدمين فقط)",
       "submit": "تسجيل الدخول",
       "submitting": "جارٍ الدخول...",
       "forgotPassword": "نسيت كلمة السر؟",

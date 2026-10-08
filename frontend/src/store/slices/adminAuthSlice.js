@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ADMIN_TOKEN_KEY } from "../../api/adminClient";
 import * as adminAuthApi from "../../api/adminAuthApi";
+import { loginAccount } from "./authSlice";
 import i18n from "../../i18n/i18n";
 
 // وقت انتهاء التوكن (ms) من الـ JWT payload — للعرض بس، السيرفر هو اللي بيتحقق فعلًا
@@ -101,6 +102,19 @@ const adminAuthSlice = createSlice({
       .addCase(loginAdmin.rejected, (state, action) => {
         state.status = "idle";
         state.error = action.payload;
+      })
+      .addCase(loginAccount.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.error = null;
+        state.sessionExpired = false;
+        if (action.payload.accountType !== "admin") {
+          clearSession(state);
+          return;
+        }
+        state.token = action.payload.token;
+        state.admin = action.payload.admin;
+        state.checked = true;
+        localStorage.setItem(ADMIN_TOKEN_KEY, action.payload.token);
       })
       .addCase(fetchAdmin.fulfilled, (state, action) => {
         state.admin = action.payload;

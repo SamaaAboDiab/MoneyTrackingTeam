@@ -19,7 +19,6 @@ import AuthLayout from "../components/layout/AuthLayout";
 import CategoriesPage from "../pages/categories/CategoriesPage";
 import SavingsPage from "../pages/savings/SavingsPage";
 import ReportsPage from "../pages/reports/ReportsPage";
-import AdminLoginPage from "../pages/admin/AdminLoginPage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import AdminUsersPage from "../pages/admin/AdminUsersPage";
 import AdminAuditLogPage from "../pages/admin/AdminAuditLogPage";
@@ -35,7 +34,7 @@ function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
       </Route>
 
       {/* Admin — separate token + guard from the regular user area */}

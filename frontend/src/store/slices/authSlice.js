@@ -19,8 +19,8 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-export const loginUser = createAsyncThunk(
-  "auth/loginUser",
+export const loginAccount = createAsyncThunk(
+  "auth/loginAccount",
   async ({ email, password, rememberMe }, { rejectWithValue }) => {
     try {
       const res = await authApi.login({ email, password, rememberMe });
@@ -31,7 +31,7 @@ export const loginUser = createAsyncThunk(
       if (status === 403 && message === "ACCOUNT_SUSPENDED") {
         return rejectWithValue(i18n.t("auth.login.accountSuspended"));
       }
-      if (status === 401) return rejectWithValue(i18n.t("auth.login.invalidCredentials"));
+      if (status === 400 || status === 401) return rejectWithValue(i18n.t("auth.login.invalidCredentials"));
       if (status === 429) return rejectWithValue(i18n.t("auth.login.tooManyAttempts"));
       return rejectWithValue(i18n.t("auth.login.genericError"));
     }
@@ -225,17 +225,23 @@ const authSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
-      .addCase(loginUser.pending, (state) => {
+      .addCase(loginAccount.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
+      .addCase(loginAccount.fulfilled, (state, action) => {
         state.status = "succeeded";
+        if (action.payload.accountType === "admin") {
+          state.user = null;
+          state.token = null;
+          localStorage.removeItem(TOKEN_KEY);
+          return;
+        }
         state.user = action.payload.user;
         state.token = action.payload.token;
         localStorage.setItem(TOKEN_KEY, action.payload.token);
       })
-      .addCase(loginUser.rejected, (state, action) => {
+      .addCase(loginAccount.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       })

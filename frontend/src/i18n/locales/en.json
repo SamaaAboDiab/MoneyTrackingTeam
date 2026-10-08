@@ -62,7 +62,7 @@
       "passwordResetSuccess": "Password changed successfully, log in with your new password",
       "emailLabel": "Email",
       "passwordLabel": "Password",
-      "rememberMe": "Remember me",
+      "rememberMe": "Remember me (users only)",
       "submit": "Log in",
       "submitting": "Logging in...",
       "forgotPassword": "Forgot password?",

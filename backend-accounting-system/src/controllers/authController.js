@@ -1,6 +1,9 @@
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const Admin = require("../models/Admin");
 const ExpenseCategory = require("../models/ExpenseCategory");
+const { signAdminToken, ADMIN_TOKEN_TTL } = require("../utils/adminToken");
 const {
   sendPasswordResetLink,
   getPasswordResetEntry,
@@ -24,6 +27,12 @@ const loginAttempts = new Map();
 
 const MAX_ATTEMPTS = 5;
 const BLOCK_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+let dummyHashPromise;
+
+function getDummyHash() {
+  dummyHashPromise ??= bcrypt.hash("dummy-password-for-timing", 12);
+  return dummyHashPromise;
+}
 
 function getBruteForceError(email) {
   const entry = loginAttempts.get(email);
@@ -81,15 +90,44 @@ exports.register = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   try {
-    const { email, password, rememberMe = false } = req.body;
+    const { rememberMe = false } = req.body ?? {};
+    const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+    const password = req.body?.password;
+    if (!email || typeof password !== "string" || !password) {
+      return res.status(400).json({ success: false, message: "Email and password are required" });
+    }
 
     const blockError = getBruteForceError(email);
     if (blockError) {
       return res.status(429).json({ success: false, message: blockError });
     }
 
-    const user = await User.findOne({ email }).select("+password");
-    if (!user || !(await user.comparePassword(password))) {
+    const [admin, user] = await Promise.all([
+      Admin.findOne({ email }).select("+password"),
+      User.findOne({ email }).select("+password"),
+    ]);
+
+    if (admin && await admin.comparePassword(password)) {
+      clearAttempts(email);
+      const token = signAdminToken(admin._id);
+      return res.json({
+        success: true,
+        data: {
+          accountType: "admin",
+          token,
+          expiresIn: ADMIN_TOKEN_TTL,
+          admin: { id: admin._id, name: admin.name, email: admin.email },
+        },
+      });
+    }
+
+    if (!user) {
+      await bcrypt.compare(password, await getDummyHash());
+      recordFailedAttempt(email);
+      return res.status(401).json({ success: false, message: "Invalid email or password" });
+    }
+
+    if (!(await user.comparePassword(password))) {
       recordFailedAttempt(email);
       return res.status(401).json({ success: false, message: "Invalid email or password" });
     }
@@ -101,11 +139,11 @@ exports.login = async (req, res, next) => {
     clearAttempts(email);
     const token = signToken(user._id, rememberMe);
 
-    // Re-fetch without password select to get the clean full document
     const fullUser = await User.findById(user._id);
     res.json({
       success: true,
       data: {
+        accountType: "user",
         token,
         user: fullUser,
       },

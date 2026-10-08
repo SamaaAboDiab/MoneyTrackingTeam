@@ -1,7 +1,7 @@
 const { verifyAdminToken, isValidUserToken } = require("../utils/adminToken");
 
 /*
- * 401 → no token / expired / invalid  (frontend redirects to /admin/login)
+ * 401 → no token / expired / invalid  (frontend redirects to /login)
  * 403 → a valid token that is not an admin token (e.g. a regular user token)
  */
 module.exports = function adminAuth(req, res, next) {
