@@ -30,4 +30,6 @@ debtSchema.virtual("progressPct").get(function () {
   return Math.min(100, (this.paidAmount / this.totalAmount) * 100);
 });
 
+debtSchema.index({ userId: 1 });
+
 module.exports = mongoose.model("Debt", debtSchema);

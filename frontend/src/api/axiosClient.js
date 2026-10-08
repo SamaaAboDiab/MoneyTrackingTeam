@@ -33,4 +33,4 @@ axiosClient.interceptors.response.use(
 );
 
 export default axiosClient;
-export { TOKEN_KEY };
+export { TOKEN_KEY, BASE_URL };

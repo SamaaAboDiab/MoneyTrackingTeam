@@ -19,6 +19,9 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+userSchema.index({ createdAt: 1 });
+userSchema.index({ subscriptionEnd: 1, isSuspended: 1 });
+
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 12);

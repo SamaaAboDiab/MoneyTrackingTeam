@@ -1,8 +1,11 @@
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
 const User = require("../models/User");
 const ExpenseCategory = require("../models/ExpenseCategory");
-const { sendPasswordResetEmail } = require("../services/mailer");
+const {
+  sendPasswordResetLink,
+  getPasswordResetEntry,
+  consumePasswordResetToken,
+} = require("../services/passwordResetService");
 
 // Default categories seeded for every new user (isDefault = true — cannot be deleted)
 const DEFAULT_CATEGORIES = [
@@ -122,9 +125,6 @@ exports.me = async (req, res, next) => {
   }
 };
 
-// In-memory reset tokens: token → { email, expiresAt }
-const resetTokens = new Map();
-
 exports.forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -132,13 +132,8 @@ exports.forgotPassword = async (req, res, next) => {
 
     // Always return success to avoid email enumeration
     if (user) {
-      const token = crypto.randomBytes(32).toString("hex");
-      resetTokens.set(token, {
-        email,
-        expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
-      });
       try {
-        await sendPasswordResetEmail(email, token);
+        await sendPasswordResetLink(email);
       } catch (mailErr) {
         console.error("sendPasswordResetEmail failed:", mailErr.message);
       }
@@ -156,9 +151,9 @@ exports.forgotPassword = async (req, res, next) => {
 exports.resetPassword = async (req, res, next) => {
   try {
     const { token, password } = req.body;
-    const entry = resetTokens.get(token);
+    const entry = getPasswordResetEntry(token);
 
-    if (!entry || Date.now() > entry.expiresAt) {
+    if (!entry) {
       return res.status(400).json({ success: false, message: "Invalid or expired reset link." });
     }
 
@@ -167,7 +162,7 @@ exports.resetPassword = async (req, res, next) => {
 
     user.password = password;
     await user.save();
-    resetTokens.delete(token);
+    consumePasswordResetToken(token);
 
     res.json({ success: true, message: "Password reset successfully." });
   } catch (err) {
