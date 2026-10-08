@@ -6,7 +6,7 @@ function CategoryList({ categories, loading, openEditForm, setDeleteTarget, MAND
   const { t } = useTranslation();
   return (
     <>
-    <div className="mt-4 divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+    <div className="mt-4 divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/80">
       {loading ? (
         <ListSkeleton rows={6} compact label={t("categoriesPage.loading")} />
       ) : categories.length === 0 ? (

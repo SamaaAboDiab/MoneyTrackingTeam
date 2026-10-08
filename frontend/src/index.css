@@ -1,45 +1,64 @@
 @import "tailwindcss";
 
 @theme {
-  /* English/Latin text uses Inter; Arabic text uses Cairo
+  /* Latin text uses Plus Jakarta Sans; Arabic text uses Cairo
      (applied below via html[lang="ar"], since the two scripts don't share one family). */
-  --font-sans: "Inter", "Cairo", "Segoe UI", sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Cairo", "Segoe UI", sans-serif;
 
-  /* Primary brand color is slate gray. */
-  --color-brand-50: #f8fafc;
-  --color-brand-100: #f1f5f9;
-  --color-brand-200: #e2e8f0;
-  --color-brand-300: #cbd5e1;
-  --color-brand-400: #94a3b8;
-  --color-brand-500: #64748b;
-  --color-brand-600: #334155;
-  --color-brand-700: #1e293b;
-  --color-brand-800: #0f172a;
-  --color-brand-900: #0f172a;
+  /* Primary brand: emerald green #059669 (= brand-600) for buttons, active states and links;
+     hover #047857 (= brand-700). brand-500 is the focus color. */
+  --color-brand-50: #ecfdf5;
+  --color-brand-100: #d1fae5;
+  --color-brand-200: #a7f3d0;
+  --color-brand-300: #6ee7b7;
+  --color-brand-400: #34d399;
+  --color-brand-500: #10b981;
+  --color-brand-600: #059669;
+  --color-brand-700: #047857;
+  --color-brand-800: #065f46;
+  --color-brand-900: #064e3b;
 
-  /* Deep blue #03346E: the logo color, also used for the icon on orange fills. */
-  --color-navy: #03346e;
+  /* Deep slate navy: the sidebar, dark hero cards and the auth backdrop. */
+  --color-navy: #1e2a38;
+  --color-navy-700: #2a3748;
+  --color-navy-800: #1e2a38;
+  --color-navy-900: #151f2b;
 
-  /* Accent: orange #FF9B51 (= accent-500). Text/icons on orange fills use navy (white fails contrast);
-     orange text on white uses accent-700. */
-  --color-accent-50: #fff4ec;
-  --color-accent-100: #ffe6d3;
-  --color-accent-300: #ffc497;
-  --color-accent-500: #ff9b51;
-  --color-accent-600: #f0802e;
-  --color-accent-700: #a8561a;
+  /* Accent: dynamic indigo #4F46E5 (= accent-500) for focal points, tags and progress. */
+  --color-accent-50: #eef2ff;
+  --color-accent-100: #e0e7ff;
+  --color-accent-300: #a5b4fc;
+  --color-accent-500: #4f46e5;
+  --color-accent-600: #4338ca;
+  --color-accent-700: #3730a3;
 
-  --color-income: #15803d;
-  --color-income-soft: #dcfce7;
-  --color-expense: #b91c1c;
-  --color-expense-soft: #fee2e2;
+  /* Financial status: emerald for income, red for expenses. */
+  --color-income: #059669;
+  --color-income-soft: #ecfdf5;
+  --color-expense: #dc2626;
+  --color-expense-soft: #fef2f2;
 
   --color-ink-900: #0f172a;
   --color-ink-500: #64748b;
+
+  /* Elevation, tinted with deep slate navy: cards (sm), menus (lg), modals and sheets (2xl). */
+  --shadow-sm: 0 4px 20px -2px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-lg: 0 8px 24px -4px rgb(15 23 42 / 0.12), 0 2px 6px -1px rgb(15 23 42 / 0.06);
+  --shadow-2xl: 0 20px 40px -8px rgb(15 23 42 / 0.18), 0 4px 12px -2px rgb(15 23 42 / 0.08);
 }
 
 html[lang="ar"] {
-  --font-sans: "Cairo", "Inter", "Segoe UI", sans-serif;
+  --font-sans: "Cairo", "Plus Jakarta Sans", "Segoe UI", sans-serif;
+}
+
+::selection {
+  background: var(--color-brand-100);
+  color: var(--color-ink-900);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-brand-600);
 }
 
 body {
@@ -79,44 +98,31 @@ body {
   animation: auth-panel-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes auth-clock-turn {
+/* Toast: slides down into view; the bar underneath shrinks until it closes. */
+@keyframes toast-enter {
   from {
-    transform: rotate(-45deg);
+    opacity: 0;
+    transform: translateY(-16px) scale(0.97);
   }
+}
 
+.toast-enter {
+  animation: toast-enter 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes toast-progress {
   to {
-    transform: rotate(0);
+    transform: scaleX(0);
   }
 }
 
-@media (min-width: 768px) {
-  .auth-clock-turn {
-    animation: auth-clock-turn 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
-    transform-origin: center;
-  }
+.toast-progress {
+  transform-origin: left;
+  animation: toast-progress linear forwards;
 }
 
-@media (max-width: 639px) {
-  .auth-mobile-form .mb-6 {
-    margin-bottom: 0.5rem;
-  }
-
-  .auth-mobile-form label.mt-3 {
-    margin-top: 0.375rem;
-  }
-
-  .auth-mobile-form p.mt-4,
-  .auth-mobile-form button.mt-4 {
-    margin-top: 0.5rem;
-  }
-
-  .auth-mobile-form .mt-3.flex.items-center.justify-between {
-    margin-top: 0.5rem;
-  }
-
-  .auth-mobile-form .mt-4.text-center {
-    margin-top: 0.625rem;
-  }
+[dir="rtl"] .toast-progress {
+  transform-origin: right;
 }
 
 /* Page enter: a quick fade of the page; the cards inside then reveal one by one. */
@@ -160,7 +166,8 @@ body {
     animation: none;
   }
 
-  .auth-panel-content {
+  .auth-panel-content,
+  .toast-enter {
     animation: none;
   }
 
@@ -222,8 +229,9 @@ html[dir="rtl"] .skeleton::after {
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--color-brand-500);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--color-brand-500);
+  box-shadow: 0 0 0 3px rgb(16 185 129 / 0.15);
 }
 
 form button[type="submit"] {

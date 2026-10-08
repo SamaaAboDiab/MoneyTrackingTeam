@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Check, Pipette } from "lucide-react";
 
 const DEFAULT_SWATCHES = [
-  "#334155",
-  "#ff9b51",
+  "#1e2a38",
+  "#10b981",
   "#4f46e5",
   "#2563eb",
   "#0891b2",
@@ -31,7 +31,7 @@ function ColorPicker({ id, name, value, onChange, swatches = DEFAULT_SWATCHES, l
       <div
         role="radiogroup"
         aria-labelledby={labelledBy}
-        className="grid w-full grid-cols-7 items-center gap-y-2 sm:grid-cols-11"
+        className="grid w-full grid-cols-7 items-center gap-y-2 sm:grid-cols-12"
       >
         {swatches.map((color, index) => {
           const selected = current === color;

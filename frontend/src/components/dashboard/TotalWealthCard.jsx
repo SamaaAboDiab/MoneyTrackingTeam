@@ -45,7 +45,7 @@ function TotalWealthCard({
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") onOpenAccounts();
         }}
-        className={`relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-3xl bg-brand-600 p-6 text-white transition-all duration-300 ease-out sm:p-7 ${
+        className={`relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-3xl bg-navy-900 p-6 text-white transition-all duration-300 ease-out sm:p-7 ${
           grown ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
       >
@@ -131,7 +131,7 @@ function TotalWealthCard({
                   return (
                     <div
                       key={index}
-                      className="w-1.5 rounded-full bg-white/30 transition-all duration-500 ease-out"
+                      className="w-1.5 rounded-full bg-brand-400/60 transition-all duration-500 ease-out"
                       style={{
                         height: grown ? `${heightPct}%` : "0%",
                         transitionDelay: `${150 + index * 40}ms`,

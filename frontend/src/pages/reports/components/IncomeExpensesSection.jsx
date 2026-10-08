@@ -24,7 +24,7 @@ function IncomeExpensesSection({ data, loading }) {
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {STATS.map(({ icon: Icon, label, value, color }) => (
-          <div key={label} className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+          <div key={label} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80">
             <div className="flex items-center gap-2 text-slate-400">
               <Icon size={15} />
               <span className="text-xs font-semibold">{label}</span>
@@ -34,7 +34,7 @@ function IncomeExpensesSection({ data, loading }) {
         ))}
       </div>
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+      <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
         <h3 className="flex items-center gap-2 text-base font-bold text-slate-900">
           <Wallet size={17} className="text-brand-600" />
           {t("reports.incomeExpenses.chartTitle")}

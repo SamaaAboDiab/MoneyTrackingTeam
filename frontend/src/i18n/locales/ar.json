@@ -17,6 +17,7 @@
       "nextMonth": "الشهر التالي"
     },
     "close": "إغلاق",
+    "added": "تمت الإضافة",
     "colorPicker": {
       "custom": "لون مخصص"
     }
@@ -488,6 +489,8 @@
     "createAccount": "إنشاء حساب كاش",
     "createAccountError": "تعذر إنشاء حساب الكاش.",
     "withdrawTitle": "تسجيل سحب",
+    "withdrawDone": "تم السحب",
+    "withdrawSuccess": "تم تسجيل السحب وإضافته لرصيد الكاش",
     "sourceAccount": "الحساب المصدر",
     "cashAccount": "حساب الكاش",
     "selectAccount": "اختر الحساب",
@@ -1309,6 +1312,24 @@
       "deletedPerson": "حساب محذوف أو غير متاح",
       "noDetails": "لا توجد تفاصيل",
       "noReason": "بدون سبب",
+      "showAll": "عرض الكل",
+      "showLess": "عرض أقل",
+      "yes": "نعم",
+      "no": "لا",
+      "daysValue": "{{count}} يوم",
+      "fields": {
+        "days": "عدد الأيام",
+        "customDays": "أيام الباقة المخصصة",
+        "oldPlan": "الباقة القديمة",
+        "newPlan": "الباقة الجديدة",
+        "oldEnd": "الانتهاء القديم",
+        "newEnd": "الانتهاء الجديد",
+        "subscriptionType": "الباقة",
+        "subscriptionEnd": "ينتهي في",
+        "isSuspended": "موقوف",
+        "status": "الحالة",
+        "reason": "السبب"
+      },
       "previous": "السابق",
       "next": "التالي",
       "page": "صفحة {{page}} من {{pages}}",

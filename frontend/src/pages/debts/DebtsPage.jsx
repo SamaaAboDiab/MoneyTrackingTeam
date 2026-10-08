@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Trash2, CheckCircle2, AlertTriangle } from "lucide-react";
@@ -19,6 +19,7 @@ import { getErrorMessage } from "./utils";
 import DebtsHeader from "./components/DebtsHeader";
 import DebtNotifications from "./components/DebtNotifications";
 import DebtForm from "./components/DebtForm";
+import SuccessToast from "../../components/common/SuccessToast";
 import DebtTabs from "./components/DebtTabs";
 import DebtsList from "./components/DebtsList";
 import PaymentModal from "./components/PaymentModal";
@@ -32,6 +33,8 @@ function DebtsPage() {
   const [error, setError] = useState("");
   const [confirmAction, setConfirmAction] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
+  const closeToast = useCallback(() => setToastMessage(""), []);
 
   // Tabs: "active" | "completed" | "all"
   const [activeTab, setActiveTab] = useState("active");
@@ -102,6 +105,13 @@ function DebtsPage() {
   }, [dispatch]);
 
   // Handle new debt form input
+  // X on the add form: hide it and discard what was typed
+  function closeAddForm() {
+    setShowAddForm(false);
+    setDebtForm({ ...EMPTY_DEBT_FORM, startDate: getTodayString() });
+    setError("");
+  }
+
   function handleDebtFormChange({ target }) {
     setDebtForm((prev) => ({ ...prev, [target.name]: target.value }));
   }
@@ -136,7 +146,7 @@ function DebtsPage() {
 
       setDebtForm({ ...EMPTY_DEBT_FORM, startDate: getTodayString() });
       setShowAddForm(false);
-      setSuccessMessage(t("debts.createSuccess"));
+      setToastMessage(t("debts.createSuccess"));
       setActiveTab("active");
     } catch (requestError) {
       setError(getErrorMessage(requestError, t("debts.createError")));
@@ -320,7 +330,6 @@ function DebtsPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-5">
       <DebtsHeader
-        showAddForm={showAddForm}
         setShowAddForm={setShowAddForm}
         setError={setError}
         setSuccessMessage={setSuccessMessage}
@@ -333,14 +342,18 @@ function DebtsPage() {
         setSuccessMessage={setSuccessMessage}
       />
 
-      <DebtForm
-        showAddForm={showAddForm}
-        setShowAddForm={setShowAddForm}
-        debtForm={debtForm}
-        handleDebtFormChange={handleDebtFormChange}
-        handleCreateDebt={handleCreateDebt}
-        savingDebt={savingDebt}
-      />
+      {showAddForm && (
+        <DebtForm
+          onClose={closeAddForm}
+          error={error}
+          debtForm={debtForm}
+          handleDebtFormChange={handleDebtFormChange}
+          handleCreateDebt={handleCreateDebt}
+          savingDebt={savingDebt}
+        />
+      )}
+
+      <SuccessToast message={toastMessage} onClose={closeToast} />
 
       <DebtTabs
         activeTab={activeTab}

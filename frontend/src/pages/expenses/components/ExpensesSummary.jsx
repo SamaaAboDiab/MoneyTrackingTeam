@@ -9,7 +9,7 @@ function ExpensesSummary({ isFiltered, totalsByCurrency = [] }) {
   const [primaryCurrency, primaryTotal] = primary;
 
   return (
-    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
       <p className="text-sm font-medium text-slate-500">
         {t("expenses.totalLabel")} {isFiltered && t("expenses.totalFilteredSuffix")}
       </p>

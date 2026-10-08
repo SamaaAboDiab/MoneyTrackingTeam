@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Plus, ReceiptText } from "lucide-react";
 import PageHeader from "../../../components/common/PageHeader";
 
-function DebtsHeader({ showAddForm, setShowAddForm, setError, setSuccessMessage }) {
+function DebtsHeader({ setShowAddForm, setError, setSuccessMessage }) {
   const { t } = useTranslation();
 
   return (
@@ -14,14 +14,14 @@ function DebtsHeader({ showAddForm, setShowAddForm, setError, setSuccessMessage 
       <button
         type="button"
         onClick={() => {
-          setShowAddForm((prev) => !prev);
+          setShowAddForm(true);
           setError("");
           setSuccessMessage("");
         }}
         className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700"
       >
         <Plus size={18} />
-        {showAddForm ? t("debts.cancel") : t("debts.addNew")}
+        {t("debts.addNew")}
       </button>
       }
     />

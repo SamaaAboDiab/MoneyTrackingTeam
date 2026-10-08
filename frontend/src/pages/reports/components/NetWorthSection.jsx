@@ -25,7 +25,7 @@ function NetWorthSection({ data, loading }) {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+      <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
         <h3 className="text-base font-bold text-slate-900">{t("reports.netWorth.historyTitle")}</h3>
         {monthly.length === 0 ? (
           <p className="mt-4 text-sm text-slate-500">{t("reports.empty")}</p>

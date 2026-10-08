@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -14,9 +13,10 @@ import AccountForm from "./components/AccountForm";
 import AccountsList from "./components/AccountsList";
 import WealthSummary from "./components/WealthSummary";
 import PageHeader from "../../components/common/PageHeader";
-import { Wallet, ArrowLeftRight } from "lucide-react";
+import SuccessToast from "../../components/common/SuccessToast";
+import { Wallet, Plus } from "lucide-react";
 
-const DEFAULT_COLOR = "#334155";
+const DEFAULT_COLOR = "#1e2a38";
 const emptyForm = {
   name: "",
   type: "",
@@ -33,6 +33,9 @@ function AccountsPage() {
   );
   const [showArchived, setShowArchived] = useState(false);
   const [form, setForm] = useState(emptyForm);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const closeToast = useCallback(() => setToastMessage(""), []);
 
   useEffect(() => {
     dispatch(fetchAccounts());
@@ -52,7 +55,18 @@ function AccountsPage() {
       currency: form.currency,
       color: form.color || DEFAULT_COLOR,
     }));
-    if (createAccount.fulfilled.match(result)) setForm(emptyForm);
+    if (createAccount.fulfilled.match(result)) {
+      setForm(emptyForm);
+      setIsCreateOpen(false);
+      setToastMessage(t("accounts.success"));
+    }
+  };
+
+  // X on the add form: hide it and discard what was typed
+  const closeCreateForm = () => {
+    setIsCreateOpen(false);
+    setForm(emptyForm);
+    dispatch(resetCreateAccountStatus());
   };
 
   const handleAdjustBalance = ({ accountId, newBalance, notes }) =>
@@ -68,15 +82,30 @@ function AccountsPage() {
         title={t("accounts.title")}
         subtitle={t("accounts.formDescription")}
         actions={
-          <Link to="/accounts/transfer" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700">
-            <ArrowLeftRight size={16} />
-            {t("layout.quickActionLabel")}
-          </Link>
+          <button
+            type="button"
+            onClick={() => setIsCreateOpen(true)}
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 sm:w-auto"
+          >
+            <Plus size={18} strokeWidth={2.5} />
+            {t("accounts.submit")}
+          </button>
         }
       />
 
       <WealthSummary accounts={items} t={t} />
-      <AccountForm form={form} createStatus={createStatus} createError={createError} onChange={handleChange} onSubmit={handleSubmit} t={t} />
+      {isCreateOpen && (
+        <AccountForm
+          form={form}
+          createStatus={createStatus}
+          createError={createError}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
+          onClose={closeCreateForm}
+          t={t}
+        />
+      )}
+      <SuccessToast message={toastMessage} onClose={closeToast} />
       <AccountsList
         accounts={displayedAccounts}
         showArchived={showArchived}

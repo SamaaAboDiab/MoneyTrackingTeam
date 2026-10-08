@@ -17,6 +17,7 @@
       "nextMonth": "Next month"
     },
     "close": "Close",
+    "added": "Added",
     "colorPicker": {
       "custom": "Custom color"
     }
@@ -460,6 +461,8 @@
     "createAccount": "Create cash account",
     "createAccountError": "Unable to create the cash account.",
     "withdrawTitle": "Record a withdrawal",
+    "withdrawDone": "Withdrawn",
+    "withdrawSuccess": "Withdrawal recorded and added to your cash balance",
     "sourceAccount": "Source account",
     "cashAccount": "Cash account",
     "selectAccount": "Select account",
@@ -1266,6 +1269,24 @@
       "deletedPerson": "Deleted or unavailable account",
       "noDetails": "No details",
       "noReason": "No reason",
+      "showAll": "Show all",
+      "showLess": "Show less",
+      "yes": "Yes",
+      "no": "No",
+      "daysValue": "{{count}} days",
+      "fields": {
+        "days": "Days",
+        "customDays": "Custom plan days",
+        "oldPlan": "Old plan",
+        "newPlan": "New plan",
+        "oldEnd": "Old end date",
+        "newEnd": "New end date",
+        "subscriptionType": "Plan",
+        "subscriptionEnd": "Ends on",
+        "isSuspended": "Suspended",
+        "status": "Status",
+        "reason": "Reason"
+      },
       "previous": "Previous",
       "next": "Next",
       "page": "Page {{page}} of {{pages}}",

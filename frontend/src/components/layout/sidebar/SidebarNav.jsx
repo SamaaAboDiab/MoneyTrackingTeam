@@ -3,11 +3,11 @@ import { NAV_ITEMS, isNavItemActive } from "./navItems";
 
 const DESKTOP_NAV_ITEMS = NAV_ITEMS.filter(({ to }) => to !== "/categories");
 
-function SidebarNav({ collapsed, pathname, t }) {
+function SidebarNav({ collapsed, pathname, t, items = DESKTOP_NAV_ITEMS, isActive: isItemActive = isNavItemActive }) {
   return (
     <nav className="flex flex-1 flex-col gap-1 p-3">
-      {DESKTOP_NAV_ITEMS.map(({ to, key, icon: Icon }) => {
-        const isActive = isNavItemActive(to, pathname);
+      {items.map(({ to, key, icon: Icon }) => {
+        const isActive = isItemActive(to, pathname);
         return (
           <NavLink
             key={to}
@@ -15,7 +15,7 @@ function SidebarNav({ collapsed, pathname, t }) {
             title={collapsed ? t(key) : undefined}
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
               collapsed ? "justify-center" : ""
-            } ${isActive ? "bg-brand-600 text-white" : "text-slate-500 hover:bg-slate-50"}`}
+            } ${isActive ? "bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/30" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}
           >
             <Icon size={18} strokeWidth={2} />
             {!collapsed && t(key)}

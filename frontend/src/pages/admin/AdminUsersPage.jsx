@@ -27,6 +27,7 @@ const EMPTY_CREATE_FORM = {
   subscriptionType: "trial",
   customDays: "30",
 };
+const PREVIEW_COUNT = 4;
 const EMPTY_PLAN_FORM = { subscriptionType: "trial", customDays: "30" };
 
 function AdminUsersPage() {
@@ -37,6 +38,7 @@ function AdminUsersPage() {
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, limit: PAGE_SIZE, total: 0, pages: 0 });
   const [page, setPage] = useState(1);
+  const [showAll, setShowAll] = useState(false);
   const [status, setStatus] = useState(initialStatus);
   const [plan, setPlan] = useState("all");
   const [searchInput, setSearchInput] = useState(initialSearch);
@@ -98,6 +100,7 @@ function AdminUsersPage() {
   const applySearch = (event) => {
     event.preventDefault();
     setPage(1);
+    setShowAll(false);
     setSearch(searchInput.trim());
   };
 
@@ -382,6 +385,66 @@ function AdminUsersPage() {
     if (Number.isNaN(date.getTime())) return t("admin.users.noEndDate");
     return new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(date);
   };
+
+  // Row actions, shared by the desktop table and the phone cards.
+  const renderActions = (user) => (
+      <div className="flex flex-wrap gap-1.5">
+        <button
+          type="button"
+          onClick={() => openPlanEditor(user)}
+          className="whitespace-nowrap rounded-lg border border-brand-200 px-3 py-2 text-xs font-bold text-brand-700 transition hover:bg-brand-50"
+        >
+          {t("admin.users.changePlan")}
+        </button>
+        <button
+          type="button"
+          onClick={() => openExtensionForm(user)}
+          className="whitespace-nowrap rounded-lg border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-50"
+        >
+          {t("admin.users.extendSubscription")}
+        </button>
+        <button
+          type="button"
+          onClick={() => openFreeDaysForm(user)}
+          className="whitespace-nowrap rounded-lg border border-amber-200 px-3 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-50"
+        >
+          {t("admin.users.addFreeDays")}
+        </button>
+        <button
+          type="button"
+          onClick={() => openManualDateForm(user)}
+          className="whitespace-nowrap rounded-lg border border-violet-200 px-3 py-2 text-xs font-bold text-violet-700 transition hover:bg-violet-50"
+        >
+          {t("admin.users.setManualDate")}
+        </button>
+        {user.isSuspended ? (
+          <button
+            type="button"
+            onClick={() => handleActivateUser(user)}
+            disabled={activatingUserId === user._id}
+            className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-wait disabled:opacity-60"
+          >
+            <CircleCheck size={14} />
+            {activatingUserId === user._id
+              ? t("admin.users.activating")
+              : t("admin.users.activate")}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => openSuspendForm(user)}
+            className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-50"
+          >
+            <Ban size={14} />
+            {t("admin.users.suspend")}
+          </button>
+        )}
+      </div>
+  );
+
+  // Only the first few users until "show all" is pressed.
+  const visibleUsers = showAll ? users : users.slice(0, PREVIEW_COUNT);
+  const hasMore = users.length > PREVIEW_COUNT || pagination.pages > 1;
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -948,7 +1011,7 @@ function AdminUsersPage() {
             <select
               id="admin-user-status"
               value={status}
-              onChange={(event) => { setStatus(event.target.value); setPage(1); }}
+              onChange={(event) => { setStatus(event.target.value); setPage(1); setShowAll(false); }}
               className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-brand-500"
             >
               {STATUSES.map((value) => (
@@ -959,7 +1022,7 @@ function AdminUsersPage() {
             <select
               id="admin-user-plan"
               value={plan}
-              onChange={(event) => { setPlan(event.target.value); setPage(1); }}
+              onChange={(event) => { setPlan(event.target.value); setPage(1); setShowAll(false); }}
               className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-brand-500"
             >
               {PLANS.map((value) => (
@@ -969,9 +1032,20 @@ function AdminUsersPage() {
           </div>
         </div>
 
-        <p className="mb-3 text-sm text-slate-500" aria-live="polite">
-          {t("admin.users.total", { count: pagination.total })}
-        </p>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm text-slate-500" aria-live="polite">
+            {t("admin.users.total", { count: pagination.total })}
+          </p>
+          {!isLoading && request.status === "succeeded" && hasMore && (
+            <button
+              type="button"
+              onClick={() => setShowAll((current) => !current)}
+              className="text-sm font-semibold text-brand-700 underline underline-offset-4 transition hover:text-brand-800"
+            >
+              {showAll ? t("admin.auditLogs.showLess") : t("admin.auditLogs.showAll")}
+            </button>
+          )}
+        </div>
 
         {isLoading ? (
           <div className="py-12 text-center text-sm text-slate-500">{t("common.loading")}</div>
@@ -980,23 +1054,47 @@ function AdminUsersPage() {
         ) : users.length === 0 ? (
           <div className="py-12 text-center text-sm text-slate-500">{t("admin.users.empty")}</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[980px] text-start text-sm">
+          <>
+          {/* Phones/tablets: one card per user, so nothing scrolls sideways. */}
+          <ul className="divide-y divide-slate-100 lg:hidden">
+            {visibleUsers.map((user) => (
+              <li key={user._id} className="space-y-2 py-4 text-sm text-slate-700">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-slate-900">{user.name}</p>
+                    <p dir="ltr" className="break-all text-xs text-slate-500 rtl:text-right">{user.email}</p>
+                  </div>
+                  <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${STATUS_STYLES[user._status] ?? STATUS_STYLES.active}`}>
+                    {t(`admin.users.status.${user._status}`)}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500">
+                  {t(`admin.users.plan.${user.subscriptionType}`, { defaultValue: user.subscriptionType })}
+                  {" · "}
+                  {t("admin.users.subscriptionEnd")}: {formatDate(user.subscriptionEnd)}
+                </p>
+                {renderActions(user)}
+              </li>
+            ))}
+          </ul>
+
+          <div className="hidden lg:block">
+            <table className="w-full table-fixed text-sm">
               <thead className="border-b border-slate-200 text-xs font-bold text-slate-500">
                 <tr>
-                  <th scope="col" className="px-3 py-3">{t("admin.users.name")}</th>
-                  <th scope="col" className="px-3 py-3">{t("admin.users.email")}</th>
-                  <th scope="col" className="px-3 py-3">{t("admin.users.subscription")}</th>
-                  <th scope="col" className="px-3 py-3">{t("admin.users.subscriptionEnd")}</th>
-                  <th scope="col" className="px-3 py-3">{t("admin.users.statusLabel")}</th>
-                  <th scope="col" className="px-3 py-3">{t("admin.users.actions")}</th>
+                  <th scope="col" className="w-[15%] px-3 py-3 text-start">{t("admin.users.name")}</th>
+                  <th scope="col" className="w-[21%] px-3 py-3 text-start">{t("admin.users.email")}</th>
+                  <th scope="col" className="w-[10%] px-3 py-3 text-start">{t("admin.users.subscription")}</th>
+                  <th scope="col" className="w-[11%] px-3 py-3 text-start">{t("admin.users.subscriptionEnd")}</th>
+                  <th scope="col" className="w-[9%] px-3 py-3 text-start">{t("admin.users.statusLabel")}</th>
+                  <th scope="col" className="w-[34%] px-3 py-3 text-start">{t("admin.users.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {users.map((user) => (
-                  <tr key={user._id} className="text-slate-700">
-                    <td className="px-3 py-4 font-semibold text-slate-900">{user.name}</td>
-                    <td dir="ltr" className="px-3 py-4 text-start">{user.email}</td>
+                {visibleUsers.map((user) => (
+                  <tr key={user._id} className="align-top text-slate-700">
+                    <td className="break-words px-3 py-4 font-semibold text-slate-900">{user.name}</td>
+                    <td className="px-3 py-4"><span dir="ltr" className="break-all">{user.email}</span></td>
                     <td className="px-3 py-4">{t(`admin.users.plan.${user.subscriptionType}`, { defaultValue: user.subscriptionType })}</td>
                     <td className="px-3 py-4">{formatDate(user.subscriptionEnd)}</td>
                     <td className="px-3 py-4">
@@ -1005,67 +1103,17 @@ function AdminUsersPage() {
                       </span>
                     </td>
                     <td className="px-3 py-4">
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => openPlanEditor(user)}
-                          className="whitespace-nowrap rounded-lg border border-brand-200 px-3 py-2 text-xs font-bold text-brand-700 transition hover:bg-brand-50"
-                        >
-                          {t("admin.users.changePlan")}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => openExtensionForm(user)}
-                          className="whitespace-nowrap rounded-lg border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-50"
-                        >
-                          {t("admin.users.extendSubscription")}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => openFreeDaysForm(user)}
-                          className="whitespace-nowrap rounded-lg border border-amber-200 px-3 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-50"
-                        >
-                          {t("admin.users.addFreeDays")}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => openManualDateForm(user)}
-                          className="whitespace-nowrap rounded-lg border border-violet-200 px-3 py-2 text-xs font-bold text-violet-700 transition hover:bg-violet-50"
-                        >
-                          {t("admin.users.setManualDate")}
-                        </button>
-                        {user.isSuspended ? (
-                          <button
-                            type="button"
-                            onClick={() => handleActivateUser(user)}
-                            disabled={activatingUserId === user._id}
-                            className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-wait disabled:opacity-60"
-                          >
-                            <CircleCheck size={14} />
-                            {activatingUserId === user._id
-                              ? t("admin.users.activating")
-                              : t("admin.users.activate")}
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => openSuspendForm(user)}
-                            className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-50"
-                          >
-                            <Ban size={14} />
-                            {t("admin.users.suspend")}
-                          </button>
-                        )}
-                      </div>
+                      {renderActions(user)}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          </>
         )}
 
-        {!isLoading && request.status === "succeeded" && pagination.pages > 1 && (
+        {!isLoading && request.status === "succeeded" && showAll && pagination.pages > 1 && (
           <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
             <button
               type="button"

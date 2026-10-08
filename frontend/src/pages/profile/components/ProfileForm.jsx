@@ -42,7 +42,7 @@ function ProfileForm({ user, t, onEditSecurity }) {
   };
 
   return (
-    <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/60 sm:p-6">
+    <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="mb-5">
         <h2 className="text-base font-bold text-slate-900">{t("profile.editTitle")}</h2>
       </div>
