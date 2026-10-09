@@ -72,7 +72,7 @@ function MonthlySummaryCard({
   };
 
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6">
+    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-base font-bold text-slate-900">{t("dashboard.summary.title")}</h2>

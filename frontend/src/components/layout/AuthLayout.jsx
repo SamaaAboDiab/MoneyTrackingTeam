@@ -31,14 +31,14 @@ function AuthLayout() {
       {/* Full-bleed photo (tablet and desktop) */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 hidden sm:block">
         <div className={`absolute inset-0 ${photo}`} style={{ backgroundImage: `url(${authBg})` }} />
-        <div className="absolute inset-0 bg-brand-900/55" />
+        <div className="absolute inset-0 bg-slate-900/55" />
       </div>
 
       <div className="flex min-h-dvh flex-col sm:items-center sm:justify-center sm:px-6 sm:py-10 lg:block lg:h-full lg:min-h-0 lg:p-0">
         {/* Phone header: a short, quiet photo strip — brand and language switch only */}
         <header className="relative isolate flex h-36 items-start justify-between overflow-hidden px-5 pt-5 sm:hidden">
           <div aria-hidden="true" className={`absolute inset-0 -z-10 ${photo}`} style={{ backgroundImage: `url(${authBg})` }} />
-          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-b from-brand-900/70 to-brand-900/85" />
+          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-b from-slate-900/70 to-slate-900/85" />
           <Brand />
           <LanguageSwitcher />
         </header>

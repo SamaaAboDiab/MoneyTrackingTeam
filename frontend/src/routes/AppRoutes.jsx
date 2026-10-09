@@ -19,6 +19,11 @@ import AuthLayout from "../components/layout/AuthLayout";
 import CategoriesPage from "../pages/categories/CategoriesPage";
 import SavingsPage from "../pages/savings/SavingsPage";
 import ReportsPage from "../pages/reports/ReportsPage";
+import AdminHomePage from "../pages/admin/AdminHomePage";
+import AdminUsersPage from "../pages/admin/AdminUsersPage";
+import AdminAuditLogPage from "../pages/admin/AdminAuditLogPage";
+import AdminProtectedRoute from "./AdminProtectedRoute";
+import AdminLayout from "../components/layout/AdminLayout";
 function AppRoutes() {
   return (
     <Routes>
@@ -29,6 +34,17 @@ function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+      </Route>
+
+      {/* Admin — separate token + guard from the regular user area */}
+      <Route path="/admin" element={<AdminProtectedRoute />}>
+        <Route element={<AdminLayout />}>
+          <Route index element={<AdminHomePage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="logs" element={<AdminAuditLogPage />} />
+          <Route path="*" element={<Navigate to="/admin" replace />} />
+        </Route>
       </Route>
 
       <Route element={<ProtectedRoute />}>

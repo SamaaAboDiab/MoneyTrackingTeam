@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,6 +11,8 @@ import CashHeader from "./components/CashHeader";
 import CashBalanceCard from "./components/CashBalanceCard";
 import NoCashAccount from "./components/NoCashAccount";
 import WithdrawCashForm from "./components/WithdrawCashForm";
+import SuccessToast from "../../components/common/SuccessToast";
+import { ArrowDownLeft } from "lucide-react";
 
 function CashPage() {
   const { t } = useTranslation();
@@ -22,6 +24,9 @@ function CashPage() {
   const [toId, setToId] = useState("");
   const [amount, setAmount] = useState("");
   const [formError, setFormError] = useState("");
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const closeToast = useCallback(() => setToastMessage(""), []);
 
   useEffect(() => {
     dispatch(fetchAccounts());
@@ -86,6 +91,8 @@ function CashPage() {
     try {
       await dispatch(transferFunds({ fromId, toId, amount: amountNumber, description: t("cash.internalTransfer") })).unwrap();
       setAmount("");
+      setIsWithdrawOpen(false);
+      setToastMessage(t("cash.withdrawSuccess"));
       await dispatch(fetchAccounts());
     } catch {
       // The Redux slice exposes the API error below the form.
@@ -93,6 +100,14 @@ function CashPage() {
   }
 
   const requestError = formError || transferError || error || createError;
+
+  // X on the withdraw form: hide it and discard what was typed
+  const closeWithdrawForm = () => {
+    setIsWithdrawOpen(false);
+    setFromId("");
+    setAmount("");
+    setFormError("");
+  };
 
 
   return (
@@ -103,9 +118,23 @@ function CashPage() {
 
       {cashAccounts.length === 0 ? (
         <NoCashAccount handleCreateCashAccount={handleCreateCashAccount} createStatus={createStatus} />
-      ) : (
+      ) : !isWithdrawOpen && (
+        <div className="flex justify-center pt-10 pb-4 sm:pt-14">
+          <button
+            type="button"
+            onClick={() => setIsWithdrawOpen(true)}
+            className="inline-flex min-h-12 w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-base font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
+          >
+            <ArrowDownLeft size={20} strokeWidth={2.5} />
+            {t("cash.withdrawTitle")}
+          </button>
+        </div>
+      )}
+
+      {isWithdrawOpen && cashAccounts.length > 0 && (
         <WithdrawCashForm
           handleSubmit={handleSubmit}
+          onClose={closeWithdrawForm}
           fromId={fromId}
           setFromId={setFromId}
           toId={toId}
@@ -119,6 +148,8 @@ function CashPage() {
           status={status}
         />
       )}
+
+      <SuccessToast message={toastMessage} onClose={closeToast} title={t("cash.withdrawDone")} />
     </div>
   );
 }

@@ -79,7 +79,7 @@ function ExpenseCategoryChart({ categories, loading, currency = "EGP", t }) {
   const hovered = slices.find((slice) => slice.categoryId === hoveredId);
 
   return (
-    <section className="@container h-full rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6">
+    <section className="@container h-full rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 sm:p-6">
       <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
         <PieChart size={18} className="text-brand-600" />
         {t("dashboard.chart.title")}

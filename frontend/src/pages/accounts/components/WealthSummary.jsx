@@ -9,7 +9,7 @@ function WealthSummary({ accounts, t }) {
   const currencies = Object.entries(totalsByCurrency);
 
   return (
-    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
       <h2 className="text-lg font-bold text-slate-900">{t("accounts.totalWealth")}</h2>
 
       {currencies.length === 0 ? (

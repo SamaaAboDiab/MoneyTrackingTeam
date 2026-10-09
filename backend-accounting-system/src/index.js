@@ -25,6 +25,14 @@ const settingsRoutes   = require("./routes/settings");
 const savingsRoutes    = require("./routes/savings");
 const adminRoutes      = require("./routes/admin");
 
+if (!process.env.JWT_ADMIN_SECRET) {
+  console.error("JWT_ADMIN_SECRET is missing in .env — admin tokens need their own secret.");
+  process.exit(1);
+}
+if (process.env.JWT_ADMIN_SECRET === process.env.JWT_SECRET) {
+  console.warn("⚠️  JWT_ADMIN_SECRET should be different from JWT_SECRET.");
+}
+
 const app = express();
 
 // Middleware

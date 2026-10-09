@@ -14,5 +14,7 @@ const adminLogSchema = new Schema({
 }, { timestamps: true });
 
 adminLogSchema.index({ user: 1, createdAt: -1 });
+adminLogSchema.index({ createdAt: -1, _id: -1 });
+adminLogSchema.index({ action: 1, createdAt: -1, _id: -1 });
 
 module.exports = mongoose.model("AdminLog", adminLogSchema);

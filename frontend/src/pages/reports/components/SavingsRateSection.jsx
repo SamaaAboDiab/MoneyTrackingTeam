@@ -13,18 +13,18 @@ function SavingsRateSection({ data, loading }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80">
           <p className="text-xs font-semibold text-slate-400">{t("reports.savingsRate.avgRate")}</p>
           <p className={`tabular-amount mt-2 text-xl font-extrabold ${avgRate >= targetRate ? "text-income" : "text-slate-900"}`}>{formatPercent(avgRate, 1)}</p>
           <p className="mt-1 text-xs text-slate-400">{t("reports.savingsRate.targetNote", { rate: formatPercent(targetRate) })}</p>
         </div>
-        <div className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80">
           <p className="text-xs font-semibold text-slate-400">{t("reports.savingsRate.avgSavings")}</p>
           <p className="tabular-amount mt-2 text-xl font-extrabold text-slate-900">{formatMoney(avgSavings)}</p>
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+      <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
         <h3 className="text-base font-bold text-slate-900">{t("reports.savingsRate.monthlyTitle")}</h3>
         {monthly.length === 0 ? (
           <p className="mt-4 text-sm text-slate-500">{t("reports.empty")}</p>

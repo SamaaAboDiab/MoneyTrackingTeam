@@ -99,7 +99,7 @@ function ProfilePage() {
         aria-labelledby="profile-tab-security"
         hidden={activeTab !== "security"}
         tabIndex={0}
-        className="mt-5 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-200/60 focus-visible:outline-none"
+        className="mt-5 rounded-2xl border border-slate-200 bg-white shadow-sm focus-visible:outline-none"
       >
         <header className="flex items-start gap-3 px-5 py-5 sm:px-6">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700">

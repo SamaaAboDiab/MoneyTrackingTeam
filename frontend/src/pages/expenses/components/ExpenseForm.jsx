@@ -1,22 +1,19 @@
 import { useTranslation } from "react-i18next";
 import CategorySelect from "../../categories/components/CategorySelect";
-import { formatMoney } from "../../../utils/formatAmount";
 import NumberInput from "../../../components/common/NumberInput";
 import { inputClass, labelClass } from "../constants";
 import DatePicker from "../../../components/common/DatePicker";
 import Select from "../../../components/common/Select";
+import FormModal from "../../../components/common/FormModal";
 
 
-function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccounts, createStatus, createError }) {
+function ExpenseForm({ form, setForm, handleChange, handleSubmit, onClose, createStatus, createError }) {
   const { t } = useTranslation();
 
   return (
-    <>
-    <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6">
-      <h2 className="text-lg font-bold text-slate-900">{t("expenses.addFormTitle")}</h2>
-
-      <form onSubmit={handleSubmit} className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
+    <FormModal title={t("expenses.addFormTitle")} onClose={onClose} closeDisabled={createStatus === "loading"}>
+      <form onSubmit={handleSubmit} className="mt-3 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
+        <div className="flex flex-col gap-1">
           <label htmlFor="description" className={labelClass}>{t("expenses.fields.description")}</label>
           <input
             id="description"
@@ -29,7 +26,7 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1">
           <label htmlFor="amount" className={labelClass}>{t("expenses.fields.amount")}</label>
           <NumberInput
             id="amount"
@@ -44,7 +41,7 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1">
           <label htmlFor="date" className={labelClass}>{t("expenses.fields.date")}</label>
           <DatePicker
             id="date"
@@ -55,7 +52,7 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1">
           <label htmlFor="paymentMethod" className={labelClass}>{t("expenses.fields.paymentMethod")}</label>
           <Select
             id="paymentMethod"
@@ -70,7 +67,7 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
           </Select>
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1">
           <label htmlFor="expenseType" className={labelClass}>{t("expenses.fields.expenseType")}</label>
           <Select
             id="expenseType"
@@ -87,7 +84,7 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
           </Select>
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1">
           <label htmlFor="category" className={labelClass}>{t("expenses.fields.category")}</label>
           <CategorySelect
             required
@@ -99,25 +96,7 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="accountId" className={labelClass}>{t("expenses.fields.account")}</label>
-          <Select
-            id="accountId"
-            name="accountId"
-            value={form.accountId}
-            onChange={handleChange}
-            className={inputClass}
-          >
-            <option value="">{t("expenses.noAccountOption")}</option>
-            {availableAccounts.map((acc) => (
-              <option key={acc._id} value={acc._id}>
-                {acc.name} ({formatMoney(acc.balance, acc.currency)})
-              </option>
-            ))}
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
+        <div className="flex flex-col gap-1 sm:col-span-2">
           <label htmlFor="notes" className={labelClass}>{t("expenses.fields.notes")}</label>
           <textarea
             id="notes"
@@ -125,8 +104,8 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
             value={form.notes}
             onChange={handleChange}
             placeholder={t("expenses.notesPlaceholder")}
-            rows="3"
-            className={`${inputClass} resize-none`}
+            rows="2"
+            className={`${inputClass} min-h-18 resize-none`}
           />
         </div>
 
@@ -134,11 +113,6 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
           {createError && (
             <p className="rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense">
               {createError}
-            </p>
-          )}
-          {createStatus === "succeeded" && (
-            <p className="rounded-xl bg-income-soft px-4 py-2.5 text-sm font-medium text-income">
-              {t("expenses.success")}
             </p>
           )}
           <button
@@ -150,8 +124,7 @@ function ExpenseForm({ form, setForm, handleChange, handleSubmit, availableAccou
           </button>
         </div>
       </form>
-    </section>
-    </>
+    </FormModal>
   );
 }
 

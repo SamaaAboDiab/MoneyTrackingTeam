@@ -34,4 +34,6 @@ const incomeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+incomeSchema.index({ createdAt: 1 });
+
 module.exports = mongoose.model("Income", incomeSchema);

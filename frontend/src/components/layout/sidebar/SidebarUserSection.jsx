@@ -1,42 +1,45 @@
 import { Link } from "react-router-dom";
 import { LogOut } from "lucide-react";
 
-function SidebarUserSection({ collapsed, user, onLogoutClick, t }) {
-  const initial = user?.name?.trim()?.[0]?.toUpperCase() || "?";
+function SidebarUserSection({ collapsed, user, onLogoutClick, t, profileTo = "/profile" }) {
+  const displayName = user?.name || user?.email;
+  const initial = displayName?.trim()?.[0]?.toUpperCase() || "?";
+  // Without a profile page (admin) the user block is shown but not clickable.
+  const UserBlock = profileTo ? Link : "div";
 
   return (
-    <div className="mt-3 border-t border-slate-100 pt-3">
+    <div className="mt-3 border-t border-white/10 pt-3">
       {!collapsed ? (
-        <Link to="/profile" className="flex items-center gap-3 rounded-xl px-1 py-1 transition hover:bg-slate-50">
+        <UserBlock to={profileTo || undefined} className="flex items-center gap-3 rounded-xl px-1 py-1 transition hover:bg-white/5">
           {user?.avatar ? (
-            <img src={user.avatar} alt={user.name} className="h-9 w-9 shrink-0 rounded-full object-cover" />
+            <img src={user.avatar} alt={displayName} className="h-9 w-9 shrink-0 rounded-full object-cover" />
           ) : (
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">
               {initial}
             </span>
           )}
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-slate-900">{user?.name}</p>
-            <p className="truncate text-xs text-slate-500">{user?.email}</p>
+            <p className="truncate text-sm font-bold text-white">{displayName}</p>
+            <p className="truncate text-xs text-slate-400">{user?.email}</p>
           </div>
-        </Link>
+        </UserBlock>
       ) : (
-        <Link to="/profile" className="mx-auto flex h-9 w-9 items-center justify-center rounded-full">
+        <UserBlock to={profileTo || undefined} className="mx-auto flex h-9 w-9 items-center justify-center rounded-full">
           {user?.avatar ? (
-            <img src={user.avatar} alt={user.name} className="h-9 w-9 rounded-full object-cover" />
+            <img src={user.avatar} alt={displayName} className="h-9 w-9 rounded-full object-cover" />
           ) : (
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">
               {initial}
             </span>
           )}
-        </Link>
+        </UserBlock>
       )}
 
       <button
         type="button"
         onClick={onLogoutClick}
         title={collapsed ? t("layout.logout") : undefined}
-        className={`mt-3 flex items-center gap-3 rounded-xl px-2 py-2 text-sm font-semibold text-expense transition hover:bg-expense-soft ${
+        className={`mt-3 flex items-center gap-3 rounded-xl px-2 py-2 text-sm font-semibold text-red-400 transition hover:bg-red-500/10 ${
           collapsed ? "w-full justify-center" : "w-full"
         }`}
       >

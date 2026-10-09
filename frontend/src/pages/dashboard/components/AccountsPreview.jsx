@@ -11,7 +11,7 @@ const ACCOUNT_TYPE_ICON = {
 
 function AccountsPreview({ status, accounts, t }) {
   return (
-    <div className="h-full rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6">
+    <div className="h-full rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 sm:p-6">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-bold text-slate-900">{t("accounts.listTitle")}</h2>
         <Link to="/accounts" className="text-sm font-semibold text-brand-700 hover:underline">

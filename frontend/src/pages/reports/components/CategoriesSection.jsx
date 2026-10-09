@@ -12,14 +12,14 @@ function CategoriesSection({ data, loading }) {
 
   if (categories.length === 0) {
     return (
-      <div className="rounded-2xl bg-white p-8 text-center shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+      <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200/80">
         <p className="text-sm text-slate-500">{t("reports.empty")}</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
       <div className="flex items-center justify-between">
         <h3 className="text-base font-bold text-slate-900">{t("reports.categories.title")}</h3>
         <span className="tabular-amount text-sm font-bold text-slate-700">{formatMoney(totalExpenses)}</span>

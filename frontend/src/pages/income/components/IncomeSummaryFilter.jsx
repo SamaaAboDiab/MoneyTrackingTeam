@@ -10,7 +10,7 @@ function IncomeSummaryFilter({ selectedMonth, setSelectedMonth, summaryCurrency,
 
   return (
     <>
-    <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6">
+    <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200/80 sm:p-6">
       <h2 className="text-lg font-bold text-slate-900">
         {t("income.filter.title")}
       </h2>

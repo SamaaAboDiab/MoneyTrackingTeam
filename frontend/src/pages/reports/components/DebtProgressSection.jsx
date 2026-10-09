@@ -12,7 +12,7 @@ function DebtProgressSection({ data, loading }) {
 
   if (debts.length === 0) {
     return (
-      <div className="rounded-2xl bg-white p-8 text-center shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+      <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200/80">
         <p className="text-sm text-slate-500">{t("reports.empty")}</p>
       </div>
     );
@@ -33,7 +33,7 @@ function DebtProgressSection({ data, loading }) {
 
       <div className="space-y-3">
         {debts.map((debt) => (
-          <div key={debt._id} className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+          <div key={debt._id} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-slate-900">{debt.creditor}</h3>
               <span className="tabular-amount text-sm font-semibold text-slate-500">

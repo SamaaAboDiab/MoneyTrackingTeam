@@ -1,3 +1,4 @@
+import FormModal from "../../../components/common/FormModal";
 import DatePicker from "../../../components/common/DatePicker";
 import Select from "../../../components/common/Select";
 import NumberInput from "../../../components/common/NumberInput";
@@ -8,12 +9,10 @@ const inputClass =
   "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500";
 const labelClass = "text-sm font-semibold text-slate-700";
 
-function IncomeForm({ form, createStatus, createError, onChange, onSubmit, availableAccounts = [], t }) {
+function IncomeForm({ form, createStatus, createError, onChange, onSubmit, onCancel, t }) {
   return (
-    <section className="mt-6 rounded-2xl bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6">
-      <h2 className="text-lg font-bold text-slate-900">{t("income.formTitle")}</h2>
-
-      <form onSubmit={onSubmit} className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <FormModal title={t("income.formTitle")} onClose={onCancel} closeDisabled={createStatus === "loading"}>
+      <form onSubmit={onSubmit} className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="income-name" className={labelClass}>
             {t("income.nameLabel")}
@@ -119,27 +118,7 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, avail
           </Select>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="income-account" className={labelClass}>
-            {t("income.accountLabel")}
-          </label>
-          <Select
-            id="income-account"
-            name="accountId"
-            value={form.accountId || ""}
-            onChange={onChange}
-            className={inputClass}
-          >
-            <option value="">{t("income.noAccountOption")}</option>
-            {availableAccounts.map((acc) => (
-              <option key={acc._id} value={acc._id}>
-                {acc.name}
-              </option>
-            ))}
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 sm:col-span-2">
           <label htmlFor="income-notes" className={labelClass}>
             {t("income.notesLabel")}
           </label>
@@ -161,11 +140,6 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, avail
               {createError}
             </p>
           )}
-          {createStatus === "succeeded" && (
-            <p role="status" className="rounded-xl bg-income-soft px-4 py-2.5 text-sm font-medium text-income">
-              {t("income.success")}
-            </p>
-          )}
           <button
             type="submit"
             disabled={createStatus === "loading"}
@@ -175,7 +149,7 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, avail
           </button>
         </div>
       </form>
-    </section>
+    </FormModal>
   );
 }
 
