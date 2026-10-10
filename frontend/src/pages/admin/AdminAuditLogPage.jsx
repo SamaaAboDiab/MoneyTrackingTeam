@@ -1,8 +1,24 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ClipboardList, Search } from "lucide-react";
+import {
+  ArrowLeft,
+  Ban,
+  CalendarClock,
+  CalendarPlus,
+  CircleCheck,
+  ClipboardList,
+  Clock,
+  Gift,
+  History,
+  Inbox,
+  Quote,
+  Repeat,
+  Search,
+  SlidersHorizontal,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { fetchAdminLogs } from "../../api/adminUsersApi";
-import PageHeader from "../../components/common/PageHeader";
 import DatePicker from "../../components/common/DatePicker";
 
 const PAGE_SIZE = 20;
@@ -18,11 +34,40 @@ const ACTIONS = [
 ];
 const EMPTY_FILTERS = { action: "all", user: "", from: "", to: "" };
 
+// Icon + colors per action, so each kind of operation is recognisable at a glance.
+const ACTION_STYLES = {
+  create_user: { icon: UserPlus, tone: "bg-emerald-50 text-emerald-600", pill: "bg-emerald-50 text-emerald-700" },
+  extend_subscription: { icon: CalendarPlus, tone: "bg-sky-50 text-sky-600", pill: "bg-sky-50 text-sky-700" },
+  change_plan: { icon: Repeat, tone: "bg-violet-50 text-violet-600", pill: "bg-violet-50 text-violet-700" },
+  add_free_days: { icon: Gift, tone: "bg-amber-50 text-amber-600", pill: "bg-amber-50 text-amber-700" },
+  suspend: { icon: Ban, tone: "bg-red-50 text-red-600", pill: "bg-red-50 text-red-700" },
+  activate: { icon: CircleCheck, tone: "bg-emerald-50 text-emerald-600", pill: "bg-emerald-50 text-emerald-700" },
+  manual_date: { icon: CalendarClock, tone: "bg-indigo-50 text-indigo-600", pill: "bg-indigo-50 text-indigo-700" },
+};
+const DEFAULT_ACTION_STYLE = { icon: History, tone: "bg-slate-100 text-slate-600", pill: "bg-slate-100 text-slate-700" };
+
+function PersonChip({ person, label, fallback }) {
+  const name = person?.name || person?.email || fallback;
+  const initial = name.trim()[0]?.toUpperCase() || "?";
+  return (
+    <span className="inline-flex min-w-0 items-center gap-2">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+        {initial}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[11px] text-slate-400">{label}</span>
+        <span className="block truncate text-sm font-semibold text-slate-800">{name}</span>
+      </span>
+    </span>
+  );
+}
+
 function AdminAuditLogPage() {
   const { t, i18n } = useTranslation();
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState(EMPTY_FILTERS);
   const [page, setPage] = useState(1);
+  const [loadedAt, setLoadedAt] = useState(0); // "now" for the relative times, taken when the logs arrive
   const [showAll, setShowAll] = useState(false);
   const [logs, setLogs] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, limit: PAGE_SIZE, total: 0, pages: 0 });
@@ -45,6 +90,7 @@ function AdminAuditLogPage() {
       .then(({ data }) => {
         setLogs(data.data);
         setPagination(data.pagination);
+        setLoadedAt(Date.now());
         setRequest({ key: requestKey, status: "succeeded", error: "" });
       })
       .catch((error) => {
@@ -68,6 +114,14 @@ function AdminAuditLogPage() {
     setPage(1);
     setShowAll(false);
     setAppliedFilters({ ...filters, user: filters.user.trim() });
+  };
+
+  // Action chips filter straight away; the text/date fields wait for "apply".
+  const pickAction = (action) => {
+    setFilters((current) => ({ ...current, action }));
+    setAppliedFilters((current) => ({ ...current, action }));
+    setPage(1);
+    setShowAll(false);
   };
 
   const clearFilters = () => {
@@ -98,17 +152,15 @@ function AdminAuditLogPage() {
     return String(value);
   };
 
-  // Details as label/value rows instead of raw JSON.
+  // Details as small label/value chips instead of raw JSON.
   const renderDetails = (details) => {
     const entries = details ? Object.entries(details) : [];
-    if (entries.length === 0) {
-      return <span className="text-xs text-slate-400">{t("admin.auditLogs.noDetails")}</span>;
-    }
+    if (entries.length === 0) return null;
     return (
-      <dl className="space-y-1.5 text-xs">
+      <dl className="mt-3 flex flex-wrap gap-2">
         {entries.map(([key, value]) => (
-          <div key={key} className="flex flex-wrap items-baseline gap-x-1.5">
-            <dt className="text-slate-500">{t(`admin.auditLogs.fields.${key}`, { defaultValue: key })}:</dt>
+          <div key={key} className="inline-flex items-baseline gap-1.5 rounded-lg bg-slate-50 px-2.5 py-1.5 text-xs ring-1 ring-slate-100">
+            <dt className="text-slate-500">{t(`admin.auditLogs.fields.${key}`, { defaultValue: key })}</dt>
             <dd className="font-semibold text-slate-800">{formatDetailValue(key, value)}</dd>
           </div>
         ))}
@@ -116,100 +168,175 @@ function AdminAuditLogPage() {
     );
   };
 
+  // "5 minutes ago" style for the last week, the full date after that (and always in the tooltip).
+  const relativeTime = (value) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return t("admin.auditLogs.notAvailable");
+    const seconds = Math.round((date.getTime() - loadedAt) / 1000);
+    const absolute = Math.abs(seconds);
+    const rtf = new Intl.RelativeTimeFormat(i18n.language, { numeric: "auto" });
+    if (absolute < 60) return rtf.format(seconds, "second");
+    if (absolute < 3600) return rtf.format(Math.round(seconds / 60), "minute");
+    if (absolute < 86400) return rtf.format(Math.round(seconds / 3600), "hour");
+    if (absolute < 604800) return rtf.format(Math.round(seconds / 86400), "day");
+    return formatDateTime(value);
+  };
+
+  // Day headings for the timeline: today, yesterday, or the date.
+  const dayKey = (value) => new Date(value).toDateString();
+  const dayLabel = (value) => {
+    const today = new Date(loadedAt);
+    const yesterday = new Date(loadedAt - 24 * 60 * 60 * 1000);
+    if (dayKey(value) === today.toDateString()) return t("chat.today");
+    if (dayKey(value) === yesterday.toDateString()) return t("chat.yesterday");
+    return new Intl.DateTimeFormat(i18n.language, { weekday: "long", day: "numeric", month: "long" }).format(new Date(value));
+  };
+  const affectedUsers = new Set(logs.map((entry) => entry.user?._id).filter(Boolean)).size;
+
   // Only the first few entries until "show all" is pressed.
   const visibleLogs = showAll ? logs : logs.slice(0, PREVIEW_COUNT);
   const hasMore = logs.length > PREVIEW_COUNT || pagination.pages > 1;
 
-  const getPersonLabel = (person) => {
-    if (!person) return t("admin.auditLogs.deletedPerson");
-    return person.name || person.email || person._id || t("admin.auditLogs.deletedPerson");
-  };
-
   return (
     <div className="mx-auto max-w-7xl">
-      <PageHeader
-        icon={ClipboardList}
-        title={t("admin.auditLogs.title")}
-        subtitle={t("admin.auditLogs.subtitle")}
-      />
-
-      <form onSubmit={applyFilters} className="mb-5">
-        {/* Apply / clear sit above the filters box, at the end side (left in Arabic). */}
-        <div className="mb-3 flex justify-end gap-2">
-          <button
-            type="submit"
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 text-sm font-bold text-white transition hover:bg-brand-700"
-          >
-            <Search size={16} />
-            {t("admin.auditLogs.applyFilters")}
-          </button>
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="min-h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-          >
-            {t("admin.auditLogs.clear")}
-          </button>
+      {/* Hero: what this page is, with a few numbers at a glance. */}
+      <section className="relative mb-5 overflow-hidden rounded-3xl bg-linear-to-br from-navy-800 to-navy-900 p-5 text-white shadow-2xl sm:p-8">
+        <span aria-hidden="true" className="absolute -top-16 h-48 w-48 rounded-full bg-brand-500/20 blur-3xl inset-e-0" />
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-start gap-4">
+            <span className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15 sm:flex">
+              <ClipboardList size={26} />
+            </span>
+            <div>
+              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t("admin.auditLogs.title")}</h1>
+              <p className="mt-1 max-w-xl text-sm leading-6 text-slate-300">{t("admin.auditLogs.subtitle")}</p>
+            </div>
+          </div>
+          <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:w-auto">
+            {[
+              { icon: History, label: t("admin.auditLogs.statTotal"), value: pagination.total },
+              { icon: Users, label: t("admin.auditLogs.statUsers"), value: affectedUsers },
+              { icon: Clock, label: t("admin.auditLogs.statLast"), value: logs[0] ? relativeTime(logs[0].createdAt) : "—" },
+            ].map(({ icon: StatIcon, label, value }) => (
+              <div key={label} className="min-w-0 rounded-2xl bg-white/5 px-3 py-3 ring-1 ring-white/10 last:col-span-2 sm:px-4 sm:last:col-span-1">
+                <dt className="flex items-center gap-1.5 text-xs text-slate-400">
+                  <StatIcon size={13} aria-hidden="true" />
+                  <span className="truncate">{label}</span>
+                </dt>
+                <dd className="tabular-amount mt-1 truncate text-base font-extrabold sm:text-lg">{isLoading ? "…" : value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
-        <section className="grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 sm:p-5 lg:grid-cols-4">
-          <label className="text-sm font-semibold text-slate-700">
-            {t("admin.auditLogs.action")}
-            <select
-              name="action"
-              value={filters.action}
-              onChange={handleFilterChange}
-              className="mt-1.5 min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 font-normal outline-none focus:border-brand-500"
+      </section>
+
+      {/* Filters: action chips apply at once; user and dates apply with the button. */}
+      <form onSubmit={applyFilters} className="mb-5 rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+              <SlidersHorizontal size={17} />
+            </span>
+            <h2 className="text-base font-bold text-slate-900">{t("admin.auditLogs.filtersTitle")}</h2>
+          </div>
+          <div className="flex w-full gap-2 sm:w-auto">
+            <button
+              type="submit"
+              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-sm font-bold text-white transition hover:bg-brand-700 sm:flex-none"
             >
-              <option value="all">{t("admin.auditLogs.allActions")}</option>
-              {ACTIONS.map((action) => (
-                <option key={action} value={action}>{t(`admin.auditLogs.actions.${action}`)}</option>
-              ))}
-            </select>
-          </label>
-          <label className="text-sm font-semibold text-slate-700">
-            {t("admin.auditLogs.user")}
-            <input
-              name="user"
-              type="search"
-              maxLength={100}
-              value={filters.user}
-              onChange={handleFilterChange}
-              placeholder={t("admin.auditLogs.userPlaceholder")}
-              className="mt-1.5 min-h-11 w-full rounded-xl border border-slate-200 px-3 font-normal outline-none focus:border-brand-500"
-            />
-          </label>
-          <div>
-            <label htmlFor="audit-from" className="text-sm font-semibold text-slate-700">
-              {t("admin.auditLogs.from")}
-            </label>
-            <DatePicker
-              id="audit-from"
-              value={filters.from}
-              onChange={(value) => handleFilterChange({ target: { name: "from", value } })}
-              max={filters.to || undefined}
-              className="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none transition focus:border-brand-500"
-            />
+              <Search size={15} />
+              {t("admin.auditLogs.applyFilters")}
+            </button>
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="min-h-10 flex-1 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:flex-none"
+            >
+              {t("admin.auditLogs.clear")}
+            </button>
           </div>
-          <div>
-            <label htmlFor="audit-to" className="text-sm font-semibold text-slate-700">
-              {t("admin.auditLogs.to")}
-            </label>
-            <DatePicker
-              id="audit-to"
-              value={filters.to}
-              onChange={(value) => handleFilterChange({ target: { name: "to", value } })}
-              min={filters.from || undefined}
-              className="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none transition focus:border-brand-500"
-            />
+        </div>
+
+        <div className="space-y-4 p-5 sm:p-6">
+          <div role="radiogroup" aria-label={t("admin.auditLogs.action")} className="no-scrollbar flex gap-2 overflow-x-auto">
+            {["all", ...ACTIONS].map((action) => {
+              const selected = filters.action === action;
+              const style = ACTION_STYLES[action];
+              const ChipIcon = style?.icon || History;
+              return (
+                <button
+                  key={action}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => pickAction(action)}
+                  className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-semibold transition ${
+                    selected
+                      ? "border-navy-900 bg-navy-900 text-white shadow-sm"
+                      : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  <ChipIcon size={14} className={selected ? "text-white" : style ? style.tone.split(" ").find((c) => c.startsWith("text-")) : "text-slate-400"} />
+                  {action === "all" ? t("admin.auditLogs.allActions") : t(`admin.auditLogs.actions.${action}`)}
+                </button>
+              );
+            })}
           </div>
-        </section>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr]">
+            <div>
+              <label htmlFor="audit-user" className="text-sm font-semibold text-slate-700">{t("admin.auditLogs.user")}</label>
+              <div className="relative mt-1.5">
+                <Search size={16} className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="audit-user"
+                  name="user"
+                  type="search"
+                  maxLength={100}
+                  value={filters.user}
+                  onChange={handleFilterChange}
+                  placeholder={t("admin.auditLogs.userPlaceholder")}
+                  className="min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 ps-9 pe-3 text-sm outline-none transition focus:border-brand-500 focus:bg-white"
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="audit-from" className="text-sm font-semibold text-slate-700">{t("admin.auditLogs.from")}</label>
+              <DatePicker
+                id="audit-from"
+                value={filters.from}
+                onChange={(value) => handleFilterChange({ target: { name: "from", value } })}
+                max={filters.to || undefined}
+                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none transition focus:border-brand-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="audit-to" className="text-sm font-semibold text-slate-700">{t("admin.auditLogs.to")}</label>
+              <DatePicker
+                id="audit-to"
+                value={filters.to}
+                onChange={(value) => handleFilterChange({ target: { name: "to", value } })}
+                min={filters.from || undefined}
+                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none transition focus:border-brand-500"
+              />
+            </div>
+          </div>
+        </div>
       </form>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm text-slate-500" aria-live="polite">
-            {t("admin.auditLogs.total", { count: pagination.total })}
-          </p>
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-linear-to-b from-slate-50 to-white px-5 py-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-navy-900 text-white shadow-sm">
+              <History size={20} />
+            </span>
+            <div>
+              <h2 className="text-base font-bold text-slate-900">{t("admin.auditLogs.listTitle")}</h2>
+              <p className="text-xs text-slate-500" aria-live="polite">
+                {t("admin.auditLogs.total", { count: pagination.total })}
+              </p>
+            </div>
+          </div>
           {!isLoading && request.status === "succeeded" && hasMore && (
             <button
               type="button"
@@ -219,85 +346,89 @@ function AdminAuditLogPage() {
               {showAll ? t("admin.auditLogs.showLess") : t("admin.auditLogs.showAll")}
             </button>
           )}
-        </div>
+        </header>
 
-        {isLoading ? (
-          <div className="py-12 text-center text-sm text-slate-500">{t("common.loading")}</div>
-        ) : request.status === "failed" ? (
-          <div role="alert" className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{request.error}</div>
-        ) : logs.length === 0 ? (
-          <div className="py-12 text-center text-sm text-slate-500">{t("admin.auditLogs.empty")}</div>
-        ) : (
-          <>
-          {/* Phones/tablets: one card per entry, so nothing scrolls sideways. */}
-          <ul className="divide-y divide-slate-100 lg:hidden">
-            {visibleLogs.map((entry) => (
-              <li key={entry._id} className="space-y-2 py-4 text-sm text-slate-700">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="inline-flex rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">
-                    {t(`admin.auditLogs.actions.${entry.action}`, { defaultValue: entry.action })}
-                  </span>
-                  <span className="text-xs text-slate-500">{formatDateTime(entry.createdAt)}</span>
-                </div>
-                <p>
-                  <span className="text-slate-500">{t("admin.auditLogs.admin")}: </span>
-                  <span className="font-semibold text-slate-900">{getPersonLabel(entry.admin)}</span>
-                </p>
-                <p>
-                  <span className="text-slate-500">{t("admin.auditLogs.targetUser")}: </span>
-                  <span className="font-semibold text-slate-900">{getPersonLabel(entry.user)}</span>
-                </p>
-                <div className="rounded-lg bg-slate-50 p-2.5">{renderDetails(entry.details)}</div>
-                <p className="whitespace-pre-wrap break-words text-slate-600">
-                  <span className="text-slate-500">{t("admin.auditLogs.reason")}: </span>
-                  {entry.reason || t("admin.auditLogs.noReason")}
-                </p>
-              </li>
-            ))}
-          </ul>
+        <div className="p-4 sm:p-6">
+          {isLoading ? (
+            <ul className="space-y-4" aria-label={t("common.loading")}>
+              {[0, 1, 2].map((item) => (
+                <li key={item} className="flex gap-4">
+                  <span className="skeleton h-11 w-11 shrink-0 rounded-2xl" />
+                  <div className="flex-1 space-y-2 rounded-2xl border border-slate-100 p-4">
+                    <span className="skeleton block h-4 w-1/3 rounded-full" />
+                    <span className="skeleton block h-3 w-2/3 rounded-full" />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : request.status === "failed" ? (
+            <div role="alert" className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{request.error}</div>
+          ) : logs.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-12 text-center">
+              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                <Inbox size={26} />
+              </span>
+              <p className="text-sm text-slate-500">{t("admin.auditLogs.empty")}</p>
+            </div>
+          ) : (
+            /* Timeline: one card per operation, with a coloured icon on the line. */
+            <ol>
+              {visibleLogs.map((entry, index) => {
+                const style = ACTION_STYLES[entry.action] || DEFAULT_ACTION_STYLE;
+                const ActionIcon = style.icon;
+                const last = index === visibleLogs.length - 1;
+                const newDay = index === 0 || dayKey(visibleLogs[index - 1].createdAt) !== dayKey(entry.createdAt);
+                const lineBelow = !last && dayKey(visibleLogs[index + 1].createdAt) === dayKey(entry.createdAt);
+                return (
+                  <li key={entry._id} className="relative pb-5 last:pb-0">
+                    {newDay && (
+                      <div className="mb-4 flex items-center gap-3">
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{dayLabel(entry.createdAt)}</span>
+                        <span aria-hidden="true" className="h-px flex-1 bg-slate-100" />
+                      </div>
+                    )}
+                    <div className="relative flex gap-3 sm:gap-4">
+                    {lineBelow && <span aria-hidden="true" className="absolute top-12 -bottom-5 w-px bg-slate-200 inset-s-[1.375rem]" />}
+                    <span className={`relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ring-4 ring-white ${style.tone}`}>
+                      <ActionIcon size={19} />
+                    </span>
 
-          <div className="hidden lg:block">
-            <table className="w-full table-fixed text-start text-sm">
-              <thead className="border-b border-slate-200 text-xs font-bold text-slate-500">
-                <tr>
-                  <th scope="col" className="w-[14%] px-3 py-3 text-start">{t("admin.auditLogs.time")}</th>
-                  <th scope="col" className="w-[17%] px-3 py-3 text-start">{t("admin.auditLogs.admin")}</th>
-                  <th scope="col" className="w-[17%] px-3 py-3 text-start">{t("admin.auditLogs.targetUser")}</th>
-                  <th scope="col" className="w-[14%] px-3 py-3 text-start">{t("admin.auditLogs.action")}</th>
-                  <th scope="col" className="w-[22%] px-3 py-3 text-start">{t("admin.auditLogs.details")}</th>
-                  <th scope="col" className="px-3 py-3 text-start">{t("admin.auditLogs.reason")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {visibleLogs.map((entry) => (
-                  <tr key={entry._id} className="align-top text-slate-700">
-                    <td className="px-3 py-4">{formatDateTime(entry.createdAt)}</td>
-                    <td className="px-3 py-4">
-                      <div className="break-words font-semibold text-slate-900">{getPersonLabel(entry.admin)}</div>
-                      {entry.admin?.email && <div dir="ltr" className="mt-1 break-all text-xs text-slate-500">{entry.admin.email}</div>}
-                    </td>
-                    <td className="px-3 py-4">
-                      <div className="break-words font-semibold text-slate-900">{getPersonLabel(entry.user)}</div>
-                      {entry.user?.email && <div dir="ltr" className="mt-1 break-all text-xs text-slate-500">{entry.user.email}</div>}
-                    </td>
-                    <td className="px-3 py-4">
-                      <span className="inline-flex rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">
-                        {t(`admin.auditLogs.actions.${entry.action}`, { defaultValue: entry.action })}
-                      </span>
-                    </td>
-                    <td className="px-3 py-4">
+                    <article className="min-w-0 flex-1 rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm transition hover:border-slate-200 hover:shadow-md sm:p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${style.pill}`}>
+                          {t(`admin.auditLogs.actions.${entry.action}`, { defaultValue: entry.action })}
+                        </span>
+                        <time
+                          dateTime={entry.createdAt}
+                          title={formatDateTime(entry.createdAt)}
+                          className="inline-flex items-center gap-1 text-xs text-slate-400"
+                        >
+                          <Clock size={12} />
+                          {relativeTime(entry.createdAt)}
+                        </time>
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+                        <PersonChip person={entry.admin} label={t("admin.auditLogs.admin")} fallback={t("admin.auditLogs.deletedPerson")} />
+                        <ArrowLeft size={16} className="shrink-0 text-slate-300 ltr:rotate-180" aria-hidden="true" />
+                        <PersonChip person={entry.user} label={t("admin.auditLogs.targetUser")} fallback={t("admin.auditLogs.deletedPerson")} />
+                      </div>
+
                       {renderDetails(entry.details)}
-                    </td>
-                    <td className="whitespace-pre-wrap break-words px-3 py-4 text-slate-600">
-                      {entry.reason || t("admin.auditLogs.noReason")}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          </>
-        )}
+
+                      {entry.reason && (
+                        <p className="mt-3 flex gap-2 rounded-xl border-s-4 border-brand-200 bg-brand-50/50 px-3 py-2 text-sm text-slate-700">
+                          <Quote size={14} className="mt-0.5 shrink-0 text-brand-400" aria-hidden="true" />
+                          <span className="whitespace-pre-wrap break-words">{entry.reason}</span>
+                        </p>
+                      )}
+                    </article>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
 
         {!isLoading && request.status === "succeeded" && showAll && pagination.pages > 1 && (
           <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
@@ -322,6 +453,7 @@ function AdminAuditLogPage() {
             </button>
           </div>
         )}
+        </div>
       </section>
     </div>
   );

@@ -22,6 +22,14 @@ import ReportsPage from "../pages/reports/ReportsPage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import AdminUsersPage from "../pages/admin/AdminUsersPage";
 import AdminAuditLogPage from "../pages/admin/AdminAuditLogPage";
+import AdminChatPage from "../pages/admin/AdminChatPage";
+import AdminSettingsPage from "../pages/admin/AdminSettingsPage";
+import AdminAnnouncementsPage from "../pages/admin/AdminAnnouncementsPage";
+import AdminRenewalsPage from "../pages/admin/AdminRenewalsPage";
+import AdminUserProfilePage from "../pages/admin/AdminUserProfilePage";
+import AdminRevenuePage from "../pages/admin/AdminRevenuePage";
+import AnnouncementsPage from "../pages/announcements/AnnouncementsPage";
+import ChatPage from "../pages/chat/ChatPage";
 import AdminProtectedRoute from "./AdminProtectedRoute";
 import AdminLayout from "../components/layout/AdminLayout";
 function AppRoutes() {
@@ -42,7 +50,13 @@ function AppRoutes() {
         <Route element={<AdminLayout />}>
           <Route index element={<AdminHomePage />} />
           <Route path="users" element={<AdminUsersPage />} />
+          <Route path="users/:userId" element={<AdminUserProfilePage />} />
+          <Route path="renewals" element={<AdminRenewalsPage />} />
+          <Route path="announcements" element={<AdminAnnouncementsPage />} />
+          <Route path="revenue" element={<AdminRevenuePage />} />
           <Route path="logs" element={<AdminAuditLogPage />} />
+          <Route path="chat" element={<AdminChatPage />} />
+          <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Route>
       </Route>
@@ -62,6 +76,8 @@ function AppRoutes() {
           <Route path="/savings" element={<SavingsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/announcements" element={<AnnouncementsPage />} />
         </Route>
       </Route>
 

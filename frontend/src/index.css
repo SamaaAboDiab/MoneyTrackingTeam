@@ -125,6 +125,32 @@ body {
   transform-origin: right;
 }
 
+/* Scrolls sideways (wheel, touch, keyboard) without showing a scrollbar. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Notification bell: a short swing when there is something new. */
+@keyframes bell-ring {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(14deg); }
+  30% { transform: rotate(-12deg); }
+  45% { transform: rotate(8deg); }
+  60% { transform: rotate(-5deg); }
+  75% { transform: rotate(2deg); }
+}
+
+/* Chat background: faint dots on a soft grey, easy on the eyes. */
+.chat-wallpaper {
+  background-color: #f4f6f8;
+  background-image: radial-gradient(rgb(15 23 42 / 0.05) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
 /* Page enter: a quick fade of the page; the cards inside then reveal one by one. */
 @keyframes page-enter {
   from {

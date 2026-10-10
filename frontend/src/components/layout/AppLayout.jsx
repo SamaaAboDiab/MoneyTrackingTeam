@@ -11,6 +11,14 @@ import UserMenu from "./appLayout/UserMenu";
 import MobileNav from "./MobileNav";
 import QuickAddButton from "./QuickAddButton";
 import useRevealCards from "./appLayout/useRevealCards";
+import { ChatUnreadProvider } from "../chat/ChatUnreadContext";
+import { fetchMyUnread } from "../../api/chatApi";
+import NotificationBell from "../notifications/NotificationBell";
+import {
+  fetchUserNotifications,
+  markAllUserNotificationsRead,
+  markUserNotificationRead,
+} from "../../api/notificationsApi";
 
 function AppLayout() {
   const { t } = useTranslation();
@@ -24,6 +32,7 @@ function AppLayout() {
   useRevealCards(pageRef, pathname);
 
   return (
+    <ChatUnreadProvider fetchUnread={fetchMyUnread} chatPath="/chat">
     <div className="min-h-screen bg-slate-50">
       <div className="flex">
         <Sidebar />
@@ -44,6 +53,11 @@ function AppLayout() {
                 {t("layout.quickActionLabel")}
               </Link>
 
+              <NotificationBell
+                fetchNotifications={fetchUserNotifications}
+                markRead={markUserNotificationRead}
+                markAllRead={markAllUserNotificationsRead}
+              />
               <UserMenu user={user} />
             </div>
           </header>
@@ -59,6 +73,7 @@ function AppLayout() {
         </div>
       </div>
     </div>
+    </ChatUnreadProvider>
   );
 }
 

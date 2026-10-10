@@ -6,13 +6,14 @@ import ProfileForm from "./components/ProfileForm";
 import EmailChangeSection from "./components/EmailChangeSection";
 import PhoneChangeSection from "./components/PhoneChangeSection";
 import PasswordChangeSection from "./components/PasswordChangeSection";
+import SubscriptionCard from "./components/SubscriptionCard";
 import PageHeader from "../../components/common/PageHeader";
 import { ShieldCheck, UserRound } from "lucide-react";
 
 const PROFILE_TABS = ["information", "security"];
 
 function ProfilePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useSelector((state) => state.auth);
   const [activeTab, setActiveTab] = useState("information");
   const [securityRequest, setSecurityRequest] = useState({ section: null, id: 0 });
@@ -91,6 +92,7 @@ function ProfilePage() {
       >
         <AvatarSection user={user} t={t} />
         <ProfileForm user={user} t={t} onEditSecurity={openSecuritySection} />
+        <SubscriptionCard t={t} language={i18n.language} />
       </section>
 
       <section

@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema(
     subscriptionStart: { type: Date, default: Date.now },
     subscriptionEnd:   { type: Date },
     isSuspended:       { type: Boolean, default: false },
+
+    /* notifications: "read all" mark + ids read one by one since then */
+    notificationsSeenAt: { type: Date, default: null },
+    notificationsReadIds: { type: [String], default: [] },
   },
   { timestamps: true }
 );

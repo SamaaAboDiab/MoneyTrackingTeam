@@ -9,6 +9,7 @@ import {
   BarChart3,
   Settings,
   Tags,
+  MessageCircle,
 } from "lucide-react";
 
 export const NAV_ITEMS = [
@@ -21,6 +22,7 @@ export const NAV_ITEMS = [
   { to: "/debts", key: "nav.debts", icon: ReceiptText },
   { to: "/savings", key: "nav.savings", icon: Goal },
   { to: "/reports", key: "nav.reports", icon: BarChart3 },
+  { to: "/chat", key: "nav.chat", icon: MessageCircle, chat: true },
   { to: "/profile", key: "nav.settings", icon: Settings },
 ];
 

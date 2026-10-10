@@ -12,32 +12,9 @@ const SavingsGoal = require("../models/SavingsGoal");
 const Debt      = require("../models/Debt");
 const { sendPasswordResetLink } = require("../services/passwordResetService");
 const { PLAN_PRICES, SUBSCRIPTION_CURRENCY } = require("../config/subscriptionPlans");
+const { calcEnd, planLabel, userStatus } = require("../utils/subscription");
 
 /* ── helpers ─────────────────────────────────────── */
-function calcEnd(type, start, customDays) {
-  const d = new Date(start);
-  if (type === "trial")    d.setDate(d.getDate() + 14);
-  else if (type === "3months") d.setMonth(d.getMonth() + 3);
-  else if (type === "6months") d.setMonth(d.getMonth() + 6);
-  else if (type === "yearly")  d.setFullYear(d.getFullYear() + 1);
-  else if (type === "custom")  d.setDate(d.getDate() + (parseInt(customDays) || 30));
-  return d;
-}
-
-function planLabel(type) {
-  return { trial:"تجريبي", "3months":"3 أشهر", "6months":"6 أشهر", yearly:"سنة", custom:"مخصص" }[type] ?? type;
-}
-
-function userStatus(user) {
-  if (user.isSuspended) return "suspended";
-  if (!user.subscriptionEnd) return "active";
-  const now  = Date.now();
-  const end  = new Date(user.subscriptionEnd).getTime();
-  if (now > end)                            return "expired";
-  if (end - now < 7 * 24 * 60 * 60 * 1000) return "expiring";
-  return "active";
-}
-
 function activeUserExpression(now) {
   return {
     $and: [
@@ -149,7 +126,7 @@ let dummyHashPromise;
 const getDummyHash = () => (dummyHashPromise ??= bcrypt.hash("dummy-password-for-timing", 12));
 
 function adminView(admin) {
-  return { id: admin._id, name: admin.name, email: admin.email };
+  return { id: admin._id, name: admin.name, email: admin.email, avatar: admin.avatar || "" };
 }
 
 /* ── POST /api/admin/auth/login ──────────────────── */

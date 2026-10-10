@@ -80,6 +80,10 @@ const adminAuthSlice = createSlice({
       clearSession(state);
       state.sessionExpired = true;
     },
+    // After the admin edits their own settings (name, photo, email).
+    setAdminProfile(state, action) {
+      state.admin = { ...state.admin, ...action.payload };
+    },
     clearAdminError(state) {
       state.error = null;
       state.sessionExpired = false;
@@ -128,5 +132,5 @@ const adminAuthSlice = createSlice({
   },
 });
 
-export const { adminLogout, adminSessionExpired, clearAdminError } = adminAuthSlice.actions;
+export const { adminLogout, adminSessionExpired, clearAdminError, setAdminProfile } = adminAuthSlice.actions;
 export default adminAuthSlice.reducer;

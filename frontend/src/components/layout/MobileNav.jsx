@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Menu, X } from "lucide-react";
 import { NAV_ITEMS, MOBILE_PRIMARY_PATHS, isNavItemActive } from "./sidebar/navItems";
+import { useChatUnread } from "../chat/ChatUnreadContext";
 
 const SHORT_LABEL_KEYS = {
   "dashboard.title": "layout.mobileNav.home",
@@ -21,6 +22,7 @@ function MobileNav() {
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const moreActive = MORE_ITEMS.some(({ to }) => isNavItemActive(to, pathname));
+  const { count: unread } = useChatUnread();
 
   function openMore() {
     setMounted(true);
@@ -91,7 +93,7 @@ function MobileNav() {
               </button>
             </div>
             <ul className="flex flex-1 flex-col gap-1 overflow-y-auto">
-              {MORE_ITEMS.map(({ to, key, icon: Icon }) => {
+              {MORE_ITEMS.map(({ to, key, icon: Icon, chat }) => {
                 const active = isNavItemActive(to, pathname);
                 return (
                   <li key={to}>
@@ -107,6 +109,11 @@ function MobileNav() {
                     >
                       <Icon size={19} strokeWidth={active ? 2.4 : 2} aria-hidden="true" />
                       <span>{t(key)}</span>
+                      {chat && unread > 0 && (
+                        <span className="ms-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-500 px-1.5 text-[11px] font-bold text-white">
+                          {unread > 99 ? "99+" : unread}
+                        </span>
+                      )}
                     </NavLink>
                   </li>
                 );
@@ -142,8 +149,11 @@ function MobileNav() {
               aria-haspopup="dialog"
               className={`w-full ${tabClass(moreActive || moreOpen)}`}
             >
-              <span className={iconWrap(moreActive || moreOpen)}>
+              <span className={`relative ${iconWrap(moreActive || moreOpen)}`}>
                 <Menu size={19} strokeWidth={moreActive || moreOpen ? 2.4 : 2} />
+                {unread > 0 && (
+                  <span className="absolute top-0 inset-e-2 h-2.5 w-2.5 rounded-full bg-brand-500 ring-2 ring-white" />
+                )}
               </span>
               <span className="max-w-full truncate">{t("layout.mobileNav.more")}</span>
             </button>

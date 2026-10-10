@@ -116,7 +116,8 @@ exports.login = async (req, res, next) => {
           accountType: "admin",
           token,
           expiresIn: ADMIN_TOKEN_TTL,
-          admin: { id: admin._id, name: admin.name, email: admin.email },
+          // Include the photo so it shows the moment the admin lands, not after a later refresh.
+          admin: { id: admin._id, name: admin.name, email: admin.email, avatar: admin.avatar || "" },
         },
       });
     }

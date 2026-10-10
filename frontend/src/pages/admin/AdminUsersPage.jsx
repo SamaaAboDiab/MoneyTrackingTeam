@@ -1,7 +1,22 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
-import { Ban, Check, CircleCheck, Plus, RefreshCw, Search, Users, X } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  ArrowLeft,
+  Ban,
+  CalendarDays,
+  Check,
+  ClipboardCheck,
+  Inbox,
+  Megaphone,
+  MessageCircle,
+  Plus,
+  RefreshCw,
+  Repeat,
+  Search,
+  Users,
+  X,
+} from "lucide-react";
 import {
   activateAdminUser,
   createAdminUser,
@@ -10,6 +25,10 @@ import {
   updateAdminUserSubscription,
 } from "../../api/adminUsersApi";
 import PageHeader from "../../components/common/PageHeader";
+import FormModal from "../../components/common/FormModal";
+import UserActionsMenu from "./users/UserActionsMenu";
+import { fetchRenewals } from "../../api/adminExtrasApi";
+import { fetchChatContacts } from "../../api/chatApi";
 
 const PAGE_SIZE = 20;
 const STATUSES = ["all", "active", "expiring", "expired", "suspended"];
@@ -19,6 +38,22 @@ const STATUS_STYLES = {
   expired: "bg-slate-100 text-slate-700",
   suspended: "bg-red-50 text-red-700",
 };
+const STATUS_DOTS = {
+  active: "bg-emerald-500",
+  expiring: "bg-amber-500",
+  expired: "bg-slate-400",
+  suspended: "bg-red-500",
+};
+// Avatar colours, picked from the name so each user keeps the same one.
+const AVATAR_TONES = [
+  "bg-emerald-100 text-emerald-700",
+  "bg-sky-100 text-sky-700",
+  "bg-violet-100 text-violet-700",
+  "bg-amber-100 text-amber-700",
+  "bg-rose-100 text-rose-700",
+  "bg-indigo-100 text-indigo-700",
+];
+const DAY_MS = 24 * 60 * 60 * 1000;
 const PLANS = ["all", "trial", "3months", "6months", "yearly", "custom"];
 const EMPTY_CREATE_FORM = {
   name: "",
@@ -39,6 +74,7 @@ function AdminUsersPage() {
   const [pagination, setPagination] = useState({ page: 1, limit: PAGE_SIZE, total: 0, pages: 0 });
   const [page, setPage] = useState(1);
   const [showAll, setShowAll] = useState(false);
+  const [loadedAt, setLoadedAt] = useState(0);
   const [status, setStatus] = useState(initialStatus);
   const [plan, setPlan] = useState("all");
   const [searchInput, setSearchInput] = useState(initialSearch);
@@ -73,6 +109,11 @@ function AdminUsersPage() {
   const [suspendStatus, setSuspendStatus] = useState("idle");
   const [suspendError, setSuspendError] = useState("");
   const [activatingUserId, setActivatingUserId] = useState("");
+  // Extra signals per user from the newer admin tools: a waiting renewal request, unread chat.
+  const [renewalsByUser, setRenewalsByUser] = useState({});
+  const [pendingRenewals, setPendingRenewals] = useState(0);
+  const [unreadByUser, setUnreadByUser] = useState({});
+  const navigate = useNavigate();
   const requestKey = JSON.stringify({ page, search, plan, status, reloadKey });
   const isLoading = request.key !== requestKey || request.status === "loading";
 
@@ -83,6 +124,7 @@ function AdminUsersPage() {
       .then(({ data }) => {
         setUsers(data.data);
         setPagination(data.pagination);
+        setLoadedAt(Date.now());
         setRequest({ key: requestKey, status: "succeeded", error: "" });
       })
       .catch((error) => {
@@ -96,6 +138,25 @@ function AdminUsersPage() {
 
     return () => controller.abort();
   }, [page, plan, reloadKey, requestKey, search, status, t]);
+
+  const loadSignals = useCallback(async () => {
+    try {
+      const [{ data: renewals }, { data: contacts }] = await Promise.all([
+        fetchRenewals({ status: "pending" }),
+        fetchChatContacts({ page: 1 }),
+      ]);
+      setPendingRenewals(renewals.pendingCount || 0);
+      setRenewalsByUser(Object.fromEntries(renewals.data.filter((item) => item.user).map((item) => [item.user._id, item])));
+      setUnreadByUser(Object.fromEntries(contacts.data.filter((item) => item.unread > 0).map((item) => [item._id, item.unread])));
+    } catch {
+      // The list still works without these hints.
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(loadSignals, 0);
+    return () => clearTimeout(timer);
+  }, [loadSignals, reloadKey]);
 
   const applySearch = (event) => {
     event.preventDefault();
@@ -386,61 +447,118 @@ function AdminUsersPage() {
     return new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(date);
   };
 
-  // Row actions, shared by the desktop table and the phone cards.
-  const renderActions = (user) => (
-      <div className="flex flex-wrap gap-1.5">
-        <button
-          type="button"
-          onClick={() => openPlanEditor(user)}
-          className="whitespace-nowrap rounded-lg border border-brand-200 px-3 py-2 text-xs font-bold text-brand-700 transition hover:bg-brand-50"
-        >
-          {t("admin.users.changePlan")}
-        </button>
-        <button
-          type="button"
-          onClick={() => openExtensionForm(user)}
-          className="whitespace-nowrap rounded-lg border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-50"
-        >
-          {t("admin.users.extendSubscription")}
-        </button>
-        <button
-          type="button"
-          onClick={() => openFreeDaysForm(user)}
-          className="whitespace-nowrap rounded-lg border border-amber-200 px-3 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-50"
-        >
-          {t("admin.users.addFreeDays")}
-        </button>
-        <button
-          type="button"
-          onClick={() => openManualDateForm(user)}
-          className="whitespace-nowrap rounded-lg border border-violet-200 px-3 py-2 text-xs font-bold text-violet-700 transition hover:bg-violet-50"
-        >
-          {t("admin.users.setManualDate")}
-        </button>
-        {user.isSuspended ? (
-          <button
-            type="button"
-            onClick={() => handleActivateUser(user)}
-            disabled={activatingUserId === user._id}
-            className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-wait disabled:opacity-60"
-          >
-            <CircleCheck size={14} />
-            {activatingUserId === user._id
-              ? t("admin.users.activating")
-              : t("admin.users.activate")}
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => openSuspendForm(user)}
-            className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-50"
-          >
-            <Ban size={14} />
-            {t("admin.users.suspend")}
-          </button>
+  const changeStatus = (value) => {
+    setStatus(value);
+    setPage(1);
+    setShowAll(false);
+  };
+
+  // One user: who they are, their plan and end date, then the main action and a "⋯" menu.
+  const renderUserCard = (user) => {
+    const name = user.name || user.email || "?";
+    const tone = AVATAR_TONES[name.charCodeAt(0) % AVATAR_TONES.length];
+    const end = user.subscriptionEnd ? new Date(user.subscriptionEnd).getTime() : NaN;
+    const daysLeft = Number.isNaN(end) || !loadedAt ? null : Math.ceil((end - loadedAt) / DAY_MS);
+    const statusKey = STATUS_STYLES[user._status] ? user._status : "active";
+    const renewal = renewalsByUser[user._id];
+    const unread = unreadByUser[user._id] || 0;
+
+    return (
+      <li key={user._id} className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-200 hover:shadow-md">
+        <div className="flex items-start gap-3">
+          <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-base font-bold ${tone}`}>
+            {name.trim()[0]?.toUpperCase()}
+          </span>
+          <div className="min-w-0 flex-1">
+            <Link to={`/admin/users/${user._id}`} className="block truncate text-sm font-bold text-slate-900 hover:text-brand-700 hover:underline">
+              {user.name}
+            </Link>
+            <p dir="ltr" className="truncate text-xs text-slate-500 rtl:text-right">{user.email}</p>
+          </div>
+          <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${STATUS_STYLES[statusKey]}`}>
+            <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOTS[statusKey]}`} />
+            {t(`admin.users.status.${user._status}`, { defaultValue: user._status })}
+          </span>
+        </div>
+
+        {(renewal || unread > 0) && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {renewal && (
+              <Link
+                to="/admin/renewals"
+                className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 ring-1 ring-amber-100 transition hover:bg-amber-100"
+              >
+                <ClipboardCheck size={12} />
+                {t("admin.users.renewalBadge", { plan: t(`admin.home.plans.${renewal.plan}`) })}
+              </Link>
+            )}
+            {unread > 0 && (
+              <Link
+                to={`/admin/chat?user=${user._id}`}
+                className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-bold text-brand-700 ring-1 ring-brand-100 transition hover:bg-brand-100"
+              >
+                <MessageCircle size={12} />
+                {t("admin.users.unreadBadge", { count: unread })}
+              </Link>
+            )}
+          </div>
         )}
-      </div>
-  );
+
+        <dl className="mt-3 grid grid-cols-2 gap-2 rounded-xl bg-slate-50 p-3 text-xs">
+          <div>
+            <dt className="text-slate-500">{t("admin.users.subscription")}</dt>
+            <dd className="mt-0.5 text-sm font-bold text-slate-800">
+              {t(`admin.users.plan.${user.subscriptionType}`, { defaultValue: user.subscriptionType })}
+            </dd>
+          </div>
+          <div>
+            <dt className="flex items-center gap-1 text-slate-500">
+              <CalendarDays size={12} aria-hidden="true" />
+              {t("admin.users.subscriptionEnd")}
+            </dt>
+            <dd className="mt-0.5 text-sm font-bold text-slate-800">{formatDate(user.subscriptionEnd)}</dd>
+            {daysLeft !== null && daysLeft > 0 && (
+              <dd className={`mt-0.5 font-semibold ${daysLeft <= 7 ? "text-amber-600" : "text-emerald-600"}`}>
+                {t("admin.home.daysRemaining", { days: daysLeft })}
+              </dd>
+            )}
+          </div>
+        </dl>
+
+        <div className="mt-4 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => openPlanEditor(user)}
+            className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-brand-50 px-3 text-sm font-bold text-brand-700 ring-1 ring-brand-100 transition hover:bg-brand-100"
+          >
+            <Repeat size={15} aria-hidden="true" />
+            {t("admin.users.changePlan")}
+          </button>
+          <Link
+            to={`/admin/chat?user=${user._id}`}
+            aria-label={t("admin.users.sendMessage")}
+            title={t("admin.users.sendMessage")}
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700"
+          >
+            <MessageCircle size={17} />
+            {unread > 0 && <span className="absolute -top-1 h-2.5 w-2.5 rounded-full bg-brand-500 ring-2 ring-white inset-e-[-0.25rem]" />}
+          </Link>
+          <UserActionsMenu
+            user={user}
+            t={t}
+            busy={activatingUserId === user._id}
+            onProfile={() => navigate(`/admin/users/${user._id}`)}
+            onChat={() => navigate(`/admin/chat?user=${user._id}`)}
+            onExtend={() => openExtensionForm(user)}
+            onFreeDays={() => openFreeDaysForm(user)}
+            onManualDate={() => openManualDateForm(user)}
+            onSuspend={() => openSuspendForm(user)}
+            onActivate={() => handleActivateUser(user)}
+          />
+        </div>
+      </li>
+    );
+  };
 
   // Only the first few users until "show all" is pressed.
   const visibleUsers = showAll ? users : users.slice(0, PREVIEW_COUNT);
@@ -453,10 +571,18 @@ function AdminUsersPage() {
         title={t("admin.users.title")}
         subtitle={t("admin.users.subtitle")}
         actions={
+          <>
+          <Link
+            to="/admin/announcements"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-brand-200 hover:text-brand-700"
+          >
+            <Megaphone size={17} />
+            {t("admin.users.sendAnnouncement")}
+          </Link>
           <button
             type="button"
             onClick={() => {
-              setShowCreateForm((current) => !current);
+              setShowCreateForm(true);
               setCreateError("");
               setCreationNotice({ type: "", message: "" });
             }}
@@ -467,8 +593,26 @@ function AdminUsersPage() {
             <Plus size={17} />
             {t("admin.users.createAction")}
           </button>
+          </>
         }
       />
+
+      {/* Waiting renewal requests: a gentle nudge with a way straight there. */}
+      {pendingRenewals > 0 && (
+        <Link
+          to="/admin/renewals"
+          className="mb-5 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 transition hover:bg-amber-100/70"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-amber-600 shadow-sm">
+            <ClipboardCheck size={19} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-bold text-amber-900">{t("admin.users.renewalsBanner", { count: pendingRenewals })}</span>
+            <span className="block text-xs text-amber-800/80">{t("admin.users.renewalsBannerHint")}</span>
+          </span>
+          <ArrowLeft size={17} className="shrink-0 text-amber-700 ltr:rotate-180" />
+        </Link>
+      )}
 
       {creationNotice.message && (
         <div
@@ -480,9 +624,12 @@ function AdminUsersPage() {
       )}
 
       {showCreateForm && (
-        <section id="admin-create-user" className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-          <h2 className="mb-4 text-lg font-extrabold text-slate-900">{t("admin.users.createTitle")}</h2>
-          <form onSubmit={handleCreateUser} className="grid gap-4 sm:grid-cols-2">
+        <FormModal
+          title={t("admin.users.createTitle")}
+          onClose={() => { setShowCreateForm(false); setCreateError(""); }}
+          closeDisabled={createStatus === "loading"}
+        >
+          <form id="admin-create-user" onSubmit={handleCreateUser} className="mt-4 grid gap-4 sm:grid-cols-2">
             <label className="text-sm font-semibold text-slate-700">
               {t("admin.users.name")}
               <input
@@ -554,24 +701,17 @@ function AdminUsersPage() {
                 {createError}
               </div>
             )}
-            <div className="flex gap-2 sm:col-span-2">
+            <div className="sm:col-span-2">
               <button
                 type="submit"
                 disabled={createStatus === "loading"}
-                className="min-h-11 rounded-xl bg-brand-600 px-4 text-sm font-bold text-white transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-60"
+                className="min-h-11 w-full rounded-xl bg-brand-600 px-4 text-sm font-bold text-white transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-60"
               >
                 {createStatus === "loading" ? t("admin.users.creating") : t("admin.users.createSubmit")}
               </button>
-              <button
-                type="button"
-                onClick={() => { setShowCreateForm(false); setCreateError(""); }}
-                className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-              >
-                {t("common.cancel")}
-              </button>
             </div>
           </form>
-        </section>
+        </FormModal>
       )}
 
       {editingUser && (
@@ -983,59 +1123,19 @@ function AdminUsersPage() {
         </div>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-        <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <form onSubmit={applySearch} className="flex w-full gap-2 lg:max-w-md">
-            <label className="relative min-w-0 flex-1">
-              <span className="sr-only">{t("admin.users.search")}</span>
-              <Search size={17} className="absolute start-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="search"
-                maxLength={100}
-                value={searchInput}
-                onChange={(event) => setSearchInput(event.target.value)}
-                placeholder={t("admin.users.search")}
-                className="min-h-11 w-full rounded-xl border border-slate-200 ps-10 pe-3 text-sm outline-none transition focus:border-brand-500"
-              />
-            </label>
-            <button
-              type="submit"
-              className="min-h-11 rounded-xl bg-brand-600 px-4 text-sm font-bold text-white transition hover:bg-brand-700"
-            >
-              {t("admin.users.searchAction")}
-            </button>
-          </form>
-
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <label className="sr-only" htmlFor="admin-user-status">{t("admin.users.statusFilter")}</label>
-            <select
-              id="admin-user-status"
-              value={status}
-              onChange={(event) => { setStatus(event.target.value); setPage(1); setShowAll(false); }}
-              className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-brand-500"
-            >
-              {STATUSES.map((value) => (
-                <option key={value} value={value}>{t(`admin.users.status.${value}`)}</option>
-              ))}
-            </select>
-            <label className="sr-only" htmlFor="admin-user-plan">{t("admin.users.planFilter")}</label>
-            <select
-              id="admin-user-plan"
-              value={plan}
-              onChange={(event) => { setPlan(event.target.value); setPage(1); setShowAll(false); }}
-              className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-brand-500"
-            >
-              {PLANS.map((value) => (
-                <option key={value} value={value}>{t(`admin.users.plan.${value}`)}</option>
-              ))}
-            </select>
+      <section className="rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <header className="flex flex-wrap items-center justify-between gap-3 rounded-t-3xl border-b border-slate-100 bg-linear-to-b from-slate-50 to-white px-5 py-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-navy-900 text-white shadow-sm">
+              <Users size={20} />
+            </span>
+            <div>
+              <h2 className="text-base font-bold text-slate-900">{t("admin.users.listTitle")}</h2>
+              <p className="text-xs text-slate-500" aria-live="polite">
+                {t("admin.users.total", { count: pagination.total })}
+              </p>
+            </div>
           </div>
-        </div>
-
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm text-slate-500" aria-live="polite">
-            {t("admin.users.total", { count: pagination.total })}
-          </p>
           {!isLoading && request.status === "succeeded" && hasMore && (
             <button
               type="button"
@@ -1045,73 +1145,96 @@ function AdminUsersPage() {
               {showAll ? t("admin.auditLogs.showLess") : t("admin.auditLogs.showAll")}
             </button>
           )}
-        </div>
+        </header>
 
-        {isLoading ? (
-          <div className="py-12 text-center text-sm text-slate-500">{t("common.loading")}</div>
-        ) : request.status === "failed" ? (
-          <div role="alert" className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{request.error}</div>
-        ) : users.length === 0 ? (
-          <div className="py-12 text-center text-sm text-slate-500">{t("admin.users.empty")}</div>
-        ) : (
-          <>
-          {/* Phones/tablets: one card per user, so nothing scrolls sideways. */}
-          <ul className="divide-y divide-slate-100 lg:hidden">
-            {visibleUsers.map((user) => (
-              <li key={user._id} className="space-y-2 py-4 text-sm text-slate-700">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-slate-900">{user.name}</p>
-                    <p dir="ltr" className="break-all text-xs text-slate-500 rtl:text-right">{user.email}</p>
-                  </div>
-                  <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${STATUS_STYLES[user._status] ?? STATUS_STYLES.active}`}>
-                    {t(`admin.users.status.${user._status}`)}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500">
-                  {t(`admin.users.plan.${user.subscriptionType}`, { defaultValue: user.subscriptionType })}
-                  {" · "}
-                  {t("admin.users.subscriptionEnd")}: {formatDate(user.subscriptionEnd)}
-                </p>
-                {renderActions(user)}
-              </li>
-            ))}
-          </ul>
+        <div className="p-4 sm:p-6">
+          {/* Filters: status as tabs, then search and plan. */}
+          <div className="mb-5 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+            <div role="tablist" aria-label={t("admin.users.statusFilter")} className="no-scrollbar flex gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1">
+              {STATUSES.map((value) => {
+                const selected = status === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    role="tab"
+                    aria-selected={selected}
+                    onClick={() => changeStatus(value)}
+                    className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-3.5 text-sm font-semibold transition ${
+                      selected ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                    }`}
+                  >
+                    {value !== "all" && <span className={`h-2 w-2 rounded-full ${STATUS_DOTS[value]}`} />}
+                    {t(`admin.users.status.${value}`)}
+                  </button>
+                );
+              })}
+            </div>
 
-          <div className="hidden lg:block">
-            <table className="w-full table-fixed text-sm">
-              <thead className="border-b border-slate-200 text-xs font-bold text-slate-500">
-                <tr>
-                  <th scope="col" className="w-[15%] px-3 py-3 text-start">{t("admin.users.name")}</th>
-                  <th scope="col" className="w-[21%] px-3 py-3 text-start">{t("admin.users.email")}</th>
-                  <th scope="col" className="w-[10%] px-3 py-3 text-start">{t("admin.users.subscription")}</th>
-                  <th scope="col" className="w-[11%] px-3 py-3 text-start">{t("admin.users.subscriptionEnd")}</th>
-                  <th scope="col" className="w-[9%] px-3 py-3 text-start">{t("admin.users.statusLabel")}</th>
-                  <th scope="col" className="w-[34%] px-3 py-3 text-start">{t("admin.users.actions")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {visibleUsers.map((user) => (
-                  <tr key={user._id} className="align-top text-slate-700">
-                    <td className="break-words px-3 py-4 font-semibold text-slate-900">{user.name}</td>
-                    <td className="px-3 py-4"><span dir="ltr" className="break-all">{user.email}</span></td>
-                    <td className="px-3 py-4">{t(`admin.users.plan.${user.subscriptionType}`, { defaultValue: user.subscriptionType })}</td>
-                    <td className="px-3 py-4">{formatDate(user.subscriptionEnd)}</td>
-                    <td className="px-3 py-4">
-                      <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${STATUS_STYLES[user._status] ?? STATUS_STYLES.active}`}>
-                        {t(`admin.users.status.${user._status}`)}
-                      </span>
-                    </td>
-                    <td className="px-3 py-4">
-                      {renderActions(user)}
-                    </td>
-                  </tr>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <form onSubmit={applySearch} className="flex min-w-0 flex-1 sm:w-80">
+                <label className="relative min-w-0 flex-1">
+                  <span className="sr-only">{t("admin.users.search")}</span>
+                  <Search size={16} className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="admin-user-search"
+                    type="search"
+                    maxLength={100}
+                    value={searchInput}
+                    onChange={(event) => setSearchInput(event.target.value)}
+                    placeholder={t("admin.users.search")}
+                    className="min-h-11 w-full rounded-s-xl rounded-e-none border border-e-0 border-slate-200 bg-slate-50 ps-9 pe-3 text-sm outline-none transition focus:border-brand-500 focus:bg-white"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-e-xl rounded-s-none bg-brand-600 px-4 text-sm font-bold text-white transition hover:bg-brand-700"
+                >
+                  <Search size={15} aria-hidden="true" />
+                  {t("admin.users.searchAction")}
+                </button>
+              </form>
+              <label className="sr-only" htmlFor="admin-user-plan">{t("admin.users.planFilter")}</label>
+              <select
+                id="admin-user-plan"
+                value={plan}
+                onChange={(event) => { setPlan(event.target.value); setPage(1); setShowAll(false); }}
+                className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-brand-500 sm:w-auto"
+              >
+                {PLANS.map((value) => (
+                  <option key={value} value={value}>{t(`admin.users.plan.${value}`)}</option>
                 ))}
-              </tbody>
-            </table>
+              </select>
+            </div>
           </div>
-          </>
-        )}
+
+          {isLoading ? (
+            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label={t("common.loading")}>
+              {[0, 1, 2].map((item) => (
+                <li key={item} className="space-y-3 rounded-2xl border border-slate-100 p-4">
+                  <div className="flex items-center gap-3">
+                    <span className="skeleton h-11 w-11 rounded-2xl" />
+                    <span className="skeleton block h-4 w-1/2 rounded-full" />
+                  </div>
+                  <span className="skeleton block h-14 rounded-xl" />
+                  <span className="skeleton block h-10 rounded-xl" />
+                </li>
+              ))}
+            </ul>
+          ) : request.status === "failed" ? (
+            <div role="alert" className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{request.error}</div>
+          ) : users.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-12 text-center">
+              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                <Inbox size={26} />
+              </span>
+              <p className="text-sm text-slate-500">{t("admin.users.empty")}</p>
+            </div>
+          ) : (
+            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {visibleUsers.map(renderUserCard)}
+            </ul>
+          )}
 
         {!isLoading && request.status === "succeeded" && showAll && pagination.pages > 1 && (
           <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
@@ -1136,6 +1259,7 @@ function AdminUsersPage() {
             </button>
           </div>
         )}
+        </div>
       </section>
     </div>
   );

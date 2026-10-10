@@ -10,6 +10,8 @@ import {
   PiggyBank,
   BarChart3,
   Tags,
+  MessageCircle,
+  Megaphone,
 } from "lucide-react";
 
 const BREADCRUMB_ITEMS = [
@@ -24,6 +26,8 @@ const BREADCRUMB_ITEMS = [
   { match: "/savings", key: "nav.savings", icon: PiggyBank },
   { match: "/reports", key: "nav.reports", icon: BarChart3 },
   { match: "/profile", key: "profile.title", icon: UserRound },
+  { match: "/chat", key: "nav.chat", icon: MessageCircle },
+  { match: "/announcements", key: "announcements.title", icon: Megaphone },
 ];
 
 function getBreadcrumb(pathname) {
