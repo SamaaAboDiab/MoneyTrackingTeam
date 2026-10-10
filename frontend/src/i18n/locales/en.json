@@ -196,7 +196,8 @@
       "accounts": "Accounts",
       "more": "More"
     },
-    "primaryNav": "Main navigation"
+    "primaryNav": "Main navigation",
+    "theme": "Theme"
   },
   "transfer": {
     "backToDashboard": "Back to dashboard",
@@ -629,7 +630,8 @@
     "sectionsLabel": "Profile Sections",
     "tabs": {
       "information": "Personal Information",
-      "security": "Security"
+      "security": "Security",
+      "preferences": "Preferences"
     },
     "changePhoto": "Change Photo",
     "removePhoto": "Remove Photo",
@@ -692,6 +694,18 @@
       "title": "Account language",
       "subtitle": "Saved with your account and synced on any device you sign in from.",
       "saving": "Saving..."
+    },
+    "preferences": {
+      "title": "Preferences",
+      "subtitle": "Customize how the app looks and which language it speaks.",
+      "theme": {
+        "title": "Theme",
+        "description": "Colors, fonts and sidebar style. Saved on this device."
+      },
+      "language": {
+        "title": "Language",
+        "description": "Used across the app. Saved to your account, so it follows you to every device."
+      }
     }
   },
   "quickAdd": {
@@ -852,7 +866,8 @@
       "message": "\"{{account}}\" only has {{balance}}, but this deposit is {{amount}}. The account will go negative. Continue anyway?",
       "cancel": "Cancel",
       "confirm": "Continue anyway"
-    }
+    },
+    "totalSaved": "Total saved"
   },
   "reports": {
     "title": "Reports & Analytics",
@@ -1298,6 +1313,45 @@
         "suspend": "Suspend user",
         "activate": "Activate user",
         "manual_date": "Set manual end date"
+      }
+    }
+  },
+  "theme": {
+    "mali": {
+      "name": "Mali",
+      "description": "Slate gray and orange, with a white sidebar."
+    },
+    "emerald": {
+      "name": "Emerald",
+      "description": "Emerald green and navy, with a dark sidebar."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "You're all caught up.",
+    "unread": "{{count}} unread",
+    "debtOverdue": {
+      "title": "Overdue debt",
+      "message": "{{creditor}} is overdue — {{amount}} still unpaid."
+    },
+    "debtDueSoon": {
+      "title": "Debt due soon",
+      "message": "{{creditor}} is {{when}} — {{amount}} remaining.",
+      "today": "due today",
+      "tomorrow": "due tomorrow",
+      "inDays_one": "due in {{count}} day",
+      "inDays_other": "due in {{count}} days"
+    },
+    "insufficient": {
+      "title": "Insufficient balance",
+      "message": "You tried to {{action}} {{amount}} from {{account}}, but its balance is {{balance}}.",
+      "actions": {
+        "transfer": "transfer",
+        "cash": "withdraw",
+        "expense": "spend",
+        "debtPayment": "pay",
+        "savings": "save"
       }
     }
   }

@@ -8,9 +8,9 @@ function SidebarUserSection({ collapsed, user, onLogoutClick, t, profileTo = "/p
   const UserBlock = profileTo ? Link : "div";
 
   return (
-    <div className="mt-3 border-t border-white/10 pt-3">
+    <div className="mt-3 border-t border-slate-100 pt-3 emerald:border-white/10">
       {!collapsed ? (
-        <UserBlock to={profileTo || undefined} className="flex items-center gap-3 rounded-xl px-1 py-1 transition hover:bg-white/5">
+        <UserBlock to={profileTo || undefined} className="flex items-center gap-3 rounded-xl px-1 py-1 transition hover:bg-slate-50 emerald:hover:bg-white/5">
           {user?.avatar ? (
             <img src={user.avatar} alt={displayName} className="h-9 w-9 shrink-0 rounded-full object-cover" />
           ) : (
@@ -19,8 +19,8 @@ function SidebarUserSection({ collapsed, user, onLogoutClick, t, profileTo = "/p
             </span>
           )}
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-white">{displayName}</p>
-            <p className="truncate text-xs text-slate-400">{user?.email}</p>
+            <p className="truncate text-sm font-bold text-slate-900 emerald:text-white">{displayName}</p>
+            <p className="truncate text-xs text-slate-500 emerald:text-slate-400">{user?.email}</p>
           </div>
         </UserBlock>
       ) : (
@@ -39,7 +39,7 @@ function SidebarUserSection({ collapsed, user, onLogoutClick, t, profileTo = "/p
         type="button"
         onClick={onLogoutClick}
         title={collapsed ? t("layout.logout") : undefined}
-        className={`mt-3 flex items-center gap-3 rounded-xl px-2 py-2 text-sm font-semibold text-red-400 transition hover:bg-red-500/10 ${
+        className={`mt-3 flex items-center gap-3 rounded-xl px-2 py-2 text-sm font-semibold text-expense transition hover:bg-expense-soft emerald:text-red-400 emerald:hover:bg-red-500/10 ${
           collapsed ? "w-full justify-center" : "w-full"
         }`}
       >

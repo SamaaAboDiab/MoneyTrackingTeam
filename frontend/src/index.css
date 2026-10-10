@@ -1,8 +1,92 @@
 @import "tailwindcss";
 
+/*
+  Two themes, switched by <html data-theme> (see utils/theme.js):
+  - "mali" (default): slate gray brand, orange accent, Inter, white sidebar.
+  - "emerald": emerald green brand, indigo accent, Plus Jakarta Sans, dark navy sidebar.
+  Colors are CSS variables, so the [data-theme="emerald"] block below swaps them at runtime.
+  Where the two designs differ beyond color (the sidebar, hero cards), components add
+  `emerald:` classes on top of the Mali ones.
+*/
+@custom-variant emerald (&:where([data-theme="emerald"], [data-theme="emerald"] *));
+
 @theme {
-  /* Latin text uses Plus Jakarta Sans; Arabic text uses Cairo
+  /* English/Latin text uses Inter; Arabic text uses Cairo
      (applied below via html[lang="ar"], since the two scripts don't share one family). */
+  --font-sans: "Inter", "Cairo", "Segoe UI", sans-serif;
+
+  /* Primary brand color is slate gray. */
+  --color-brand-50: #f8fafc;
+  --color-brand-100: #f1f5f9;
+  --color-brand-200: #e2e8f0;
+  --color-brand-300: #cbd5e1;
+  --color-brand-400: #94a3b8;
+  --color-brand-500: #64748b;
+  --color-brand-600: #334155;
+  --color-brand-700: #1e293b;
+  --color-brand-800: #0f172a;
+  --color-brand-900: #0f172a;
+
+  /* Deep blue #03346E: the logo color, also used for the icon on orange fills. */
+  --color-navy: #03346e;
+
+  /* Emerald theme only: deep slate navy for the sidebar and dark hero cards. */
+  --color-navy-700: #2a3748;
+  --color-navy-800: #1e2a38;
+  --color-navy-900: #151f2b;
+
+  /* Accent: orange #FF9B51 (= accent-500). Text/icons on orange fills use navy (white fails contrast);
+     orange text on white uses accent-700. */
+  --color-accent-50: #fff4ec;
+  --color-accent-100: #ffe6d3;
+  --color-accent-300: #ffc497;
+  --color-accent-500: #ff9b51;
+  --color-accent-600: #f0802e;
+  --color-accent-700: #a8561a;
+
+  --color-income: #15803d;
+  --color-income-soft: #dcfce7;
+  --color-expense: #b91c1c;
+  --color-expense-soft: #fee2e2;
+
+  --color-ink-900: #0f172a;
+  --color-ink-500: #64748b;
+
+  /* Total cards (TotalsCard): a dark gradient, the currency in the accent, muted secondary text. */
+  --color-hero-start: #334155;
+  --color-hero-end: #1e293b;
+  --color-hero-accent: #ff9b51;
+  --color-hero-muted: #cbd5e1;
+
+  /* Currency labels beside amounts on light surfaces (see Money); a step darker than the
+     accent so the orange stays readable on white. */
+  --color-currency: #f0802e;
+
+  /* Elevation comes from per-theme variables (set below) instead of fixed values, so it can
+     switch at runtime; colored shadows (e.g. shadow-brand-600/30) still apply. */
+  --shadow-sm: var(--theme-shadow-sm);
+  --shadow-lg: var(--theme-shadow-lg);
+  --shadow-2xl: var(--theme-shadow-2xl);
+}
+
+html[lang="ar"] {
+  --font-sans: "Cairo", "Inter", "Segoe UI", sans-serif;
+}
+
+/* Set on every element so var(--tw-shadow-color) resolves against that element's own
+   shadow color utility. Mali: Tailwind's default shadows. */
+*,
+::before,
+::after {
+  --theme-shadow-sm: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)),
+    0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+  --theme-shadow-lg: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)),
+    0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+  --theme-shadow-2xl: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));
+}
+
+/* ---------- Emerald theme ---------- */
+[data-theme="emerald"] {
   --font-sans: "Plus Jakarta Sans", "Cairo", "Segoe UI", sans-serif;
 
   /* Primary brand: emerald green #059669 (= brand-600) for buttons, active states and links;
@@ -18,11 +102,7 @@
   --color-brand-800: #065f46;
   --color-brand-900: #064e3b;
 
-  /* Deep slate navy: the sidebar, dark hero cards and the auth backdrop. */
   --color-navy: #1e2a38;
-  --color-navy-700: #2a3748;
-  --color-navy-800: #1e2a38;
-  --color-navy-900: #151f2b;
 
   /* Accent: dynamic indigo #4F46E5 (= accent-500) for focal points, tags and progress. */
   --color-accent-50: #eef2ff;
@@ -38,28 +118,51 @@
   --color-expense: #dc2626;
   --color-expense-soft: #fef2f2;
 
-  --color-ink-900: #0f172a;
-  --color-ink-500: #64748b;
+  --color-hero-start: #1e2a38;
+  --color-hero-end: #151f2b;
+  --color-hero-accent: #34d399;
+  --color-hero-muted: #94a3b8;
 
-  /* Elevation, tinted with deep slate navy: cards (sm), menus (lg), modals and sheets (2xl). */
-  --shadow-sm: 0 4px 20px -2px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.04);
-  --shadow-lg: 0 8px 24px -4px rgb(15 23 42 / 0.12), 0 2px 6px -1px rgb(15 23 42 / 0.06);
-  --shadow-2xl: 0 20px 40px -8px rgb(15 23 42 / 0.18), 0 4px 12px -2px rgb(15 23 42 / 0.08);
+  --color-currency: #059669;
 }
 
-html[lang="ar"] {
+html[lang="ar"][data-theme="emerald"] {
   --font-sans: "Cairo", "Plus Jakarta Sans", "Segoe UI", sans-serif;
 }
 
-::selection {
+/* Elevation, tinted with deep slate navy: cards (sm), menus (lg), modals and sheets (2xl). */
+[data-theme="emerald"],
+[data-theme="emerald"] *,
+[data-theme="emerald"] ::before,
+[data-theme="emerald"] ::after {
+  --theme-shadow-sm: 0 4px 20px -2px var(--tw-shadow-color, rgb(15 23 42 / 0.06)),
+    0 1px 2px var(--tw-shadow-color, rgb(15 23 42 / 0.04));
+  --theme-shadow-lg: 0 8px 24px -4px var(--tw-shadow-color, rgb(15 23 42 / 0.12)),
+    0 2px 6px -1px var(--tw-shadow-color, rgb(15 23 42 / 0.06));
+  --theme-shadow-2xl: 0 20px 40px -8px var(--tw-shadow-color, rgb(15 23 42 / 0.18)),
+    0 4px 12px -2px var(--tw-shadow-color, rgb(15 23 42 / 0.08));
+}
+
+@layer utilities {
+  /* Mali cards and modals carry a slate shadow tint; emerald uses the plain navy-tinted shadow. */
+  [data-theme="emerald"] .shadow-slate-200,
+  [data-theme="emerald"] .shadow-slate-200\/60,
+  [data-theme="emerald"] .shadow-slate-900\/10 {
+    --tw-shadow-color: initial;
+  }
+}
+
+[data-theme="emerald"] ::selection {
   background: var(--color-brand-100);
   color: var(--color-ink-900);
 }
 
+/* Checkboxes and radios take the theme's brand color (slate in Mali, emerald in emerald). */
 input[type="checkbox"],
 input[type="radio"] {
   accent-color: var(--color-brand-600);
 }
+/* ---------- end emerald theme ---------- */
 
 body {
   margin: 0;
@@ -212,9 +315,18 @@ html[dir="rtl"] .skeleton::after {
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
+  /* Just the field's own border, darkened — no outline or halo around it. */
+  outline: none;
+  border-color: var(--color-brand-600);
+}
+
+/* Emerald: a soft glow around the field instead of an offset outline. */
+[data-theme="emerald"] input:focus-visible,
+[data-theme="emerald"] select:focus-visible,
+[data-theme="emerald"] textarea:focus-visible {
   outline: none;
   border-color: var(--color-brand-500);
-  box-shadow: 0 0 0 3px rgb(16 185 129 / 0.15);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand-500) 15%, transparent);
 }
 
 form button[type="submit"] {
@@ -246,6 +358,13 @@ summary:focus-visible {
 button:not(:disabled),
 [role="button"] {
   cursor: pointer;
+}
+
+/* Charts: Recharts makes the chart and its slices/bars focusable, so a click left the browser's
+   focus box around them. Keyboard users still get the hovered mark and its tooltip. */
+.recharts-wrapper:focus,
+.recharts-wrapper :focus {
+  outline: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

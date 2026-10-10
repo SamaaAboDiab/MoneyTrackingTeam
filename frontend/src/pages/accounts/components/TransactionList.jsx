@@ -3,7 +3,7 @@ import { ListSkeleton } from "../../../components/common/Skeleton";
 
 function TransactionList({ transactions, status, error, formatDate, t }) {
   return (
-    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80" aria-live="polite">
+    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80" aria-live="polite">
       {status === "loading" && <ListSkeleton rows={5} label={t("accounts.transactions.loading")} />}
       {error && (
         <p className="rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense">{error}</p>

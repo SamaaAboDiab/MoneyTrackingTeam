@@ -7,7 +7,7 @@ const labelClass = "text-sm font-semibold text-slate-700";
 function TransactionFilters({ start, end, onStartChange, onEndChange, onSubmit, t }) {
   return (
     <form
-      className="mt-6 grid grid-cols-1 gap-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200/80 sm:grid-cols-3 sm:items-end sm:p-6"
+      className="mt-6 grid grid-cols-1 gap-4 rounded-2xl bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80 sm:grid-cols-3 sm:items-end sm:p-6"
       onSubmit={onSubmit}
     >
       <div className="flex flex-col gap-1.5">

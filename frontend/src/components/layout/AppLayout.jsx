@@ -3,11 +3,11 @@ import { useSelector } from "react-redux";
 import { Outlet, useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowLeftRight } from "lucide-react";
-import LanguageSwitcher from "../common/LanguageSwitcher";
 import Sidebar from "./Sidebar";
 import Breadcrumb from "./appLayout/Breadcrumb";
 import DateBadge from "./appLayout/DateBadge";
 import UserMenu from "./appLayout/UserMenu";
+import NotificationsMenu from "./appLayout/NotificationsMenu";
 import MobileNav from "./MobileNav";
 import QuickAddButton from "./QuickAddButton";
 import useRevealCards from "./appLayout/useRevealCards";
@@ -34,7 +34,7 @@ function AppLayout() {
 
             <div className="ms-auto flex items-center gap-2 sm:gap-3">
               <DateBadge />
-              <LanguageSwitcher />
+              <NotificationsMenu user={user} t={t} />
 
               <Link
                 to="/accounts/transfer"

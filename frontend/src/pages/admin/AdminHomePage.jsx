@@ -2,10 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Ban, ChartNoAxesColumn, Clock3, PieChart, UserCheck, Users, UserX } from "lucide-react";
+import { Ban, ChartNoAxesColumn, Clock3, PieChart as PieChartIcon, UserCheck, Users, UserX } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { fetchAdminDashboard, fetchAdminStats } from "../../api/adminAuthApi";
 import { formatMoney } from "../../utils/formatAmount";
 import { toIntlLocale } from "../../i18n/locale";
+import ChartTooltip from "../../components/charts/ChartTooltip";
+import { AXIS_TICK, BAR_CURSOR, BAR_RADIUS, CHART_COLORS, GRID_PROPS, useChartLayout } from "../../components/charts/chartTheme";
 
 const EMPTY_STATS = { total: 0, active: 0, expiring: 0, expired: 0, suspended: 0 };
 const PLAN_TYPES = [
@@ -16,9 +19,6 @@ const PLAN_TYPES = [
   { type: "custom", color: "#ec4899" },
 ];
 const DONUT_SIZE = 184;
-const DONUT_RADIUS = 72;
-const DONUT_STROKE = 24;
-const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS;
 
 function UserGrowthChart({ monthly, loading, error, t, language }) {
   const [period, setPeriod] = useState(12);
@@ -26,7 +26,12 @@ function UserGrowthChart({ monthly, loading, error, t, language }) {
   const dateFormat = new Intl.DateTimeFormat(toIntlLocale(language), { month: "short", year: "2-digit" });
   const visibleMonths = monthly.slice(-period);
   const total = visibleMonths.reduce((sum, month) => sum + month.count, 0);
-  const maxCount = Math.max(1, ...visibleMonths.map((month) => month.count));
+  const { xAxisProps, yAxisProps, animate } = useChartLayout();
+  const chartData = visibleMonths.map((month) => ({
+    key: `${month.year}-${month.month}`,
+    month: dateFormat.format(new Date(month.year, month.month, 1)),
+    count: month.count,
+  }));
 
   return (
     <section aria-labelledby="admin-user-growth-title" className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -65,34 +70,48 @@ function UserGrowthChart({ monthly, loading, error, t, language }) {
             <span className="text-sm font-semibold text-slate-600">{t("admin.home.userGrowthTotal", { months: period })}</span>
             <strong className="text-xl font-extrabold tabular-nums text-slate-900">{numberFormat.format(total)}</strong>
           </div>
-          <div className="mt-5 overflow-x-auto pb-2">
-            <ul
-              aria-label={t("admin.home.userGrowthChartLabel", { months: period })}
-              className="grid min-w-[540px] grid-flow-col auto-cols-fr items-end gap-2"
-            >
-              {visibleMonths.map((month) => {
-                const date = new Date(month.year, month.month, 1);
-                const monthLabel = dateFormat.format(date);
-                const barHeight = month.count > 0 ? Math.max((month.count / maxCount) * 100, 6) : 2;
-                return (
-                  <li key={`${month.year}-${month.month}`} className="flex min-w-0 flex-col items-center gap-2">
-                    <span className="text-xs font-bold tabular-nums text-slate-700">{numberFormat.format(month.count)}</span>
-                    <div className="flex h-36 w-full items-end justify-center border-b border-slate-200">
-                      <span
-                        aria-hidden="true"
-                        className={`w-2/3 max-w-10 rounded-t-md transition-[height] ${month.count > 0 ? "bg-brand-500" : "bg-slate-200"}`}
-                        style={{ height: `${barHeight}%` }}
-                      />
-                    </div>
-                    <span className="truncate text-xs font-medium text-slate-500">{monthLabel}</span>
-                    <span className="sr-only">
-                      {t("admin.home.userGrowthMonthValue", { month: monthLabel, value: numberFormat.format(month.count) })}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
+          <div className="mt-5 h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 20, right: 4, bottom: 0, left: 4 }}>
+                <CartesianGrid {...GRID_PROPS} />
+                <XAxis dataKey="month" {...xAxisProps} interval="preserveStartEnd" />
+                <YAxis {...yAxisProps} allowDecimals={false} />
+                <Tooltip
+                  cursor={BAR_CURSOR}
+                  content={
+                    <ChartTooltip showNames={false} title={(label) => label} formatValue={(value) => numberFormat.format(value)} />
+                  }
+                />
+                <Bar
+                  dataKey="count"
+                  fill={CHART_COLORS.brandSoft}
+                  radius={BAR_RADIUS}
+                  maxBarSize={40}
+                  minPointSize={2}
+                  isAnimationActive={animate}
+                >
+                  {chartData.map((month) => (
+                    <Cell key={month.key} fill={month.count > 0 ? CHART_COLORS.brandSoft : CHART_COLORS.empty} />
+                  ))}
+                  <LabelList
+                    dataKey="count"
+                    position="top"
+                    offset={6}
+                    formatter={(value) => numberFormat.format(value)}
+                    style={{ ...AXIS_TICK, fill: "var(--color-slate-700, #334155)", fontWeight: 700 }}
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
+          {/* The same values for screen readers. */}
+          <ul className="sr-only" aria-label={t("admin.home.userGrowthChartLabel", { months: period })}>
+            {chartData.map((month) => (
+              <li key={month.key}>
+                {t("admin.home.userGrowthMonthValue", { month: month.month, value: numberFormat.format(month.count) })}
+              </li>
+            ))}
+          </ul>
         </>
       )}
     </section>
@@ -167,11 +186,14 @@ function ExpiringUsersList({ users, total, loading, error, t, language }) {
 function PlanDistributionChart({ plans, loading, error, revenue, t, language }) {
   const total = plans.reduce((sum, plan) => sum + plan.count, 0);
   const numberFormat = new Intl.NumberFormat(language);
+  const { animate, donutTooltipProps } = useChartLayout();
+  // name / fill ride on each slice for the tooltip; an empty ring shows when nobody subscribed.
+  const slices = plans.map((plan) => ({ ...plan, name: t(`admin.home.plans.${plan.type}`), fill: plan.color }));
 
   return (
     <section aria-labelledby="admin-plan-distribution-title" className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <h2 id="admin-plan-distribution-title" className="flex items-center gap-2 text-lg font-extrabold text-slate-900">
-        <PieChart size={19} className="text-brand-600" />
+        <PieChartIcon size={19} className="text-brand-600" />
         {t("admin.home.planDistributionTitle")}
       </h2>
       <p className="mt-1 text-sm text-slate-500">{t("admin.home.planDistributionSubtitle")}</p>
@@ -191,43 +213,39 @@ function PlanDistributionChart({ plans, loading, error, revenue, t, language }) 
       ) : (
         <div className="mt-5 flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           <div className="relative h-[184px] w-[184px] shrink-0">
-            <svg
-              viewBox={`0 0 ${DONUT_SIZE} ${DONUT_SIZE}`}
-              role="img"
-              aria-label={t("admin.home.planDistributionChartLabel", { total: numberFormat.format(total) })}
-              className="h-full w-full -rotate-90"
-            >
-              <circle
-                cx={DONUT_SIZE / 2}
-                cy={DONUT_SIZE / 2}
-                r={DONUT_RADIUS}
-                fill="none"
-                stroke="#e2e8f0"
-                strokeWidth={DONUT_STROKE}
-              />
-              {plans.map((plan, index) => {
-                const arcLength = total > 0 ? plan.count / total * DONUT_CIRCUMFERENCE : 0;
-                const offset = plans.slice(0, index).reduce(
-                  (sum, previousPlan) => sum + (total > 0 ? previousPlan.count / total * DONUT_CIRCUMFERENCE : 0),
-                  0,
-                );
-                return (
-                  <circle
-                    key={plan.type}
-                    cx={DONUT_SIZE / 2}
-                    cy={DONUT_SIZE / 2}
-                    r={DONUT_RADIUS}
-                    fill="none"
-                    stroke={plan.color}
-                    strokeWidth={DONUT_STROKE}
-                    strokeDasharray={`${arcLength} ${DONUT_CIRCUMFERENCE - arcLength}`}
-                    strokeDashoffset={-offset}
-                  >
-                    <title>{`${t(`admin.home.plans.${plan.type}`)}: ${numberFormat.format(plan.count)} (${numberFormat.format(plan.percentage)}%)`}</title>
-                  </circle>
-                );
-              })}
-            </svg>
+            <PieChart width={DONUT_SIZE} height={DONUT_SIZE} accessibilityLayer>
+              {total === 0 ? (
+                <Pie data={[{ value: 1 }]} dataKey="value" innerRadius={60} outerRadius={84} stroke="none" fill={CHART_COLORS.empty} isAnimationActive={false} />
+              ) : (
+                <Pie
+                  data={slices}
+                  dataKey="count"
+                  nameKey="name"
+                  innerRadius={60}
+                  outerRadius={84}
+                  startAngle={90}
+                  endAngle={-270}
+                  paddingAngle={slices.filter((plan) => plan.count > 0).length > 1 ? 1.5 : 0}
+                  stroke="none"
+                  isAnimationActive={animate}
+                >
+                  {slices.map((plan) => (
+                    <Cell key={plan.type} fill={plan.fill} className="outline-none" />
+                  ))}
+                </Pie>
+              )}
+              {total > 0 && (
+                <Tooltip
+                  {...donutTooltipProps}
+                  content={
+                    <ChartTooltip
+                      formatValue={(value) => numberFormat.format(value)}
+                      footer={(payload) => `${numberFormat.format(payload[0]?.payload?.percentage ?? 0)}%`}
+                    />
+                  }
+                />
+              )}
+            </PieChart>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
               <span className="text-xs font-medium text-slate-500">{t("admin.home.planDistributionTotal")}</span>
               <strong className="text-2xl font-extrabold tabular-nums text-slate-900">{numberFormat.format(total)}</strong>

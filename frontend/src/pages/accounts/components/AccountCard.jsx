@@ -17,7 +17,7 @@ function AccountCard({ account, adjustStatus, onAdjust, onToggleArchive, t }) {
 
   return (
     <article
-      className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80"
+      className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80"
       style={{ opacity: account.isArchived ? 0.6 : 1 }}
     >
       <Link to={`/accounts/${account._id}/transactions`} className="flex items-start gap-3">

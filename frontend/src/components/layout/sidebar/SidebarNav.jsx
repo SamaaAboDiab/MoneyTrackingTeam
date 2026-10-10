@@ -15,7 +15,11 @@ function SidebarNav({ collapsed, pathname, t, items = DESKTOP_NAV_ITEMS, isActiv
             title={collapsed ? t(key) : undefined}
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
               collapsed ? "justify-center" : ""
-            } ${isActive ? "bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/30" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}
+            } ${
+              isActive
+                ? "bg-brand-600 text-white emerald:bg-brand-500/10 emerald:text-brand-400 emerald:ring-1 emerald:ring-brand-500/30"
+                : "text-slate-500 hover:bg-slate-50 emerald:text-slate-300 emerald:hover:bg-white/5 emerald:hover:text-white"
+            }`}
           >
             <Icon size={18} strokeWidth={2} />
             {!collapsed && t(key)}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import { insufficientBalanceDetected } from "../../store/slices/notificationsSlice";
 import {
   createAccount,
   fetchAccounts,
@@ -78,6 +79,7 @@ function CashPage() {
 
     const fromAccount = sourceAccounts.find((account) => String(account._id) === String(fromId));
     if (fromAccount && amountNumber > Number(fromAccount.balance)) {
+      dispatch(insufficientBalanceDetected({ source: "cash", account: fromAccount, amount: amountNumber }));
       setFormError(
         t("cash.insufficientBalance.message", {
           account: fromAccount.name,

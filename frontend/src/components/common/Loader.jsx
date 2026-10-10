@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { ClipLoader } from "react-spinners";
 
-// Brand slate (--color-brand-600).
-const SPINNER_COLOR = "#059669";
+// Brand color of the active theme.
+const SPINNER_COLOR = "var(--color-brand-600)";
 
 // ClipLoader's own animation also scales the ring (1 → 0.8 → 1); rotate only so it stays put.
 const ROTATE_ONLY = { animation: "spinner-rotate 0.75s linear infinite" };

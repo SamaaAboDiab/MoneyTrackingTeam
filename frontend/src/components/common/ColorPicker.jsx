@@ -1,10 +1,15 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, Pipette } from "lucide-react";
+import { useTheme } from "../../utils/theme";
 
-const DEFAULT_SWATCHES = [
-  "#1e2a38",
-  "#10b981",
+// The first two swatches are the active theme's own colors.
+const THEME_SWATCHES = {
+  mali: ["#334155", "#ff9b51"],
+  emerald: ["#1e2a38", "#10b981"],
+};
+
+const SHARED_SWATCHES = [
   "#4f46e5",
   "#2563eb",
   "#0891b2",
@@ -17,8 +22,10 @@ const DEFAULT_SWATCHES = [
 ];
 
 // Preset swatches and a custom-color button (opens the native picker).
-function ColorPicker({ id, name, value, onChange, swatches = DEFAULT_SWATCHES, labelledBy }) {
+function ColorPicker({ id, name, value, onChange, swatches: swatchesProp, labelledBy }) {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const swatches = swatchesProp || [...THEME_SWATCHES[theme], ...SHARED_SWATCHES];
   const generatedId = useId();
   const inputId = id || `color-${generatedId}`;
   const current = (value || "").toLowerCase();

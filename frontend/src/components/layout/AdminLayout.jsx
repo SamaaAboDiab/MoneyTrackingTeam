@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ClipboardList, LayoutDashboard, LogOut, Users } from "lucide-react";
 import { adminLogout } from "../../store/slices/adminAuthSlice";
 import LanguageSwitcher from "../common/LanguageSwitcher";
+import ThemeMenu from "../common/ThemeMenu";
 import Sidebar from "./Sidebar";
 
 const ADMIN_NAV_ITEMS = [
@@ -42,6 +43,7 @@ function AdminLayout() {
               {currentItem ? t(currentItem.key) : t("admin.layout.title")}
             </h1>
             <div className="ms-auto flex items-center gap-2 sm:gap-3">
+              <ThemeMenu />
               <LanguageSwitcher />
               {/* The sidebar (with its logout) is hidden below lg. */}
               <button

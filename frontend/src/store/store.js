@@ -7,6 +7,7 @@ import debtsReducer from "./slices/debtsSlice";
 import dashboardReducer from "./slices/dashboardSlice";
 import savingsReducer from "./slices/savingsSlice";
 import adminAuthReducer from "./slices/adminAuthSlice";
+import notificationsReducer from "./slices/notificationsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,5 +19,6 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     savings: savingsReducer,
     adminAuth: adminAuthReducer,
+    notifications: notificationsReducer,
   },
 });

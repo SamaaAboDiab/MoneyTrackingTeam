@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { formatAmount, formatMoney, formatDate } from "../../../utils/formatAmount";
+import { formatAmount, formatDate } from "../../../utils/formatAmount";
 import { ReportSkeleton } from "../../../components/common/Skeleton";
+import ReportStatCard from "./ReportStatCard";
 
 function CashFlowSection({ data, loading }) {
   const { t } = useTranslation();
@@ -12,23 +13,12 @@ function CashFlowSection({ data, loading }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <p className="text-xs font-semibold text-slate-500">{t("reports.cashFlow.totalIn")}</p>
-          <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-slate-900">{formatMoney(totalIn)}</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <p className="text-xs font-semibold text-slate-500">{t("reports.cashFlow.totalOut")}</p>
-          <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-slate-900">{formatMoney(totalOut)}</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <p className="text-xs font-semibold text-slate-500">{t("reports.cashFlow.netFlow")}</p>
-          <p className={`tabular-amount mt-1.5 text-2xl font-extrabold ${netFlow >= 0 ? "text-income" : "text-expense"}`}>
-            {formatMoney(netFlow)}
-          </p>
-        </div>
+        <ReportStatCard label={t("reports.cashFlow.totalIn")} amount={totalIn} />
+        <ReportStatCard label={t("reports.cashFlow.totalOut")} amount={totalOut} />
+        <ReportStatCard label={t("reports.cashFlow.netFlow")} amount={netFlow} tone={netFlow >= 0 ? "positive" : "negative"} />
       </div>
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
+      <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
         <h3 className="text-base font-bold text-slate-900">{t("reports.cashFlow.timelineTitle")}</h3>
         {timeline.length === 0 ? (
           <p className="mt-4 text-sm text-slate-500">{t("reports.empty")}</p>

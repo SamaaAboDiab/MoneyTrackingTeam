@@ -1,5 +1,6 @@
 import { ArrowUp, ArrowDown } from "lucide-react";
-import { formatMoney, formatDate, formatPercent } from "../../../utils/formatAmount";
+import { formatDate, formatPercent } from "../../../utils/formatAmount";
+import Money from "../../../components/common/Money";
 import DatePicker from "../../../components/common/DatePicker";
 import Select from "../../../components/common/Select";
 import { StatsSkeleton } from "../../../components/common/Skeleton";
@@ -39,7 +40,8 @@ function MonthlySummaryCard({
 
   // One compact row under each tile: the change badge (when there's something to compare)
   // alongside the previous-period figure, instead of two disconnected blocks with a gap between them.
-  const renderComparison = (current, previousValue, type) => {
+  // currencyClassName: the deficit card passes "" so its currency keeps the card's red.
+  const renderComparison = (current, previousValue, type, currencyClassName) => {
     const hasPrevious = previousValue !== null && previousValue !== undefined;
     const difference = hasPrevious ? current - previousValue : 0;
     const showBadge = hasPrevious && previousValue !== 0 && difference !== 0;
@@ -64,7 +66,11 @@ function MonthlySummaryCard({
         <span className="truncate text-xs text-slate-400">
           {t("dashboard.summary.previousPeriod")}{" "}
           <span className="tabular-amount font-semibold text-slate-600">
-            {hasPrevious ? formatMoney(previousValue, currency) : t("dashboard.summary.notAvailable")}
+            {hasPrevious ? (
+              <Money value={previousValue} currency={currency} currencyClassName={currencyClassName} />
+            ) : (
+              t("dashboard.summary.notAvailable")
+            )}
           </span>
         </span>
       </div>
@@ -72,7 +78,7 @@ function MonthlySummaryCard({
   };
 
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 sm:p-6">
+    <section className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-base font-bold text-slate-900">{t("dashboard.summary.title")}</h2>
@@ -130,13 +136,13 @@ function MonthlySummaryCard({
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="rounded-lg border border-slate-200 bg-white p-4">
             <span className="text-xs font-semibold text-slate-500">{t("dashboard.summary.income")}</span>
-            <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-slate-900">{formatMoney(income, currency)}</p>
+            <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-slate-900"><Money value={income} currency={currency} /></p>
             {renderComparison(income, prevIncome, "income")}
           </div>
 
           <div className="rounded-lg border border-slate-200 bg-white p-4">
             <span className="text-xs font-semibold text-slate-500">{t("dashboard.summary.expenses")}</span>
-            <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-slate-900">{formatMoney(expenses, currency)}</p>
+            <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-slate-900"><Money value={expenses} currency={currency} /></p>
             {renderComparison(expenses, prevExpenses, "expenses")}
           </div>
 
@@ -153,9 +159,9 @@ function MonthlySummaryCard({
               )}
             </div>
             <p className={`tabular-amount mt-1.5 text-2xl font-extrabold ${isPositive ? "text-income" : "text-expense"}`}>
-              {formatMoney(Math.abs(net), currency)}
+              <Money value={Math.abs(net)} currency={currency} currencyClassName={isPositive ? undefined : ""} />
             </p>
-            {renderComparison(net, prevNet, "income")}
+            {renderComparison(net, prevNet, "income", isPositive ? undefined : "")}
           </div>
         </div>
       )}

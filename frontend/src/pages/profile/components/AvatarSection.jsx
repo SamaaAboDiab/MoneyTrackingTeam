@@ -44,7 +44,7 @@ function AvatarSection({ user, t }) {
   };
 
   return (
-    <section className="mt-6 flex flex-col items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm sm:flex-row sm:p-6 sm:text-start">
+    <section className="mt-6 flex flex-col items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm shadow-slate-200/60 sm:flex-row sm:p-6 sm:text-start">
       <div className="relative shrink-0">
         {user?.avatar ? (
           <img
