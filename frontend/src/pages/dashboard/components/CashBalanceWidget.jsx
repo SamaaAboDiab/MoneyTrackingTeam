@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Wallet, AlertTriangle } from "lucide-react";
 import { getExpenses } from "../../../api/expenseApi";
-import { formatMoney, formatPercent, formatNumber } from "../../../utils/formatAmount";
+import { formatPercent, formatNumber } from "../../../utils/formatAmount";
 import { Skeleton } from "../../../components/common/Skeleton";
+import Money from "../../../components/common/Money";
 
 function CashBalanceWidget({ cashAccount, totalWealth, t }) {
   const balance = Number(cashAccount?.balance || 0);
@@ -28,7 +29,7 @@ function CashBalanceWidget({ cashAccount, totalWealth, t }) {
   const spent = (monthExpenses || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
 
   return (
-    <div className="relative flex h-full flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 transition hover:ring-brand-300 lg:flex-col lg:flex-nowrap lg:items-stretch lg:justify-start lg:gap-4 lg:p-6">
+    <div className="relative flex h-full flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80 transition hover:ring-brand-300 lg:flex-col lg:flex-nowrap lg:items-stretch lg:justify-start lg:gap-4 lg:p-6">
       {/* The whole card opens /cash. */}
       <Link to="/cash" className="flex items-center gap-3 after:absolute after:inset-0 after:rounded-2xl">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 lg:h-11 lg:w-11">
@@ -38,7 +39,7 @@ function CashBalanceWidget({ cashAccount, totalWealth, t }) {
           <p className="text-sm font-medium text-slate-500">{t("cash.widgetLabel")}</p>
           {cashAccount ? (
             <p className="tabular-amount text-lg font-extrabold text-slate-900 lg:text-2xl">
-              {formatMoney(balance, currency)}
+              <Money value={balance} currency={currency} />
             </p>
           ) : (
             <p className="text-sm font-semibold text-slate-500">{t("cash.widgetNoAccount")}</p>
@@ -74,7 +75,7 @@ function CashBalanceWidget({ cashAccount, totalWealth, t }) {
               {monthExpenses === null ? (
                 <Skeleton className="mt-1 h-4 w-16" />
               ) : (
-                <p className="tabular-amount text-sm font-bold text-slate-900">{formatMoney(spent, currency)}</p>
+                <p className="tabular-amount text-sm font-bold text-slate-900"><Money value={spent} currency={currency} /></p>
               )}
             </div>
             <div className="px-3">

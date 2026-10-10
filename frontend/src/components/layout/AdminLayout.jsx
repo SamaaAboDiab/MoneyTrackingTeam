@@ -15,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { adminLogout } from "../../store/slices/adminAuthSlice";
+import ThemeMenu from "../common/ThemeMenu";
 import Sidebar from "./Sidebar";
 import { ChatUnreadProvider, useChatUnread } from "../chat/ChatUnreadContext";
 import { fetchAdminUnread } from "../../api/chatApi";
@@ -96,6 +97,7 @@ function AdminShell() {
               {currentItem ? t(currentItem.key) : t("admin.layout.title")}
             </h1>
             <div className="ms-auto flex shrink-0 items-center gap-2 sm:gap-3">
+              <ThemeMenu />
               <NotificationBell
                 fetchNotifications={fetchAdminNotifications}
                 markRead={markAdminNotificationRead}

@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "متتبّع الأموال",
+    "appName": "Mali",
     "loading": "جارٍ التحميل...",
     "backToDashboard": "الرجوع للوحة التحكم",
     "comingSoon": "الصفحة دي قيد الإنشاء.",
@@ -59,7 +59,7 @@
     },
     "login": {
       "title": "أهلاً بعودتك!",
-      "subtitle": "سجّل دخولك عشان تتابع فلوسك بكل سهولة.",
+      "subtitle": "سجّل دخولك لكي تتابع فلوسك بكل سهولة.",
       "registeredSuccess": "تم إنشاء الحساب بنجاح، سجّل دخولك الآن",
       "passwordResetSuccess": "تم تغيير كلمة السر بنجاح، سجّل دخولك بكلمة السر الجديدة",
       "emailLabel": "البريد الإلكتروني",
@@ -68,7 +68,7 @@
       "submit": "تسجيل الدخول",
       "submitting": "جارٍ الدخول...",
       "forgotPassword": "نسيت كلمة السر؟",
-      "noAccount": "مفيش حساب؟",
+      "noAccount": "ليس لديك حساب؟",
       "registerLink": "إنشاء حساب جديد",
       "invalidCredentials": "البريد الإلكتروني أو كلمة السر غير صحيحة",
       "tooManyAttempts": "محاولات كثيرة، حاول مرة أخرى بعد قليل",
@@ -225,7 +225,8 @@
     "userMenu": {
       "profile": "الملف الشخصي"
     },
-    "primaryNav": "القائمة الرئيسية"
+    "primaryNav": "القائمة الرئيسية",
+    "theme": "المظهر"
   },
   "transfer": {
     "backToDashboard": "الرجوع للوحة التحكم",
@@ -662,7 +663,8 @@
     "sectionsLabel": "أقسام الملف الشخصي",
     "tabs": {
       "information": "المعلومات الشخصية",
-      "security": "الأمان"
+      "security": "الأمان",
+      "preferences": "التفضيلات"
     },
     "changePhoto": "تغيير الصورة",
     "removePhoto": "حذف الصورة",
@@ -725,6 +727,18 @@
       "title": "لغة الحساب",
       "subtitle": "بتتحفظ مع حسابك وتتزامن على أي جهاز تسجّل دخولك منه.",
       "saving": "جارٍ الحفظ..."
+    },
+    "preferences": {
+      "title": "التفضيلات",
+      "subtitle": "خصّص شكل التطبيق واللغة اللي بيتكلم بيها.",
+      "theme": {
+        "title": "المظهر",
+        "description": "الألوان والخطوط وشكل القائمة الجانبية. بيتحفظ على الجهاز ده."
+      },
+      "language": {
+        "title": "اللغة",
+        "description": "بتتطبق على التطبيق كله، وبتتحفظ في حسابك فتلاقيها على أي جهاز."
+      }
     }
   },
   "quickAdd": {
@@ -885,7 +899,8 @@
       "message": "حساب \"{{account}}\" فيه {{balance}} بس، والإيداع ده {{amount}}. الحساب هيبقى بالسالب. تحب تكمل؟",
       "cancel": "إلغاء",
       "confirm": "أكمل على أي حال"
-    }
+    },
+    "totalSaved": "إجمالي المدخرات"
   },
   "reports": {
     "title": "التقارير والتحليلات",
@@ -1611,7 +1626,35 @@
     "markAllRead": "قراءة الكل",
     "markRead": "تحديد كمقروء",
     "read": "مقروء",
-    "unread": "غير مقروء"
+    "unread": "غير مقروء",
+    "empty": "مفيش إشعارات جديدة.",
+    "debtOverdue": {
+      "title": "دين متأخر",
+      "message": "{{creditor}} اتأخر، ولسه فاضل {{amount}}."
+    },
+    "debtDueSoon": {
+      "title": "دين ميعاده قرب",
+      "message": "{{creditor}}: {{when}}، والباقي {{amount}}.",
+      "today": "ميعاد سداده النهارده",
+      "tomorrow": "ميعاد سداده بكرة",
+      "inDays_zero": "ميعاد سداده النهارده",
+      "inDays_one": "ميعاد سداده بعد يوم",
+      "inDays_two": "ميعاد سداده بعد يومين",
+      "inDays_few": "ميعاد سداده بعد {{count}} أيام",
+      "inDays_many": "ميعاد سداده بعد {{count}} يومًا",
+      "inDays_other": "ميعاد سداده بعد {{count}} يوم"
+    },
+    "insufficient": {
+      "title": "رصيد غير كافٍ",
+      "message": "حاولت {{action}} {{amount}} من {{account}}، ورصيده {{balance}} بس.",
+      "actions": {
+        "transfer": "تحوّل",
+        "cash": "تسحب",
+        "expense": "تصرف",
+        "debtPayment": "تدفع",
+        "savings": "تحوّش"
+      }
+    }
   },
   "announcements": {
     "title": "الإعلانات",
@@ -1632,5 +1675,15 @@
     "lastApproved": "تمت الموافقة على تجديد باقة {{plan}} ✅",
     "lastRejected": "تم رفض طلب تجديد باقة {{plan}}",
     "requestError": "تعذّر إرسال الطلب"
+  },
+  "theme": {
+    "mali": {
+      "name": "Mali",
+      "description": "رمادي وبرتقالي، مع قائمة جانبية بيضاء."
+    },
+    "emerald": {
+      "name": "زمردي",
+      "description": "أخضر زمردي وكحلي، مع قائمة جانبية غامقة."
+    }
   }
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowUpRight, ArrowDownRight, Wallet, Scale } from "lucide-react";
 import { formatMoney, currencyName } from "../../utils/formatAmount";
+import Money from "../common/Money";
 
 function TotalWealthCard({
   label,
@@ -45,7 +46,7 @@ function TotalWealthCard({
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") onOpenAccounts();
         }}
-        className={`relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-3xl bg-navy-900 p-6 text-white transition-all duration-300 ease-out sm:p-7 ${
+        className={`relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-3xl bg-brand-600 p-6 text-white transition-all emerald:bg-navy-900 duration-300 ease-out sm:p-7 ${
           grown ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
       >
@@ -91,7 +92,7 @@ function TotalWealthCard({
         {/* Amount */}
         <div className="relative">
           <span className="tabular-amount block text-3xl font-extrabold tracking-tight sm:text-4xl">
-            {formatMoney(amount, currency)}
+            <Money value={amount} currency={currency} currencyClassName="text-hero-accent" />
           </span>
         </div>
 
@@ -131,7 +132,7 @@ function TotalWealthCard({
                   return (
                     <div
                       key={index}
-                      className="w-1.5 rounded-full bg-brand-400/60 transition-all duration-500 ease-out"
+                      className="w-1.5 rounded-full bg-white/30 transition-all emerald:bg-brand-400/60 duration-500 ease-out"
                       style={{
                         height: grown ? `${heightPct}%` : "0%",
                         transitionDelay: `${150 + index * 40}ms`,

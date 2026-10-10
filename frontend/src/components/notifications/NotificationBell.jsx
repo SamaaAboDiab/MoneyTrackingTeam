@@ -39,13 +39,14 @@ const TYPES = {
   renewalRequest: { icon: ClipboardCheck, tone: "bg-amber-50 text-amber-600" },
   renewalApproved: { icon: ClipboardCheck, tone: "bg-emerald-50 text-emerald-600" },
   renewalRejected: { icon: ClipboardX, tone: "bg-rose-50 text-rose-600" },
+  insufficientBalance: { icon: WalletMinimal, tone: "bg-amber-50 text-amber-600" },
 };
 const FALLBACK = { icon: Bell, tone: "bg-slate-100 text-slate-600" };
 
 // Header bell for the user app and the admin panel. Polls the server and shows an unread badge.
 // Opening it changes nothing: an item becomes read when it's opened (or its dot is pressed),
 // or all at once with "mark all as read".
-function NotificationBell({ fetchNotifications, markRead, markAllRead }) {
+function NotificationBell({ fetchNotifications, markRead, markAllRead, localItems = [], markLocalRead }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const rootRef = useRef(null);
@@ -81,11 +82,17 @@ function NotificationBell({ fetchNotifications, markRead, markAllRead }) {
     };
   }, [open]);
 
-  const unread = items.filter((item) => !item.read).length;
+  // Server notifications plus any alerts kept in this browser, newest first.
+  const allItems = [...items, ...localItems].sort((a, b) => new Date(b.at) - new Date(a.at));
+  const unread = allItems.filter((item) => !item.read).length;
 
   // Optimistic: flip it locally, then tell the server (reload on failure to stay truthful).
   const readOne = async (item) => {
     if (item.read) return;
+    if (item.local) {
+      markLocalRead?.([item.id]);
+      return;
+    }
     setItems((current) => current.map((entry) => (entry.id === item.id ? { ...entry, read: true } : entry)));
     try {
       await markRead(item.id);
@@ -95,6 +102,8 @@ function NotificationBell({ fetchNotifications, markRead, markAllRead }) {
   };
 
   const readAll = async () => {
+    const localUnread = localItems.filter((item) => !item.read).map((item) => item.id);
+    if (localUnread.length) markLocalRead?.(localUnread);
     setItems((current) => current.map((entry) => ({ ...entry, read: true })));
     try {
       await markAllRead();
@@ -107,6 +116,14 @@ function NotificationBell({ fetchNotifications, markRead, markAllRead }) {
     const params = { ...item.params };
     if (params.amount !== undefined) params.amount = formatMoney(Math.abs(params.amount), params.currency || "EGP");
     if (params.plan) params.plan = t(`admin.home.plans.${params.plan}`, { defaultValue: params.plan });
+    if (item.type === "insufficientBalance") {
+      return t("notifications.insufficient.message", {
+        action: t(`notifications.insufficient.actions.${params.source}`),
+        amount: formatMoney(params.amount, params.currency || "EGP"),
+        account: params.accountName,
+        balance: formatMoney(params.balance, params.currency || "EGP"),
+      });
+    }
     return t(`notifications.types.${item.type}`, { ...params, defaultValue: item.type });
   };
 
@@ -170,7 +187,7 @@ function NotificationBell({ fetchNotifications, markRead, markAllRead }) {
             <p className="px-4 py-8 text-center text-sm text-slate-500">{t("common.loading")}</p>
           ) : status === "error" ? (
             <p className="px-4 py-8 text-center text-sm text-expense">{t("notifications.loadError")}</p>
-          ) : items.length === 0 ? (
+          ) : allItems.length === 0 ? (
             <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
               <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
                 <BellOff size={22} />
@@ -180,7 +197,7 @@ function NotificationBell({ fetchNotifications, markRead, markAllRead }) {
             </div>
           ) : (
             <ul className="max-h-[min(26rem,70vh)] divide-y divide-slate-100 overflow-y-auto">
-              {items.map((item) => {
+              {allItems.map((item) => {
                 const { icon: Icon, tone } = TYPES[item.type] || FALLBACK;
                 const fresh = !item.read;
                 return (

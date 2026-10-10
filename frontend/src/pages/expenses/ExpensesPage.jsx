@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import { insufficientBalanceDetected } from "../../store/slices/notificationsSlice";
 import {
   createExpenseEntry,
   fetchExpenses,
@@ -240,6 +241,7 @@ function ExpensesPage() {
 
     const account = findAccount(form.accountId);
     if (account && Number(form.amount) > Number(account.balance)) {
+      dispatch(insufficientBalanceDetected({ source: "expense", account, amount: form.amount }));
       setBalanceWarning("create");
       return;
     }
@@ -310,6 +312,7 @@ function ExpensesPage() {
 
     const account = findAccount(editForm.accountId);
     if (account && Number(editForm.amount) > Number(account.balance)) {
+      dispatch(insufficientBalanceDetected({ source: "expense", account, amount: editForm.amount }));
       setBalanceWarning("edit");
       return;
     }
@@ -371,7 +374,7 @@ function ExpensesPage() {
         />
       )}
 
-      <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
+      <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
         <ExpenseFilters
           filters={filters}
           setFilters={setFilters}

@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <script>
@@ -19,10 +19,18 @@
           document.documentElement.dir = "ltr";
         }
       } catch (e) {}
+      // Same for the theme (see src/utils/theme.js): the saved "emerald", otherwise "mali".
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("appTheme") === "emerald" ? "emerald" : "mali";
+      } catch (e) {
+        document.documentElement.dataset.theme = "mali";
+      }
     </script>
     <style>
       .boot-loader { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f8fafc; }
-      .boot-loader span { width: 32px; height: 32px; border-radius: 50%; border: 3px solid #e2e8f0; border-top-color: #1e2a38; animation: boot-spin 0.8s linear infinite; }
+      .boot-loader span { width: 32px; height: 32px; border-radius: 50%; border: 3px solid #cbd5e1; border-top-color: #334155; animation: boot-spin 0.8s linear infinite; }
+      [data-theme="emerald"] .boot-loader span { border-color: #e2e8f0; border-top-color: #1e2a38; }
       @keyframes boot-spin { to { transform: rotate(360deg); } }
     </style>
   </head>

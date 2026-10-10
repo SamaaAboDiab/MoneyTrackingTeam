@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { insufficientBalanceDetected } from "../../store/slices/notificationsSlice";
 import { useTranslation } from "react-i18next";
 import {
   fetchAccounts,
@@ -84,6 +85,12 @@ function TransferPage() {
     if (!amountNum || amountNum <= 0) {
       setFormError(t("transfer.amountPositiveError"));
       return;
+    }
+
+    // The server decides whether the transfer goes through; this only logs the attempt in notifications.
+    const fromAccount = activeAccounts.find((a) => String(a._id) === String(form.fromId));
+    if (fromAccount && amountNum > Number(fromAccount.balance)) {
+      dispatch(insufficientBalanceDetected({ source: "transfer", account: fromAccount, amount: amountNum }));
     }
 
     try {

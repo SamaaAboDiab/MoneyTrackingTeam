@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import { insufficientBalanceDetected } from "../../store/slices/notificationsSlice";
 import { Plus, Trash2, Goal } from "lucide-react";
 import { fetchAccounts } from "../../store/slices/accountsSlice";
 import {
@@ -24,6 +25,7 @@ import GoalActionModal from "./components/GoalActionModal";
 import AccountPickerModal from "./components/AccountPickerModal";
 import { CardGridSkeleton } from "../../components/common/Skeleton";
 import PageHeader from "../../components/common/PageHeader";
+import TotalsCard from "../../components/common/TotalsCard";
 
 function SavingsPage() {
   const { t } = useTranslation();
@@ -61,6 +63,17 @@ function SavingsPage() {
     if (tab === "archived") return goals.filter((g) => g.status === "archived");
     return goals;
   }, [tab, goals]);
+
+  // Money currently held in goals (active and completed), per currency. Archived goals are left out.
+  const savedByCurrency = useMemo(() => {
+    const totals = {};
+    for (const goal of goals) {
+      if (goal.status === "archived") continue;
+      const currency = goal.currency || "EGP";
+      totals[currency] = (totals[currency] || 0) + (Number(goal.currentAmount) || 0);
+    }
+    return Object.entries(totals);
+  }, [goals]);
 
   useEffect(() => {
     dispatch(fetchGoals());
@@ -138,6 +151,7 @@ function SavingsPage() {
         (acc) => String(acc._id) === String(actionForm.accountId)
       );
       if (account && amt > Number(account.balance)) {
+        dispatch(insufficientBalanceDetected({ source: "savings", account, amount: amt }));
         setError(
           t("savings.insufficientBalance.message", {
             account: account.name,
@@ -268,6 +282,8 @@ function SavingsPage() {
           )}
         </div>
       )}
+
+      <TotalsCard className="" title={t("savings.totalSaved")} totals={savedByCurrency} />
 
       <GoalForm
         show={showForm}

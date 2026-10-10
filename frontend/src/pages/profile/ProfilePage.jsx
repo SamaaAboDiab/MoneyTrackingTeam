@@ -7,10 +7,12 @@ import EmailChangeSection from "./components/EmailChangeSection";
 import PhoneChangeSection from "./components/PhoneChangeSection";
 import PasswordChangeSection from "./components/PasswordChangeSection";
 import SubscriptionCard from "./components/SubscriptionCard";
+import PreferencesSection from "./components/PreferencesSection";
 import PageHeader from "../../components/common/PageHeader";
-import { ShieldCheck, UserRound } from "lucide-react";
+import { ShieldCheck, SlidersHorizontal, UserRound } from "lucide-react";
 
-const PROFILE_TABS = ["information", "security"];
+const PROFILE_TABS = ["information", "security", "preferences"];
+const TAB_ICONS = { information: UserRound, security: ShieldCheck, preferences: SlidersHorizontal };
 
 function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -57,7 +59,7 @@ function ProfilePage() {
       >
         {PROFILE_TABS.map((tab) => {
           const selected = activeTab === tab;
-          const TabIcon = tab === "security" ? ShieldCheck : UserRound;
+          const TabIcon = TAB_ICONS[tab];
 
           return (
             <button
@@ -101,7 +103,7 @@ function ProfilePage() {
         aria-labelledby="profile-tab-security"
         hidden={activeTab !== "security"}
         tabIndex={0}
-        className="mt-5 rounded-2xl border border-slate-200 bg-white shadow-sm focus-visible:outline-none"
+        className="mt-5 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-200/60 focus-visible:outline-none"
       >
         <header className="flex items-start gap-3 px-5 py-5 sm:px-6">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
@@ -133,6 +135,28 @@ function ProfilePage() {
             securityRequest={securityRequest}
             onClearRequest={clearSecurityRequest}
           />
+        </div>
+      </section>
+
+      <section
+        id="profile-panel-preferences"
+        role="tabpanel"
+        aria-labelledby="profile-tab-preferences"
+        hidden={activeTab !== "preferences"}
+        tabIndex={0}
+        className="mt-5 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-200/60 focus-visible:outline-none"
+      >
+        <header className="flex items-start gap-3 px-5 py-5 sm:px-6">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+            <SlidersHorizontal size={20} aria-hidden="true" />
+          </span>
+          <div>
+            <h2 className="text-base font-bold text-slate-900">{t("profile.preferences.title")}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t("profile.preferences.subtitle")}</p>
+          </div>
+        </header>
+        <div className="border-t border-slate-100">
+          <PreferencesSection t={t} i18n={i18n} />
         </div>
       </section>
     </div>

@@ -27,13 +27,13 @@ function Sidebar({ navItems, isItemActive, account, profileTo, tagline, onLogout
 
   return (
     <aside
-      className={`sticky top-0 hidden h-screen shrink-0 flex-col overflow-y-auto bg-navy-900 text-slate-300 transition-all duration-200 lg:flex ${
+      className={`sticky top-0 hidden h-screen shrink-0 flex-col overflow-y-auto border-e border-slate-200 bg-white transition-all duration-200 lg:flex emerald:border-e-0 emerald:bg-navy-900 emerald:text-slate-300 ${
         collapsed ? "w-24" : "w-64"
       }`}
     >
       <SidebarHeader collapsed={collapsed} onToggleCollapsed={() => setCollapsed((prev) => !prev)} t={t} tagline={tagline} />
 
-      <div className="border-t border-white/10" />
+      <div className="border-t border-slate-100 emerald:border-white/10" />
 
       <SidebarNav collapsed={collapsed} pathname={pathname} t={t} items={navItems} isActive={isItemActive} />
 

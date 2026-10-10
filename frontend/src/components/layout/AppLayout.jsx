@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { Outlet, useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowLeftRight } from "lucide-react";
-import LanguageSwitcher from "../common/LanguageSwitcher";
 import Sidebar from "./Sidebar";
 import Breadcrumb from "./appLayout/Breadcrumb";
 import DateBadge from "./appLayout/DateBadge";
@@ -14,6 +13,7 @@ import useRevealCards from "./appLayout/useRevealCards";
 import { ChatUnreadProvider } from "../chat/ChatUnreadContext";
 import { fetchMyUnread } from "../../api/chatApi";
 import NotificationBell from "../notifications/NotificationBell";
+import useLocalAlerts from "../notifications/useLocalAlerts";
 import {
   fetchUserNotifications,
   markAllUserNotificationsRead,
@@ -23,6 +23,7 @@ import {
 function AppLayout() {
   const { t } = useTranslation();
   const { user } = useSelector((state) => state.auth);
+  const localAlerts = useLocalAlerts(user);
   const { pathname } = useLocation();
   const pageRef = useRef(null);
   // A new page always opens at the top (SPA navigation would otherwise keep the old scroll position).
@@ -43,7 +44,6 @@ function AppLayout() {
 
             <div className="ms-auto flex items-center gap-2 sm:gap-3">
               <DateBadge />
-              <LanguageSwitcher />
 
               <Link
                 to="/accounts/transfer"
@@ -57,6 +57,8 @@ function AppLayout() {
                 fetchNotifications={fetchUserNotifications}
                 markRead={markUserNotificationRead}
                 markAllRead={markAllUserNotificationsRead}
+                localItems={localAlerts.items}
+                markLocalRead={localAlerts.markRead}
               />
               <UserMenu user={user} />
             </div>

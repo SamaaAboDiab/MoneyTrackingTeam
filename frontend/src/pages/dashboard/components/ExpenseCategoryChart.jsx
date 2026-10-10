@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PieChart } from "lucide-react";
+import { PieChart as PieChartIcon } from "lucide-react";
 import { formatAmount, formatMoney, formatNumber, formatPercent, currencyLabel } from "../../../utils/formatAmount";
 import { categoryLabel } from "../../categories/components/mandatoryCategories";
+import { Cell, Pie, PieChart, Tooltip } from "recharts";
+import ChartTooltip from "../../../components/charts/ChartTooltip";
+import { useChartLayout } from "../../../components/charts/chartTheme";
 
 const FALLBACK_PALETTE = [
   "#ff9b51",
@@ -19,39 +22,13 @@ const FALLBACK_PALETTE = [
 const NEUTRAL_GRAY = "#6b7280";
 
 const SIZE = 200;
-const CENTER = SIZE / 2;
 const OUTER_R = 90;
 const INNER_R = 58;
-const GAP_RAD = 0.015;
-
-function polarToCartesian(radius, angle) {
-  return {
-    x: CENTER + radius * Math.cos(angle),
-    y: CENTER + radius * Math.sin(angle),
-  };
-}
-
-function donutSlicePath(startAngle, endAngle) {
-  const start = Math.min(startAngle + GAP_RAD, endAngle);
-  const end = Math.max(endAngle - GAP_RAD, start);
-  const startOuter = polarToCartesian(OUTER_R, start);
-  const endOuter = polarToCartesian(OUTER_R, end);
-  const startInner = polarToCartesian(INNER_R, end);
-  const endInner = polarToCartesian(INNER_R, start);
-  const largeArc = end - start > Math.PI ? 1 : 0;
-
-  return [
-    `M ${startOuter.x} ${startOuter.y}`,
-    `A ${OUTER_R} ${OUTER_R} 0 ${largeArc} 1 ${endOuter.x} ${endOuter.y}`,
-    `L ${startInner.x} ${startInner.y}`,
-    `A ${INNER_R} ${INNER_R} 0 ${largeArc} 0 ${endInner.x} ${endInner.y}`,
-    "Z",
-  ].join(" ");
-}
 
 function ExpenseCategoryChart({ categories, loading, currency = "EGP", t }) {
   const navigate = useNavigate();
   const [hoveredId, setHoveredId] = useState(null);
+  const { animate, donutTooltipProps } = useChartLayout();
 
   const coloredCategories = categories.reduce((acc, cat, index) => {
     const used = new Set(acc.map((item) => item.color));
@@ -68,20 +45,19 @@ function ExpenseCategoryChart({ categories, loading, currency = "EGP", t }) {
     navigate(`/expenses?category=${encodeURIComponent(name)}`);
   };
 
-  const slices = coloredCategories.reduce((acc, cat) => {
-    const fraction = total > 0 ? Number(cat.total || 0) / total : 0;
-    const startAngle = acc.length > 0 ? acc[acc.length - 1].endAngle : -Math.PI / 2;
-    const endAngle = startAngle + fraction * 2 * Math.PI;
-    acc.push({ ...cat, startAngle, endAngle, fraction });
-    return acc;
-  }, []);
-
-  const hovered = slices.find((slice) => slice.categoryId === hoveredId);
+  // label / fill ride on each slice for the tooltip (its name and color key).
+  const slices = coloredCategories.map((cat) => ({
+    ...cat,
+    total: Number(cat.total || 0),
+    label: categoryLabel(cat.name),
+    fill: cat.color,
+    fraction: total > 0 ? Number(cat.total || 0) / total : 0,
+  }));
 
   return (
-    <section className="@container h-full rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 sm:p-6">
+    <section className="@container h-full rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80 sm:p-6">
       <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
-        <PieChart size={18} className="text-brand-600" />
+        <PieChartIcon size={18} className="text-brand-600" />
         {t("dashboard.chart.title")}
       </h2>
 
@@ -100,50 +76,49 @@ function ExpenseCategoryChart({ categories, loading, currency = "EGP", t }) {
       ) : (
         <div className="mt-5 flex flex-col items-center gap-6 @2xl:flex-row @2xl:items-start">
           <div className="relative shrink-0" style={{ width: SIZE, height: SIZE }}>
-            <svg
-              viewBox={`0 0 ${SIZE} ${SIZE}`}
-              width={SIZE}
-              height={SIZE}
-              role="img"
-              aria-label={t("dashboard.chart.title")}
-            >
-              {slices.map((slice) => (
-                <path
-                  key={slice.categoryId}
-                  d={donutSlicePath(slice.startAngle, slice.endAngle)}
-                  fill={slice.color}
-                  className="cursor-pointer transition-opacity"
-                  style={{ opacity: hoveredId && hoveredId !== slice.categoryId ? 0.45 : 1 }}
-                  onMouseEnter={() => setHoveredId(slice.categoryId)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  onClick={() => goToCategory(slice.name)}
-                >
-                  <title>{`${categoryLabel(slice.name)}: ${formatMoney(slice.total, currency)}`}</title>
-                </path>
-              ))}
-            </svg>
+            <PieChart width={SIZE} height={SIZE} accessibilityLayer>
+              <Pie
+                data={slices}
+                dataKey="total"
+                nameKey="label"
+                innerRadius={INNER_R}
+                outerRadius={OUTER_R}
+                startAngle={90}
+                endAngle={-270}
+                paddingAngle={slices.length > 1 ? 1.5 : 0}
+                stroke="none"
+                isAnimationActive={animate}
+                onMouseEnter={(_, index) => setHoveredId(slices[index]?.categoryId ?? null)}
+                onMouseLeave={() => setHoveredId(null)}
+                onClick={(_, index) => slices[index] && goToCategory(slices[index].name)}
+              >
+                {slices.map((slice) => (
+                  <Cell
+                    key={slice.categoryId}
+                    fill={slice.fill}
+                    className="cursor-pointer outline-none transition-opacity"
+                    fillOpacity={hoveredId && hoveredId !== slice.categoryId ? 0.45 : 1}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                {...donutTooltipProps}
+                content={
+                  <ChartTooltip
+                    formatValue={(value) => formatMoney(value, currency)}
+                    footer={(payload) => formatPercent((payload[0]?.payload?.fraction ?? 0) * 100)}
+                  />
+                }
+              />
+            </PieChart>
 
-            {/* التسمية في مركز الدونت: الإجمالي، أو تفاصيل التصنيف اللي عليه الماوس */}
+            {/* The total sits in the donut's center; the hovered category shows in the tooltip. */}
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-              {hovered ? (
-                <>
-                  <span className="max-w-[7rem] truncate text-xs font-semibold text-slate-500">{categoryLabel(hovered.name)}</span>
-                  <strong className="tabular-amount text-sm font-extrabold text-slate-900">
-                    {formatAmount(hovered.total)}
-                  </strong>
-                  <span className="text-xs text-slate-400">
-                    {formatPercent(hovered.fraction * 100)}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="text-xs font-medium text-slate-500">{t("expenses.totalLabel")}</span>
-                  <strong className="tabular-amount text-lg font-extrabold text-slate-900">
-                    {formatAmount(total)}
-                  </strong>
-                  <span className="text-xs text-slate-400">{currencyLabel(currency)}</span>
-                </>
-              )}
+              <span className="text-xs font-medium text-slate-500">{t("expenses.totalLabel")}</span>
+              <strong className="tabular-amount text-lg font-extrabold text-slate-900">
+                {formatAmount(total)}
+              </strong>
+              <span className="text-xs text-slate-400">{currencyLabel(currency)}</span>
             </div>
           </div>
 

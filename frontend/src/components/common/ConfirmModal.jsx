@@ -48,7 +48,7 @@ function ConfirmModal({
       onClick={onClose}
     >
       <div
-        className={`relative w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-2xl transition-all ease-out ${
+        className={`relative w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-2xl shadow-slate-900/10 transition-all ease-out ${
           visible
             ? "scale-100 opacity-100 duration-200"
             : "scale-95 opacity-0 duration-150"

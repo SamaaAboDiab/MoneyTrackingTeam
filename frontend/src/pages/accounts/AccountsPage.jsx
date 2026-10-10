@@ -15,15 +15,17 @@ import WealthSummary from "./components/WealthSummary";
 import PageHeader from "../../components/common/PageHeader";
 import SuccessToast from "../../components/common/SuccessToast";
 import { Wallet, Plus } from "lucide-react";
+import { getTheme } from "../../utils/theme";
 
-const DEFAULT_COLOR = "#1e2a38";
-const emptyForm = {
+// A new account starts with the active theme's main color (the first ColorPicker swatch).
+const defaultColor = () => (getTheme() === "emerald" ? "#1e2a38" : "#334155");
+const emptyForm = () => ({
   name: "",
   type: "",
   initialBalance: "",
   currency: "EGP",
-  color: DEFAULT_COLOR,
-};
+  color: defaultColor(),
+});
 
 function AccountsPage() {
   const { t } = useTranslation();
@@ -53,10 +55,10 @@ function AccountsPage() {
       type: form.type,
       balance: Number(form.initialBalance),
       currency: form.currency,
-      color: form.color || DEFAULT_COLOR,
+      color: form.color || defaultColor(),
     }));
     if (createAccount.fulfilled.match(result)) {
-      setForm(emptyForm);
+      setForm(emptyForm());
       setIsCreateOpen(false);
       setToastMessage(t("accounts.success"));
     }
@@ -65,7 +67,7 @@ function AccountsPage() {
   // X on the add form: hide it and discard what was typed
   const closeCreateForm = () => {
     setIsCreateOpen(false);
-    setForm(emptyForm);
+    setForm(emptyForm());
     dispatch(resetCreateAccountStatus());
   };
 

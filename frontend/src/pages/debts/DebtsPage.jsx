@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import { insufficientBalanceDetected } from "../../store/slices/notificationsSlice";
 import { Trash2, CheckCircle2, AlertTriangle } from "lucide-react";
 import { getDebtPayments } from "../../api/debtsApi";
 import { fetchAccounts } from "../../store/slices/accountsSlice";
@@ -262,6 +263,7 @@ function DebtsPage() {
       (acc) => String(acc._id) === String(paymentForm.accountId)
     );
     if (account && amountNum > Number(account.balance)) {
+      dispatch(insufficientBalanceDetected({ source: "debtPayment", account, amount: amountNum }));
       setBalanceWarning(true);
       return;
     }

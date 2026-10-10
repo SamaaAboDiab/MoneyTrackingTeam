@@ -3,7 +3,7 @@ import { CardGridSkeleton } from "../../../components/common/Skeleton";
 
 function AccountsList({ accounts, showArchived, status, error, adjustStatus, onToggleView, onAdjust, onToggleArchive, t }) {
   return (
-    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
+    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold text-slate-900">{t("accounts.listTitle")}</h2>
