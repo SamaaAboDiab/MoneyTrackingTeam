@@ -16,7 +16,6 @@ import ProfilePage from "../pages/profile/ProfilePage";
 import ProtectedRoute from "./ProtectedRoute";
 import AppLayout from "../components/layout/AppLayout";
 import AuthLayout from "../components/layout/AuthLayout";
-import CategoriesPage from "../pages/categories/CategoriesPage";
 import SavingsPage from "../pages/savings/SavingsPage";
 import ReportsPage from "../pages/reports/ReportsPage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
@@ -69,7 +68,8 @@ function AppRoutes() {
           <Route path="/accounts/transfer" element={<TransferPage />} />
           <Route path="/income" element={<IncomePage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
+          {/* The categories page was removed; old links land on Expenses. */}
+          <Route path="/categories" element={<Navigate to="/expenses" replace />} />
           <Route path="/cash" element={<CashPage />} />
           <Route path="/cash/expenses" element={<CashExpensesPage />} />
           <Route path="/debts" element={<DebtsPage />} />

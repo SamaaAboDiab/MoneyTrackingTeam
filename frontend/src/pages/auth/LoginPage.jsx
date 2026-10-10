@@ -9,6 +9,7 @@ import AuthFormHeader from "./components/AuthFormHeader";
 import AuthBanner from "./components/AuthBanner";
 import PasswordField from "./components/PasswordField";
 import AuthSubmitButton from "./components/AuthSubmitButton";
+import { createPortal } from "react-dom";
 
 function LoginPage() {
   const dispatch = useDispatch();
@@ -43,8 +44,16 @@ function LoginPage() {
     }
   };
 
-  if (adminToken) return <Navigate to="/admin" replace />;
-  if (token) return <Navigate to="/dashboard" replace />;
+  // Signed in: go straight to the account. For the instant before it appears, cover the whole
+  // login screen with the app's plain background so no (empty) form card flashes.
+  if (adminToken || token) {
+    return (
+      <>
+        <Navigate to={adminToken ? "/admin" : "/dashboard"} replace />
+        {createPortal(<div aria-hidden="true" className="fixed inset-0 z-50 bg-slate-50" />, document.body)}
+      </>
+    );
+  }
 
   return (
     <AuthCard onSubmit={handleSubmit}>

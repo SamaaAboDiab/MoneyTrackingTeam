@@ -23,7 +23,7 @@ function ChatPage() {
   });
 
   return (
-    <div className="mx-auto h-[calc(100dvh-13rem)] max-w-4xl overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/80 lg:h-[calc(100dvh-8.5rem)]">
+    <div className="mx-auto -mb-9 h-[calc(100dvh-10.25rem)] max-w-4xl overflow-hidden lg:mb-0 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/80 lg:h-[calc(100dvh-8.5rem)]">
       <ChatThread
         title={t("chat.supportName")}
         subtitle={t("chat.supportSubtitle")}

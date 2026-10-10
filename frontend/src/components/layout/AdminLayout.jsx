@@ -15,13 +15,13 @@ import {
   Users,
 } from "lucide-react";
 import { adminLogout } from "../../store/slices/adminAuthSlice";
-import ThemeMenu from "../common/ThemeMenu";
 import Sidebar from "./Sidebar";
 import { ChatUnreadProvider, useChatUnread } from "../chat/ChatUnreadContext";
 import { fetchAdminUnread } from "../../api/chatApi";
 import { fetchRenewals } from "../../api/adminExtrasApi";
 import usePolling from "../chat/usePolling";
 import NotificationBell from "../notifications/NotificationBell";
+import FloatingChatButton from "../chat/FloatingChatButton";
 import {
   fetchAdminNotifications,
   markAllAdminNotificationsRead,
@@ -97,7 +97,6 @@ function AdminShell() {
               {currentItem ? t(currentItem.key) : t("admin.layout.title")}
             </h1>
             <div className="ms-auto flex shrink-0 items-center gap-2 sm:gap-3">
-              <ThemeMenu />
               <NotificationBell
                 fetchNotifications={fetchAdminNotifications}
                 markRead={markAdminNotificationRead}
@@ -135,6 +134,7 @@ function AdminShell() {
           <main className="px-4 pt-5 pb-28 sm:px-6 sm:pt-6 lg:px-8 lg:pb-8">
             <Outlet />
           </main>
+          <FloatingChatButton to="/admin/chat" />
 
           {/* Phones and tablets: the sidebar is hidden, so the main sections sit in a bottom bar
               and the rest open from "More". */}
@@ -174,7 +174,7 @@ function AdminShell() {
 
           <nav
             aria-label={t("admin.layout.navigation")}
-            className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur lg:hidden"
+            className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur emerald:border-white/10 emerald:bg-navy-900/95 lg:hidden"
           >
             <ul className="mx-auto grid max-w-xl grid-cols-5">
               {navItems.filter((item) => item.primary).map((item) => {
@@ -189,13 +189,15 @@ function AdminShell() {
                       onClick={() => setMoreOpen(false)}
                       aria-current={active ? "page" : undefined}
                       className={`flex min-h-16 flex-col items-center justify-center gap-1 px-1 text-[11px] font-semibold transition ${
-                        active ? "text-brand-700" : "text-slate-400 hover:text-slate-600"
+                        active
+                          ? "text-brand-700 emerald:text-brand-400"
+                          : "text-slate-400 hover:text-slate-600 emerald:hover:text-white"
                       }`}
                     >
-                      <span className={`relative flex h-7 w-12 items-center justify-center rounded-full transition ${active ? "bg-brand-100" : ""}`}>
+                      <span className={`relative flex h-7 w-12 items-center justify-center rounded-full transition ${active ? "bg-brand-100 emerald:bg-brand-500/15" : ""}`}>
                         <Icon size={19} strokeWidth={active ? 2.4 : 2} />
                         {badge > 0 && (
-                          <span className="absolute -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-expense px-1 text-[9px] font-bold text-white ring-2 ring-white inset-e-1">
+                          <span className="absolute -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-expense px-1 text-[9px] font-bold text-white ring-2 ring-white emerald:ring-navy-900 inset-e-1">
                             {badge > 9 ? "9+" : badge}
                           </span>
                         )}
@@ -212,10 +214,12 @@ function AdminShell() {
                   aria-expanded={moreOpen}
                   aria-haspopup="dialog"
                   className={`flex min-h-16 w-full flex-col items-center justify-center gap-1 px-1 text-[11px] font-semibold transition ${
-                    moreActive || moreOpen ? "text-brand-700" : "text-slate-400 hover:text-slate-600"
+                    moreActive || moreOpen
+                      ? "text-brand-700 emerald:text-brand-400"
+                      : "text-slate-400 hover:text-slate-600 emerald:hover:text-white"
                   }`}
                 >
-                  <span className={`flex h-7 w-12 items-center justify-center rounded-full transition ${moreActive || moreOpen ? "bg-brand-100" : ""}`}>
+                  <span className={`flex h-7 w-12 items-center justify-center rounded-full transition ${moreActive || moreOpen ? "bg-brand-100 emerald:bg-brand-500/15" : ""}`}>
                     <Menu size={19} />
                   </span>
                   <span>{t("admin.layout.more")}</span>

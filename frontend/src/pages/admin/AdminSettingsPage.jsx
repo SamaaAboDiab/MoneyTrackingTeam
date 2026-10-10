@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, Settings, ShieldCheck, UserRound } from "lucide-react";
+import { ChevronLeft, Settings, ShieldCheck, UserRound, Wallet } from "lucide-react";
 import PageHeader from "../../components/common/PageHeader";
 import AdminInfoTab from "./settings/AdminInfoTab";
 import AdminSecurityTab from "./settings/AdminSecurityTab";
+import AdminPaymentsTab from "./settings/AdminPaymentsTab";
 import AdminProfileCard from "./settings/AdminProfileCard";
-import LanguageMenu from "./settings/LanguageMenu";
+import LanguageMenu from "../../components/common/LanguageMenu";
+import ThemePicker from "../../components/common/ThemePicker";
 
 const TABS = [
   { key: "information", icon: UserRound, label: "profile.tabs.information", hint: "admin.settings.infoHint", tone: "bg-brand-50 text-brand-600" },
   { key: "security", icon: ShieldCheck, label: "profile.tabs.security", hint: "admin.settings.securityHint", tone: "bg-amber-50 text-amber-600" },
+  { key: "payments", icon: Wallet, label: "admin.payments.tab", hint: "admin.payments.hint", tone: "bg-emerald-50 text-emerald-600" },
 ];
 
 // The signed-in admin's settings: profile card and a menu on one side, the chosen section on the other.
@@ -45,11 +48,13 @@ function AdminSettingsPage() {
     <div className="mx-auto max-w-6xl pb-8">
       <PageHeader icon={Settings} title={t("admin.settings.title")} subtitle={t("admin.settings.subtitle")} />
 
-      <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
-        <aside className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 lg:content-start">
-          <AdminProfileCard admin={admin} t={t} />
+      {/* Photo card across the full width; below it the menu and the chosen section, side by side
+          and the same height on large screens. */}
+      <AdminProfileCard admin={admin} t={t} />
 
-          <nav className="rounded-3xl border border-slate-200/80 bg-white p-2 shadow-sm">
+      <div className="mt-6 grid gap-6 lg:grid-cols-[20rem_1fr]">
+        <aside>
+          <nav className="h-full rounded-3xl border border-slate-200/80 bg-white p-2 shadow-sm">
             <div role="tablist" aria-orientation="vertical" aria-label={t("admin.settings.title")} onKeyDown={handleTabKeyDown}>
               {TABS.map(({ key, icon: TabIcon, label, hint, tone }) => {
                 const selected = activeTab === key;
@@ -80,20 +85,30 @@ function AdminSettingsPage() {
               })}
             </div>
 
-            {/* Language: opens a small menu in place (not a section). */}
-            <div className="mt-1 flex items-center justify-between gap-3 border-t border-slate-100 px-3 pt-3 pb-1">
-              <span className="text-xs font-semibold text-slate-500">{t("admin.settings.languageTitle")}</span>
-              <LanguageMenu t={t} i18n={i18n} />
+            {/* Language and theme: each opens a small menu in place (not a section). */}
+            <div className="mt-1 space-y-2 border-t border-slate-100 px-3 pt-3 pb-1">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs font-semibold text-slate-500">{t("admin.settings.languageTitle")}</span>
+                <LanguageMenu t={t} i18n={i18n} />
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs font-semibold text-slate-500">{t("layout.theme")}</span>
+                <ThemePicker t={t} />
+              </div>
             </div>
           </nav>
         </aside>
 
-        <div className="min-w-0">
-          <section id="admin-settings-panel-information" role="tabpanel" aria-labelledby="admin-settings-tab-information" hidden={activeTab !== "information"}>
+        <div className="min-w-0 lg:h-full">
+          {/* Panels fill the row (lg), so the card lines up with the photo + menu column. */}
+          <section id="admin-settings-panel-information" role="tabpanel" aria-labelledby="admin-settings-tab-information" hidden={activeTab !== "information"} className="h-full">
             <AdminInfoTab admin={admin} t={t} onEditSecurity={openSecuritySection} />
           </section>
-          <section id="admin-settings-panel-security" role="tabpanel" aria-labelledby="admin-settings-tab-security" hidden={activeTab !== "security"}>
+          <section id="admin-settings-panel-security" role="tabpanel" aria-labelledby="admin-settings-tab-security" hidden={activeTab !== "security"} className="h-full">
             <AdminSecurityTab admin={admin} t={t} openSection={openSection} setOpenSection={setOpenSection} />
+          </section>
+          <section id="admin-settings-panel-payments" role="tabpanel" aria-labelledby="admin-settings-tab-payments" hidden={activeTab !== "payments"} className="h-full">
+            {activeTab === "payments" && <AdminPaymentsTab t={t} />}
           </section>
         </div>
       </div>

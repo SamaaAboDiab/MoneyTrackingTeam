@@ -4,6 +4,8 @@ const AdminLog = require("../models/AdminLog");
 const Announcement = require("../models/Announcement");
 const QuickReply = require("../models/QuickReply");
 const RenewalRequest = require("../models/RenewalRequest");
+const PaymentProof = require("../models/PaymentProof");
+const PaymentSettings = require("../models/PaymentSettings");
 const SupportConversation = require("../models/SupportConversation");
 const Account = require("../models/Account");
 const Income = require("../models/Income");
@@ -177,6 +179,7 @@ exports.listRenewalRequests = async (req, res, next) => {
     const [items, pendingCount] = await Promise.all([
       RenewalRequest.find(filter)
         .sort({ status: 1, createdAt: -1 })
+        .select("-payment.proof")
         .limit(100)
         .populate("user", "name email subscriptionType subscriptionEnd isSuspended")
         .populate("handledBy", "name")
@@ -187,7 +190,8 @@ exports.listRenewalRequests = async (req, res, next) => {
       success: true,
       data: items.map((item) => ({
         ...item,
-        price: PLAN_PRICES[item.plan] ?? 0,
+        // What they actually paid (falls back to today's price for requests made before payments).
+        price: item.payment?.amount ?? PLAN_PRICES[item.plan] ?? 0,
         currency: SUBSCRIPTION_CURRENCY,
         handledByName: item.handledBy?.name ?? "",
         user: item.user ? { ...item.user, _status: userStatus(item.user) } : null,
@@ -226,6 +230,7 @@ exports.approveRenewal = async (req, res, next) => {
     request.status = "approved";
     request.handledBy = req.adminId;
     request.handledAt = now;
+    if (request.payment?.method) request.payment.verifiedAt = now;
     request.response = readString(req.body?.response, 500) ?? "";
     await request.save();
 
@@ -234,7 +239,9 @@ exports.approveRenewal = async (req, res, next) => {
       user: user._id,
       action: "change_plan",
       details,
-      reason: "موافقة على طلب تجديد",
+      reason: request.payment?.method
+        ? `تأكيد دفع ${request.payment.amount} ${request.payment.currency} (${request.payment.method}) — رقم العملية ${request.payment.reference}`
+        : "موافقة على طلب تجديد",
     });
     res.json({ success: true, data: { status: "approved", subscriptionEnd: user.subscriptionEnd } });
   } catch (err) { next(err); }
@@ -250,6 +257,56 @@ exports.rejectRenewal = async (req, res, next) => {
     request.response = readString(req.body?.response, 500) ?? "";
     await request.save();
     res.json({ success: true, data: { status: "rejected" } });
+  } catch (err) { next(err); }
+};
+
+// The transfer screenshot attached to a request.
+exports.getRenewalProof = async (req, res, next) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return bad(res, "Invalid id");
+    const request = await RenewalRequest.findById(req.params.id).select("payment.proof").lean();
+    const file = request?.payment?.proof ? await PaymentProof.findById(request.payment.proof) : null;
+    if (!file) return bad(res, "مفيش إثبات دفع للطلب ده", 404);
+    res.set("Content-Type", file.mimeType);
+    res.set("Cache-Control", "private, max-age=3600");
+    res.send(file.data);
+  } catch (err) { next(err); }
+};
+
+/* ── Where users send their payments ─────────────── */
+const PAYMENT_FIELDS = {
+  vodafoneCashNumber: 30,
+  vodafoneCashName: 80,
+  instapayAddress: 80,
+  instapayName: 80,
+  instructions: 500,
+};
+
+exports.getPaymentSettings = async (req, res, next) => {
+  try {
+    const settings = await PaymentSettings.get();
+    res.json({ success: true, data: Object.fromEntries(Object.keys(PAYMENT_FIELDS).map((key) => [key, settings[key] ?? ""])) });
+  } catch (err) { next(err); }
+};
+
+exports.updatePaymentSettings = async (req, res, next) => {
+  try {
+    const update = {};
+    for (const [key, max] of Object.entries(PAYMENT_FIELDS)) {
+      const value = req.body?.[key];
+      if (value === undefined) continue;
+      if (typeof value !== "string" || value.trim().length > max) return bad(res, `قيمة غير صالحة: ${key}`);
+      update[key] = value.trim();
+    }
+    if (update.vodafoneCashNumber && !/^[0-9+\s-]{8,20}$/.test(update.vodafoneCashNumber)) {
+      return bad(res, "رقم فودافون كاش غير صحيح");
+    }
+    const settings = await PaymentSettings.findOneAndUpdate(
+      { key: "main" },
+      { $set: update },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
+    ).lean();
+    res.json({ success: true, data: Object.fromEntries(Object.keys(PAYMENT_FIELDS).map((key) => [key, settings[key] ?? ""])) });
   } catch (err) { next(err); }
 };
 
@@ -296,7 +353,7 @@ exports.getRevenueReport = async (req, res, next) => {
     });
 
     const yearTotal = months.reduce((sum, month) => sum + month.total, 0);
-    const pendingRenewals = await RenewalRequest.find({ status: "pending" }).select("plan").lean();
+    const pendingRenewals = await RenewalRequest.find({ status: "pending" }).select("plan payment.amount").lean();
     res.json({
       success: true,
       data: {
@@ -310,7 +367,7 @@ exports.getRevenueReport = async (req, res, next) => {
         forecast,
         pendingRenewals: {
           count: pendingRenewals.length,
-          total: pendingRenewals.reduce((sum, request) => sum + (PLAN_PRICES[request.plan] ?? 0), 0),
+          total: pendingRenewals.reduce((sum, request) => sum + (request.payment?.amount ?? PLAN_PRICES[request.plan] ?? 0), 0),
         },
       },
     });

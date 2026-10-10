@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Check, ClipboardCheck, Inbox, MessageSquareText, X } from "lucide-react";
+import { Check, ClipboardCheck, Eye, Inbox, PartyPopper, Landmark, Loader2, MessageSquareText, ShieldCheck, Smartphone, X } from "lucide-react";
 import PageHeader from "../../components/common/PageHeader";
 import SuccessToast from "../../components/common/SuccessToast";
-import { approveRenewal, fetchRenewals, rejectRenewal } from "../../api/adminExtrasApi";
+import { approveRenewal, fetchRenewalProof, fetchRenewals, rejectRenewal } from "../../api/adminExtrasApi";
 import { formatMoney } from "../../utils/formatAmount";
 import { toIntlLocale } from "../../i18n/locale";
 
 const TABS = ["pending", "approved", "rejected"];
+const METHOD_ICON = { vodafone_cash: Smartphone, instapay: Landmark };
 const STATUS_PILL = {
   pending: "bg-amber-50 text-amber-700",
   approved: "bg-emerald-50 text-emerald-700",
@@ -26,6 +27,8 @@ function AdminRenewalsPage() {
   const [responses, setResponses] = useState({});
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
+  const [proof, setProof] = useState(null); // { url, item } while the screenshot is open
+  const [proofLoadingId, setProofLoadingId] = useState("");
   const dateFormat = new Intl.DateTimeFormat(toIntlLocale(i18n.language), { dateStyle: "medium" });
 
   const load = useCallback(async () => {
@@ -46,7 +49,25 @@ function AdminRenewalsPage() {
 
   const closeToast = useCallback(() => setToast(""), []);
 
+  const openProof = async (item) => {
+    setProofLoadingId(item._id);
+    setError("");
+    try {
+      const { data } = await fetchRenewalProof(item._id);
+      setProof({ url: URL.createObjectURL(data), item });
+    } catch {
+      setError(t("admin.renewals.proofError"));
+    }
+    setProofLoadingId("");
+  };
+
+  const closeProof = () => {
+    if (proof) URL.revokeObjectURL(proof.url);
+    setProof(null);
+  };
+
   const decide = async (item, approve) => {
+    closeProof();
     setError("");
     setBusyId(item._id);
     try {
@@ -97,9 +118,15 @@ function AdminRenewalsPage() {
         <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{t("admin.renewals.loadError")}</p>
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200/80 bg-white py-14 text-center shadow-sm">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
-            <Inbox size={26} />
-          </span>
+          {tab === "pending" ? (
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-400 to-emerald-600 text-white shadow-sm shadow-emerald-500/30">
+              <PartyPopper size={26} />
+            </span>
+          ) : (
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+              <Inbox size={26} />
+            </span>
+          )}
           <p className="text-sm text-slate-500">{t(`admin.renewals.empty.${tab}`)}</p>
         </div>
       ) : (
@@ -143,6 +170,45 @@ function AdminRenewalsPage() {
                 </div>
               </dl>
 
+              {item.payment?.method && (
+                <div className="mt-3 rounded-2xl border border-slate-100 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800">
+                      {(() => {
+                        const MethodIcon = METHOD_ICON[item.payment.method] || ShieldCheck;
+                        return <MethodIcon size={15} className="text-brand-600" />;
+                      })()}
+                      {t(`subscription.methods.${item.payment.method}`)}
+                    </span>
+                    {item.payment.verifiedAt && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700">
+                        <ShieldCheck size={12} />
+                        {t("admin.renewals.verified")}
+                      </span>
+                    )}
+                  </div>
+                  <dl className="mt-2 space-y-1 text-xs">
+                    <div className="flex justify-between gap-2">
+                      <dt className="text-slate-500">{t("subscription.checkout.reference")}</dt>
+                      <dd dir="ltr" className="font-bold text-slate-800">{item.payment.reference}</dd>
+                    </div>
+                    <div className="flex justify-between gap-2">
+                      <dt className="text-slate-500">{t(`subscription.checkout.sender.${item.payment.method}`)}</dt>
+                      <dd dir="ltr" className="font-bold text-slate-800">{item.payment.sender}</dd>
+                    </div>
+                  </dl>
+                  <button
+                    type="button"
+                    onClick={() => openProof(item)}
+                    disabled={proofLoadingId === item._id}
+                    className="mt-3 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl bg-slate-100 text-sm font-bold text-slate-700 transition hover:bg-slate-200 disabled:opacity-60"
+                  >
+                    {proofLoadingId === item._id ? <Loader2 size={15} className="animate-spin" /> : <Eye size={15} />}
+                    {t("admin.renewals.viewProof")}
+                  </button>
+                </div>
+              )}
+
               {item.note && (
                 <p className="mt-3 flex gap-2 rounded-xl bg-brand-50/50 px-3 py-2 text-sm text-slate-700">
                   <MessageSquareText size={15} className="mt-0.5 shrink-0 text-brand-500" aria-hidden="true" />
@@ -168,7 +234,7 @@ function AdminRenewalsPage() {
                       className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand-600 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-60"
                     >
                       <Check size={16} />
-                      {t("admin.renewals.approve")}
+                      {item.payment?.method ? t("admin.renewals.confirmPayment") : t("admin.renewals.approve")}
                     </button>
                     <button
                       type="button"
@@ -177,7 +243,7 @@ function AdminRenewalsPage() {
                       className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-60"
                     >
                       <X size={16} />
-                      {t("admin.renewals.reject")}
+                      {item.payment?.method ? t("admin.renewals.rejectPayment") : t("admin.renewals.reject")}
                     </button>
                   </div>
                 </div>
@@ -193,6 +259,32 @@ function AdminRenewalsPage() {
             </li>
           ))}
         </ul>
+      )}
+
+      {/* Payment screenshot */}
+      {proof && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4" onClick={closeProof}>
+          <div className="max-h-full w-full max-w-lg overflow-auto rounded-3xl bg-white p-4 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-slate-900">{t("admin.renewals.proofTitle", { name: proof.item.user?.name || "" })}</p>
+                <p className="text-xs text-slate-500">
+                  {formatMoney(proof.item.price, proof.item.currency)} · {t(`subscription.methods.${proof.item.payment.method}`)}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeProof}
+                aria-label={t("common.close")}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <img src={proof.url} alt={t("subscription.checkout.proof")} className="w-full rounded-2xl bg-slate-50 object-contain" />
+            <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">{t("admin.renewals.verifyHint")}</p>
+          </div>
+        </div>
       )}
 
       <SuccessToast message={toast} onClose={closeToast} title={t("admin.renewals.doneTitle")} />

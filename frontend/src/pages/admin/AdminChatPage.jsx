@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { MessagesSquare, Search } from "lucide-react";
+import { MessagesSquare, Mic, Search } from "lucide-react";
 import {
   deleteAdminMessage,
   editAdminMessage,
@@ -147,7 +147,7 @@ function AdminChatPage() {
   };
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-12.5rem)] max-w-6xl overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm lg:h-[calc(100dvh-7.5rem)]">
+    <div className="mx-auto flex -mb-9 h-[calc(100dvh-10.25rem)] max-w-6xl lg:mb-0 overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm lg:h-[calc(100dvh-7.5rem)]">
       {/* Contacts: every registered user, recent chats first. Hidden on phones while a chat is open. */}
       <aside
         className={`flex min-h-0 w-full flex-col border-e border-slate-100 bg-white lg:w-88 lg:shrink-0 ${
@@ -228,7 +228,11 @@ function AdminChatPage() {
                         {last?.deleted ? (
                           <span className="italic">{t("chat.deleted")}</span>
                         ) : last?.audio ? (
-                          `${last.sender === "admin" ? t("admin.chat.you") : ""}🎤 ${t("chat.voiceMessage")}`
+                          <span className="inline-flex items-center gap-1">
+                            {last.sender === "admin" && t("admin.chat.you")}
+                            <Mic size={12} className="shrink-0 text-brand-600" aria-hidden="true" />
+                            {t("chat.voiceMessage")}
+                          </span>
                         ) : last?.text ? (
                           `${last.sender === "admin" ? t("admin.chat.you") : ""}${last.text}`
                         ) : (

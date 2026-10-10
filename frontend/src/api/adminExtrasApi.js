@@ -21,3 +21,8 @@ export const rejectRenewal = (id, response) => adminClient.post(`/admin/renewals
 
 // Revenue report
 export const fetchRevenueReport = () => adminClient.get("/admin/revenue-report");
+
+// Payment proof and where users send money
+export const fetchRenewalProof = (id) => adminClient.get(`/admin/renewals/${id}/proof`, { responseType: "blob" });
+export const fetchPaymentSettings = () => adminClient.get("/admin/payment-settings");
+export const updatePaymentSettings = (payload) => adminClient.put("/admin/payment-settings", payload);

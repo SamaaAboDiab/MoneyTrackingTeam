@@ -64,7 +64,7 @@
       "passwordResetSuccess": "Password changed successfully, log in with your new password",
       "emailLabel": "Email",
       "passwordLabel": "Password",
-      "rememberMe": "Remember me (users only)",
+      "rememberMe": "Remember me",
       "submit": "Log in",
       "submitting": "Logging in...",
       "forgotPassword": "Forgot password?",
@@ -632,7 +632,8 @@
     "tabs": {
       "information": "Personal Information",
       "security": "Security",
-      "preferences": "Preferences"
+      "preferences": "Preferences",
+      "subscription": "Subscription"
     },
     "changePhoto": "Change Photo",
     "removePhoto": "Remove Photo",
@@ -707,6 +708,11 @@
         "title": "Language",
         "description": "Used across the app. Saved to your account, so it follows you to every device."
       }
+    },
+    "tabHints": {
+      "information": "Name, email and phone",
+      "subscription": "Your plan and renewal",
+      "security": "Email, phone and password"
     }
   },
   "quickAdd": {
@@ -1385,7 +1391,8 @@
       "role": "Administrator",
       "infoHint": "Name and email",
       "securityHint": "Email and password",
-      "infoSubtitle": "How you appear in the admin panel."
+      "infoSubtitle": "How you appear in the admin panel.",
+      "welcomeBack": "Welcome back"
     },
     "announcements": {
       "title": "Announcements",
@@ -1454,14 +1461,14 @@
     },
     "renewals": {
       "title": "Renewal requests",
-      "subtitle": "Approve a request and the plan starts right away, or reject it with a note.",
+      "subtitle": "Users pay and attach proof. Check the money arrived, then activate the plan or reject the request.",
       "tabs": {
         "pending": "Pending",
         "approved": "Approved",
         "rejected": "Rejected"
       },
       "empty": {
-        "pending": "Nothing waiting for you 🎉",
+        "pending": "Nothing waiting for you",
         "approved": "No approved requests.",
         "rejected": "No rejected requests."
       },
@@ -1477,7 +1484,14 @@
       "doneTitle": "Done",
       "actionError": "Couldn't complete the action",
       "loadError": "Couldn't load requests",
-      "handledBy": "By {{name}} · {{date}}"
+      "handledBy": "By {{name}} · {{date}}",
+      "confirmPayment": "Confirm payment & activate",
+      "rejectPayment": "Payment not valid",
+      "viewProof": "View payment proof",
+      "proofTitle": "{{name}}'s payment proof",
+      "proofError": "Couldn't load the proof",
+      "verified": "Payment verified",
+      "verifyHint": "Before confirming, check the amount and reference actually arrived in your account."
     },
     "revenue": {
       "title": "Revenue report",
@@ -1498,6 +1512,22 @@
       "nextDays": "Next {{days}} days",
       "pricesTitle": "Plan prices",
       "pricesNote": "Prices are set in the server settings."
+    },
+    "payments": {
+      "tab": "Payments",
+      "hint": "Where users pay",
+      "title": "Payment methods",
+      "subtitle": "What users see when renewing, to send money to. A method left empty isn't offered.",
+      "enabled": "On",
+      "disabled": "Off",
+      "walletNumber": "Vodafone Cash number",
+      "accountName": "Account holder name",
+      "instapayAddress": "InstaPay address",
+      "cardNote": "Card payments need a payment gateway (e.g. Paymob) with a merchant account, which isn't connected yet. Until then users see it as unavailable.",
+      "instructions": "Extra instructions for users (optional)",
+      "instructionsPlaceholder": "e.g. Put your email in the transfer note",
+      "saved": "Payment details saved",
+      "loadError": "Couldn't load payment details"
     }
   },
   "chat": {
@@ -1553,7 +1583,8 @@
     "pause": "Pause",
     "audioError": "Couldn't play",
     "micDenied": "Couldn't access the microphone. Allow microphone access in your browser and try again.",
-    "micUnsupported": "This browser doesn't support voice recording."
+    "micUnsupported": "This browser doesn't support voice recording.",
+    "openWithCount": "Open chat ({{count}} new)"
   },
   "notifications": {
     "title": "Notifications",
@@ -1570,14 +1601,14 @@
       "debtDueSoon": "Debt \"{{creditor}}\" is due in {{days}} day(s) ({{amount}} left)",
       "debtOverdue": "Debt \"{{creditor}}\" is overdue ({{amount}} left)",
       "negativeBalance": "\"{{name}}\" has a negative balance (-{{amount}})",
-      "goalCompleted": "Congrats! You reached your savings goal \"{{name}}\" 🎉",
+      "goalCompleted": "Congrats! You reached your savings goal \"{{name}}\"",
       "userMessage": "{{name}} sent {{count}} new message(s)",
       "newUser": "New user signed up: {{name}}",
       "subscriptionsExpiring": "{{count}} subscription(s) end this week",
       "subscriptionsExpired": "{{count}} subscription(s) ended in the last week",
       "announcement": "New announcement: {{title}}",
-      "renewalRequest": "{{name}} asked to renew ({{plan}})",
-      "renewalApproved": "Your renewal ({{plan}}) was approved ✅",
+      "renewalRequest": "{{name}} paid for {{plan}} and is waiting for you to confirm the payment",
+      "renewalApproved": "Your renewal ({{plan}}) was approved",
       "renewalRejected": "Your renewal request ({{plan}}) was declined"
     },
     "markAllRead": "Mark all as read",
@@ -1625,13 +1656,60 @@
     "sending": "Sending...",
     "pending": "Your {{plan}} renewal is being reviewed",
     "cancelRequest": "Cancel request",
-    "lastApproved": "Your {{plan}} renewal was approved ✅",
+    "lastApproved": "Your {{plan}} renewal was approved",
     "lastRejected": "Your {{plan}} renewal was declined",
-    "requestError": "Couldn't send the request"
+    "requestError": "Couldn't send the request",
+    "pendingTitle": "Checking your payment",
+    "pendingPaid": "We got your {{plan}} renewal and payment of {{amount}} via {{method}}. Your plan starts as soon as the team confirms it.",
+    "methods": {
+      "vodafone_cash": "Vodafone Cash",
+      "instapay": "InstaPay",
+      "card": "Visa / Mastercard"
+    },
+    "methodHints": {
+      "vodafone_cash": "Send from your wallet to our number",
+      "instapay": "Send from the InstaPay app to our address",
+      "card": "Pay by card"
+    },
+    "sendTo": {
+      "vodafone_cash": "Send the amount to this Vodafone Cash number",
+      "instapay": "Send the amount to this InstaPay address"
+    },
+    "checkout": {
+      "title": "Renew subscription",
+      "steps": {
+        "plan": "Plan",
+        "method": "Payment",
+        "pay": "Pay & confirm"
+      },
+      "continue": "Continue",
+      "back": "Back",
+      "amountToPay": "Amount to pay:",
+      "unavailable": "Not available right now",
+      "noMethods": "No payment method is available right now. Please contact support from the chat.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "reference": "Transaction reference",
+      "sender": {
+        "vodafone_cash": "Wallet number you paid from",
+        "instapay": "InstaPay address you paid from"
+      },
+      "proof": "Payment screenshot",
+      "uploadProof": "Upload a screenshot of the transfer",
+      "proofHint": "JPG, PNG or WEBP — up to 4MB",
+      "removeProof": "Remove image",
+      "proofRequired": "Please attach the payment screenshot",
+      "proofType": "The image must be JPG, PNG or WEBP",
+      "proofSize": "The image is too large (max 4MB)",
+      "submit": "I've paid — send request",
+      "afterSubmit": "Your plan starts once the team confirms the payment; you'll get a notification.",
+      "sent": "Payment received — we'll confirm it shortly",
+      "sentTitle": "Request sent"
+    }
   },
   "theme": {
     "mali": {
-      "name": "Mali",
+      "name": "Classic",
       "description": "Slate gray and orange, with a white sidebar."
     },
     "emerald": {

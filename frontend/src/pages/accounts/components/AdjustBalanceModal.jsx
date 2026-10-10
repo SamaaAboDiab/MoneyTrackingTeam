@@ -64,9 +64,9 @@ export default function AdjustBalanceButton({ account, onSubmit, onUpdated }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition hover:border-brand-300 hover:bg-slate-50"
+        className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-brand-50 px-3 text-sm font-bold text-brand-700 transition hover:bg-brand-100"
       >
-        <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 shrink-0 text-slate-500">
+        <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 shrink-0">
           <path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-8.5 8.5a2 2 0 0 1-.878.507l-3 .8a.5.5 0 0 1-.612-.612l.8-3a2 2 0 0 1 .507-.878l8.5-8.5Z" />
         </svg>
         {t("accounts.adjustBalance.trigger")}

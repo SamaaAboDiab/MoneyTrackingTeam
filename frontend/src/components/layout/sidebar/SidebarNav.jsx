@@ -2,9 +2,8 @@ import { NavLink } from "react-router-dom";
 import { NAV_ITEMS, isNavItemActive } from "./navItems";
 import { useChatUnread } from "../../chat/ChatUnreadContext";
 
-const DESKTOP_NAV_ITEMS = NAV_ITEMS.filter(({ to }) => to !== "/categories");
 
-function SidebarNav({ collapsed, pathname, t, items = DESKTOP_NAV_ITEMS, isActive: isItemActive = isNavItemActive }) {
+function SidebarNav({ collapsed, pathname, t, items = NAV_ITEMS, isActive: isItemActive = isNavItemActive }) {
   const { count: unread } = useChatUnread();
 
   return (

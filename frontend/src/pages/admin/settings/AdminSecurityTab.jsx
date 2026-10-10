@@ -212,7 +212,7 @@ function AdminSecurityTab({ admin, t, openSection, setOpenSection }) {
   const toggle = (section) => setOpenSection((current) => (current === section ? null : section));
 
   return (
-    <section className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
+    <section className="h-full overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
       <header className="flex items-start gap-3 px-5 py-5 sm:px-6">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
           <ShieldCheck size={20} aria-hidden="true" />

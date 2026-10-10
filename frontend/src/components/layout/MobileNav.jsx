@@ -58,10 +58,12 @@ function MobileNav() {
 
   const tabClass = (active) =>
     `flex min-h-14 flex-col items-center justify-center gap-0.5 px-1 py-1.5 text-[11px] font-semibold transition-colors ${
-      active ? "text-brand-700" : "text-slate-400 hover:text-slate-600"
+      active
+        ? "text-brand-700 emerald:text-brand-400"
+        : "text-slate-400 hover:text-slate-600 emerald:text-slate-400 emerald:hover:text-white"
     }`;
   const iconWrap = (active) =>
-    `flex h-7 w-12 items-center justify-center rounded-full transition-colors ${active ? "bg-brand-100" : ""}`;
+    `flex h-7 w-12 items-center justify-center rounded-full transition-colors ${active ? "bg-brand-100 emerald:bg-brand-500/15" : ""}`;
 
   return (
     <>
@@ -77,7 +79,7 @@ function MobileNav() {
             aria-modal="true"
             aria-label={t("layout.mobileNav.more")}
             onClick={(event) => event.stopPropagation()}
-            className={`absolute inset-y-0 inset-e-0 flex w-80 max-w-[88vw] flex-col bg-white px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] pt-4 shadow-2xl transition-transform ease-out ${
+            className={`absolute inset-y-0 inset-e-0 flex w-64 max-w-[72vw] flex-col bg-white px-3 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] pt-4 shadow-2xl transition-transform ease-out ${
               visible ? "translate-x-0 duration-200" : "translate-x-full rtl:-translate-x-full duration-150"
             }`}
           >
@@ -125,7 +127,7 @@ function MobileNav() {
 
       <nav
         aria-label={t("layout.primaryNav")}
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur emerald:border-white/10 emerald:bg-navy-900/95 lg:hidden"
       >
         <ul className="mx-auto grid max-w-xl grid-cols-5">
           {PRIMARY_ITEMS.map(({ to, key, icon: Icon }) => {
@@ -152,7 +154,7 @@ function MobileNav() {
               <span className={`relative ${iconWrap(moreActive || moreOpen)}`}>
                 <Menu size={19} strokeWidth={moreActive || moreOpen ? 2.4 : 2} />
                 {unread > 0 && (
-                  <span className="absolute top-0 inset-e-2 h-2.5 w-2.5 rounded-full bg-brand-500 ring-2 ring-white" />
+                  <span className="absolute top-0 inset-e-2 h-2.5 w-2.5 rounded-full bg-brand-500 ring-2 ring-white emerald:ring-navy-900" />
                 )}
               </span>
               <span className="max-w-full truncate">{t("layout.mobileNav.more")}</span>

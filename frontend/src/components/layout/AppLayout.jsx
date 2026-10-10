@@ -9,6 +9,7 @@ import DateBadge from "./appLayout/DateBadge";
 import UserMenu from "./appLayout/UserMenu";
 import MobileNav from "./MobileNav";
 import QuickAddButton from "./QuickAddButton";
+import FloatingChatButton from "../chat/FloatingChatButton";
 import useRevealCards from "./appLayout/useRevealCards";
 import { ChatUnreadProvider } from "../chat/ChatUnreadContext";
 import { fetchMyUnread } from "../../api/chatApi";
@@ -72,6 +73,7 @@ function AppLayout() {
           </main>
           <MobileNav />
           <QuickAddButton />
+          <FloatingChatButton to="/chat" raised />
         </div>
       </div>
     </div>

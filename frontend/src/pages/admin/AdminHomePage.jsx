@@ -35,7 +35,8 @@ const PLAN_TYPES = [
 ];
 const DONUT_SIZE = 184;
 
-const cardClass = "rounded-3xl border border-slate-200/80 bg-white p-4 shadow-sm sm:p-6";
+// h-full: cards in the same row line up at the same height.
+const cardClass = "h-full rounded-3xl border border-slate-200/80 bg-white p-4 shadow-sm sm:p-6";
 
 function CardTitle({ icon: Icon, tone, title, subtitle, action }) {
   return (

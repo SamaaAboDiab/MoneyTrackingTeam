@@ -212,13 +212,25 @@ body {
   transform-origin: right;
 }
 
-/* Scrolls sideways (wheel, touch, keyboard) without showing a scrollbar. */
-.no-scrollbar {
+/* Sideways scrolling strips (tab bars, chips...) still scroll with wheel, touch and keyboard,
+   but never show a scrollbar. Applies to every overflow-x-auto/scroll, plus .no-scrollbar. */
+.no-scrollbar,
+.overflow-x-auto,
+.overflow-x-scroll {
   scrollbar-width: none;
 }
 
-.no-scrollbar::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-x-scroll::-webkit-scrollbar {
   display: none;
+}
+
+/* The page itself never scrolls sideways on small screens; vertical scrolling is untouched.
+   (clip, unlike hidden, keeps sticky headers working.) */
+html,
+body {
+  overflow-x: clip;
 }
 
 /* Notification bell: a short swing when there is something new. */
@@ -236,6 +248,12 @@ body {
   background-color: #f4f6f8;
   background-image: radial-gradient(rgb(15 23 42 / 0.05) 1px, transparent 1px);
   background-size: 18px 18px;
+}
+
+/* Password fields have their own show/hide eye (PasswordField); hide the one Edge/IE adds. */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
 }
 
 /* Page enter: a quick fade of the page; the cards inside then reveal one by one. */

@@ -9,7 +9,6 @@ import {
   CreditCard,
   PiggyBank,
   BarChart3,
-  Tags,
   MessageCircle,
   Megaphone,
 } from "lucide-react";
@@ -20,7 +19,6 @@ const BREADCRUMB_ITEMS = [
   { match: "/accounts", key: "accounts.title", icon: Wallet },
   { match: "/income", key: "nav.income", icon: TrendingUp },
   { match: "/expenses", key: "nav.expenses", icon: TrendingDown },
-  { match: "/categories", key: "nav.categories", icon: Tags },
   { match: "/cash", key: "nav.cash", icon: Banknote },
   { match: "/debts", key: "nav.debts", icon: CreditCard },
   { match: "/savings", key: "nav.savings", icon: PiggyBank },

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   AlarmClock,
+  BadgeCheck,
   Bell,
   BellOff,
   CheckCheck,
@@ -37,7 +38,7 @@ const TYPES = {
   newUser: { icon: UserPlus, tone: "bg-sky-50 text-sky-600" },
   announcement: { icon: Megaphone, tone: "bg-brand-50 text-brand-600" },
   renewalRequest: { icon: ClipboardCheck, tone: "bg-amber-50 text-amber-600" },
-  renewalApproved: { icon: ClipboardCheck, tone: "bg-emerald-50 text-emerald-600" },
+  renewalApproved: { icon: BadgeCheck, tone: "bg-linear-to-br from-emerald-400 to-emerald-600 text-white shadow-sm shadow-emerald-500/30" },
   renewalRejected: { icon: ClipboardX, tone: "bg-rose-50 text-rose-600" },
   insufficientBalance: { icon: WalletMinimal, tone: "bg-amber-50 text-amber-600" },
 };

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Plus, X } from "lucide-react";
@@ -17,6 +18,7 @@ const inputClass =
 
 function QuickAddButton() {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
   const dispatch = useDispatch();
   const { items: accounts } = useSelector((state) => state.accounts);
 
@@ -84,8 +86,12 @@ function QuickAddButton() {
     }
   };
 
+  // On the chat page the floating button would cover the message box's send button.
+  const onChatPage = pathname.startsWith("/chat");
+
   return createPortal(
     <>
+      {!onChatPage && (
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -95,9 +101,10 @@ function QuickAddButton() {
       >
         <Plus size={20} />
       </button>
+      )}
 
       {toast && (
-        <div className="fixed bottom-[calc(9.5rem+env(safe-area-inset-bottom,0px))] inset-e-5 z-50 lg:bottom-24 lg:inset-e-5 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-2xl">
+        <div className="fixed bottom-[calc(13.5rem+env(safe-area-inset-bottom,0px))] inset-e-5 z-50 lg:bottom-40 lg:inset-e-5 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-2xl">
           {toast}
         </div>
       )}

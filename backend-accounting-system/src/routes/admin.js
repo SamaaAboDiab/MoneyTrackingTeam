@@ -44,6 +44,11 @@ router.get("/users/:id/profile",         extras.getUserProfile);
 router.get("/renewals",                  extras.listRenewalRequests);
 router.post("/renewals/:id/approve",     extras.approveRenewal);
 router.post("/renewals/:id/reject",      extras.rejectRenewal);
+router.get("/renewals/:id/proof",        extras.getRenewalProof);
+
+/* where users send payments */
+router.get("/payment-settings",          extras.getPaymentSettings);
+router.put("/payment-settings",          extras.updatePaymentSettings);
 
 /* revenue report */
 router.get("/revenue-report",            extras.getRevenueReport);
