@@ -20,7 +20,8 @@
     "added": "Added",
     "colorPicker": {
       "custom": "Custom color"
-    }
+    },
+    "skipToContent": "Skip to content"
   },
   "nav": {
     "income": "Income",
@@ -186,7 +187,7 @@
       "profile": "Profile"
     },
     "upgradeTitle": "Upgrade to Premium",
-    "upgradeSubtitle": "Unlock unlimited reports and more.",
+    "upgradeSubtitle": "Pick a plan and keep every feature after your free trial.",
     "upgradeButton": "Upgrade Now",
     "notifications": "Notifications",
     "quickActionLabel": "New Transfer",
@@ -198,7 +199,15 @@
       "more": "More"
     },
     "primaryNav": "Main navigation",
-    "theme": "Theme"
+    "theme": "Theme",
+    "upgradeExpiringTitle": "Your plan ends soon",
+    "upgradeExpiringSubtitle": "It ends on {{date}}. Renew before it does.",
+    "upgradeExpiredTitle": "Your plan has ended",
+    "upgradeExpiredSubtitle": "Renew to keep adding and editing your data.",
+    "renewButton": "Renew now",
+    "upgradePendingTitle": "Request under review",
+    "upgradePendingSubtitle": "We'll let you know as soon as your payment is confirmed.",
+    "viewRequest": "View request"
   },
   "transfer": {
     "backToDashboard": "Back to dashboard",
@@ -623,7 +632,9 @@
       "confirm": "Confirm Payment",
       "saving": "Saving..."
     },
-    "confirmTitle": "Are you sure?"
+    "confirmTitle": "Are you sure?",
+    "overdueBy_one": "Overdue by {{count}} day — pay it or update the due date",
+    "overdueBy_other": "Overdue by {{count}} days — pay it or update the due date"
   },
   "profile": {
     "title": "Profile",
@@ -983,7 +994,7 @@
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
-    "subscriptionExpired": "Your subscription has expired. Renew it to keep editing your data.",
+    "subscriptionExpired": "Your subscription has ended. Renew it to add or change anything.",
     "accounts": {
       "load": "Couldn't load accounts",
       "transfer": "Couldn't complete the transfer",
@@ -1461,7 +1472,7 @@
     },
     "renewals": {
       "title": "Renewal requests",
-      "subtitle": "Users pay and attach proof. Check the money arrived, then activate the plan or reject the request.",
+      "subtitle": "Review renewal requests and their payment proofs. Once you've confirmed the payment arrived, activate the subscription or reject the request.",
       "tabs": {
         "pending": "Pending",
         "approved": "Approved",
@@ -1477,16 +1488,16 @@
       "currentPlan": "Current plan",
       "requestedOn": "Requested on",
       "responsePlaceholder": "Message to the user (optional)",
-      "approve": "Approve",
-      "reject": "Reject",
+      "approve": "Approve & activate",
+      "reject": "Reject request",
       "approvedToast": "{{name}}'s plan was renewed",
       "rejectedToast": "{{name}}'s request was rejected",
       "doneTitle": "Done",
       "actionError": "Couldn't complete the action",
       "loadError": "Couldn't load requests",
       "handledBy": "By {{name}} · {{date}}",
-      "confirmPayment": "Confirm payment & activate",
-      "rejectPayment": "Payment not valid",
+      "confirmPayment": "Activate subscription",
+      "rejectPayment": "Reject request",
       "viewProof": "View payment proof",
       "proofTitle": "{{name}}'s payment proof",
       "proofError": "Couldn't load the proof",
@@ -1527,7 +1538,10 @@
       "instructions": "Extra instructions for users (optional)",
       "instructionsPlaceholder": "e.g. Put your email in the transfer note",
       "saved": "Payment details saved",
-      "loadError": "Couldn't load payment details"
+      "loadError": "Couldn't load payment details",
+      "pricesTitle": "Plan prices",
+      "pricesNote": "Users see the new price right away, and it applies to requests sent from now on. Requests already sent keep the price they were sent at.",
+      "currency": "EGP"
     }
   },
   "chat": {
@@ -1609,7 +1623,12 @@
       "announcement": "New announcement: {{title}}",
       "renewalRequest": "{{name}} paid for {{plan}} and is waiting for you to confirm the payment",
       "renewalApproved": "Your renewal ({{plan}}) was approved",
-      "renewalRejected": "Your renewal request ({{plan}}) was declined"
+      "renewalRejected": "Your renewal request ({{plan}}) was declined",
+      "debtPaid": "Debt \"{{creditor}}\" is fully paid off and moved to completed debts.",
+      "debtPaymentAdded": "A payment of {{amount}} was recorded for \"{{creditor}}\".",
+      "debtAdded": "New debt \"{{creditor}}\" added ({{amount}}).",
+      "renewalApprovedByAdmin": "{{name}}'s subscription was renewed ({{plan}}).",
+      "renewalRejectedByAdmin": "{{name}}'s renewal request was rejected ({{plan}})."
     },
     "markAllRead": "Mark all as read",
     "markRead": "Mark as read",
@@ -1638,7 +1657,14 @@
         "debtPayment": "pay",
         "savings": "save"
       }
-    }
+    },
+    "filters": {
+      "all": "All"
+    },
+    "groups": {
+      "earlier": "Earlier"
+    },
+    "emptyUnread": "No unread notifications"
   },
   "announcements": {
     "title": "Announcements",
@@ -1704,8 +1730,28 @@
       "submit": "I've paid — send request",
       "afterSubmit": "Your plan starts once the team confirms the payment; you'll get a notification.",
       "sent": "Payment received — we'll confirm it shortly",
-      "sentTitle": "Request sent"
-    }
+      "sentTitle": "Request sent",
+      "subscribeTitle": "Subscribe to a plan"
+    },
+    "subscribeNow": "Subscribe now",
+    "loadError": "Couldn't load your subscription details.",
+    "retry": "Try again",
+    "banner": {
+      "expiredTitle": "Your subscription has ended",
+      "expiredText": "You can still view your data, but you can't add or change anything until you renew.",
+      "pendingTitle": "Your renewal request is under review",
+      "pendingText": "Your account stays read-only until the admin confirms your payment."
+    },
+    "currentPlan": "Current plan",
+    "daysLeft_one": "{{count}} day left",
+    "daysLeft_other": "{{count}} days left",
+    "endedOn": "Ended on {{date}}",
+    "timeUsed": "Time used in this plan",
+    "availablePlans": "Available plans",
+    "perMonth": "{{amount}} / month",
+    "bestValue": "Best value",
+    "howItWorks": "Pick a plan, send the payment and attach the proof. Your plan starts as soon as the team confirms the payment.",
+    "renewWithPlan": "Renew with this plan"
   },
   "theme": {
     "mali": {

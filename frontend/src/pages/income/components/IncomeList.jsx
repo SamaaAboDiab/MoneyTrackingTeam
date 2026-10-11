@@ -1,31 +1,7 @@
-import { currencyLabel, currencyName, formatAmount, formatMoney, formatNumber } from "../../../utils/formatAmount";
+import { currencyName, formatNumber } from "../../../utils/formatAmount";
 import IncomeItem, { INCOME_COLUMNS } from "./IncomeItem";
 import { ListSkeleton } from "../../../components/common/Skeleton";
-
-// One currency's total. Mali: the amount inline. Emerald: a tile with the code badge and name.
-function CurrencyTotal({ currency, total, large = false, inlineOptions = { minimumFractionDigits: 2 } }) {
-  return (
-    <>
-    <strong className={`tabular-amount font-extrabold text-income emerald:hidden ${large ? "text-xl" : "text-lg"}`}>
-      {formatMoney(total, currency, inlineOptions)}
-    </strong>
-    <div className="hidden items-center gap-3 rounded-xl bg-income-soft/50 p-3 ring-1 ring-income/10 sm:p-4 emerald:flex">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-xs font-extrabold tracking-wide text-income shadow-sm ring-1 ring-income/15">
-        {currency}
-      </span>
-      <div className="min-w-0">
-        <p className="truncate text-xs font-semibold text-slate-500">{currencyName(currency)}</p>
-        <p className="mt-0.5 flex items-baseline gap-1.5">
-          <strong className="tabular-amount truncate text-lg font-extrabold text-income">
-            {formatAmount(total, { minimumFractionDigits: 2 })}
-          </strong>
-          <span className="text-xs font-semibold text-income/80">{currencyLabel(currency)}</span>
-        </p>
-      </div>
-    </div>
-    </>
-  );
-}
+import Money from "../../../components/common/Money";
 
 function IncomeList({
   items,
@@ -44,6 +20,13 @@ function IncomeList({
     sum[currency] = (sum[currency] || 0) + Number(income.monthlyAmount ?? income.amount ?? 0);
     return sum;
   }, {});
+  const totals =
+    displayCurrency === "ALL"
+      ? Object.entries(totalsByCurrency || calculatedTotal)
+      : [[displayCurrency, totalAmount ?? Object.values(calculatedTotal).reduce((sum, total) => sum + total, 0)]];
+  if (totals.length === 0) totals.push(["EGP", 0]);
+  const totalsTitle = t(displayCurrency === "ALL" ? "income.totalByCurrencyLabel" : "income.totalConvertedLabel");
+
   return (
     <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
       <div className="flex items-center justify-between gap-2">
@@ -77,7 +60,8 @@ function IncomeList({
         </div>
       )}
 
-      <div className="mt-1 flex flex-col divide-y divide-slate-100">
+      {/* Phones: separate small cards. From md: one table with hairline rows. */}
+      <div className="mt-4 flex flex-col gap-3 md:mt-1 md:gap-0 md:divide-y md:divide-slate-100">
         {items.map((income) => (
           <IncomeItem
             key={income._id}
@@ -91,26 +75,29 @@ function IncomeList({
         ))}
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 emerald:block emerald:pt-5">
-        <h3 className="font-bold text-slate-700 emerald:text-sm">
-          {t(displayCurrency === "ALL" ? "income.totalByCurrencyLabel" : "income.totalConvertedLabel")}
-        </h3>
-        <div className="flex flex-wrap justify-end gap-x-4 gap-y-2 emerald:mt-3 emerald:grid emerald:grid-cols-1 emerald:gap-3 emerald:min-[420px]:grid-cols-2 emerald:lg:grid-cols-4">
-          {displayCurrency === "ALL"
-            ? Object.entries(totalsByCurrency || calculatedTotal).map(([currency, total]) => (
-              <CurrencyTotal key={currency} currency={currency} total={total} />
-            ))
-            : (
-              <CurrencyTotal
-                large
-                currency={displayCurrency}
-                total={totalAmount ?? Object.values(calculatedTotal).reduce((sum, total) => sum + total, 0)}
-              />
-            )}
-          {displayCurrency === "ALL" && Object.keys(totalsByCurrency || calculatedTotal).length === 0 && (
-            <CurrencyTotal currency="EGP" total={0} inlineOptions={{}} />
-          )}
-        </div>
+      {/* Totals: one strip with a cell per currency — stacked rows on phones, side by side from sm.
+          Dividers use logical borders (border-s), so they sit right in both directions. */}
+      <div className="mt-5 border-t border-slate-100 pt-4">
+        <h3 className="text-sm font-semibold text-slate-700">{totalsTitle}</h3>
+        <dl className="mt-3 flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-50/40 sm:flex-row">
+          {totals.map(([currency, total]) => (
+            <div
+              key={currency}
+              className="flex min-w-0 flex-1 items-center justify-between gap-3 border-t border-slate-200 px-4 py-3.5 first:border-t-0 sm:block sm:border-t-0 sm:border-s sm:px-5 sm:py-4 sm:first:border-s-0"
+            >
+              <dt className="flex min-w-0 items-center gap-2 text-xs text-slate-500">
+                <span className="shrink-0 rounded-md bg-white px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-slate-600 ring-1 ring-slate-200">
+                  {currency}
+                </span>
+                {/* The code is in the badge, so drop the "(EGP)" tail from the name. */}
+                <span className="truncate">{currencyName(currency).replace(/\s*\([^)]*\)\s*$/, "")}</span>
+              </dt>
+              <dd className="tabular-amount shrink-0 text-lg font-bold text-income sm:mt-2 sm:text-xl">
+                <Money value={total} currency={currency} />
+              </dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
   );

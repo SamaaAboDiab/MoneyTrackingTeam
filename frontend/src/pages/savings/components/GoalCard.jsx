@@ -28,7 +28,7 @@ function GoalCard({
   const GoalIcon = GOAL_ICON_MAP[goal.emoji] || DEFAULT_GOAL_ICON;
 
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
+    <div className="card-hover rounded-2xl bg-white p-5 ring-1 ring-slate-100 emerald:ring-slate-200/80">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-brand-600">
@@ -51,7 +51,7 @@ function GoalCard({
 
         <div className="flex items-center gap-1.5">
           {isActive && (
-            <button type="button" onClick={() => onEdit(goal)} title={t("savings.actions.edit")} aria-label={t("savings.actions.edit")} className="rounded-lg p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-700">
+            <button type="button" onClick={() => onEdit(goal)} title={t("savings.actions.edit")} aria-label={t("savings.actions.edit")} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
               <Pencil size={15} />
             </button>
           )}
@@ -84,11 +84,11 @@ function GoalCard({
               {t("savings.actions.withdraw")}
             </button>
           )}
-          <button type="button" onClick={() => onComplete(goal)} className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+          <button type="button" onClick={() => onComplete(goal)} className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">
             <CheckCircle2 size={15} />
             {t("savings.actions.complete")}
           </button>
-          <button type="button" onClick={() => onArchive(goal)} className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+          <button type="button" onClick={() => onArchive(goal)} className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">
             <Archive size={15} />
             {t("savings.actions.archive")}
           </button>

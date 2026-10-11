@@ -11,7 +11,7 @@ function DebtsList({ debtsLoadingStatus, debts, displayedDebts, activeTab, ...ca
     {debtsLoadingStatus === "loading" && debts.length === 0 ? (
       <CardGridSkeleton
         cards={2}
-        className="grid items-stretch gap-4 xl:grid-cols-2"
+        className="grid grid-cols-1 gap-4"
         label={t("debts.loading")}
       />
     ) : displayedDebts.length === 0 ? (
@@ -31,7 +31,8 @@ function DebtsList({ debtsLoadingStatus, debts, displayedDebts, activeTab, ...ca
         </p>
       </div>
     ) : (
-        <div className="grid items-stretch gap-4 xl:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4">
+          {/* One debt per row: opening a card's payment history only moves the cards below it. */}
           {displayedDebts.map((debt) => (
             <div key={debt._id} className="min-w-0">
               <DebtCard debt={debt} {...cardProps} />

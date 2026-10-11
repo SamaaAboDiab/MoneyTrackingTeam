@@ -12,6 +12,7 @@ import {
   MessageCircle,
   Megaphone,
 } from "lucide-react";
+import usePageTitle from "../usePageTitle";
 
 const BREADCRUMB_ITEMS = [
   { match: "/dashboard", key: "dashboard.title", icon: LayoutDashboard },
@@ -35,6 +36,7 @@ function getBreadcrumb(pathname) {
 function Breadcrumb({ pathname, t }) {
   const breadcrumb = getBreadcrumb(pathname);
   const Icon = breadcrumb.icon;
+  usePageTitle(t(breadcrumb.key));
 
   return (
     <div className="flex min-w-0 items-center gap-2 text-sm font-bold text-slate-900">

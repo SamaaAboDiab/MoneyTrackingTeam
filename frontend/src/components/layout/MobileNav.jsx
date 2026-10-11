@@ -15,14 +15,32 @@ const MORE_ITEMS = NAV_ITEMS.filter((item) => !MOBILE_PRIMARY_PATHS.includes(ite
 
 const ANIMATION_MS = 220;
 
-function MobileNav() {
+/*
+  Phones and tablets: the main sections in a bottom bar, the rest in a "More" drawer.
+  Defaults are the user app's sections; the admin panel passes its own (same look and behavior).
+  - shortLabel(item): the bar's label; badgeFor(item): a count shown on that section.
+  - moreFooter(close): optional content under the drawer's links (gets the close function).
+*/
+function MobileNav({
+  primaryItems = PRIMARY_ITEMS,
+  moreItems = MORE_ITEMS,
+  isActive = isNavItemActive,
+  shortLabel,
+  badgeFor,
+  moreLabelKey = "layout.mobileNav.more",
+  navLabelKey = "layout.primaryNav",
+  moreFooter,
+}) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
-  const moreActive = MORE_ITEMS.some(({ to }) => isNavItemActive(to, pathname));
+  const moreActive = moreItems.some(({ to }) => isActive(to, pathname));
   const { count: unread } = useChatUnread();
+  const labelFor = shortLabel || ((item) => t(SHORT_LABEL_KEYS[item.key] || item.key));
+  const countFor = badgeFor || ((item) => (item.chat ? unread : item.badge || 0));
+  const moreHasBadge = moreItems.some((item) => countFor(item) > 0);
 
   function openMore() {
     setMounted(true);
@@ -77,14 +95,14 @@ function MobileNav() {
           <div
             role="dialog"
             aria-modal="true"
-            aria-label={t("layout.mobileNav.more")}
+            aria-label={t(moreLabelKey)}
             onClick={(event) => event.stopPropagation()}
             className={`absolute inset-y-0 inset-e-0 flex w-64 max-w-[72vw] flex-col bg-white px-3 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] pt-4 shadow-2xl transition-transform ease-out ${
               visible ? "translate-x-0 duration-200" : "translate-x-full rtl:-translate-x-full duration-150"
             }`}
           >
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-bold text-slate-900">{t("layout.mobileNav.more")}</h2>
+              <h2 className="text-base font-bold text-slate-900">{t(moreLabelKey)}</h2>
               <button
                 type="button"
                 onClick={closeMore}
@@ -95,8 +113,10 @@ function MobileNav() {
               </button>
             </div>
             <ul className="flex flex-1 flex-col gap-1 overflow-y-auto">
-              {MORE_ITEMS.map(({ to, key, icon: Icon, chat }) => {
-                const active = isNavItemActive(to, pathname);
+              {moreItems.map((item) => {
+                const { to, key, icon: Icon } = item;
+                const active = isActive(to, pathname);
+                const badge = countFor(item);
                 return (
                   <li key={to}>
                     <NavLink
@@ -111,9 +131,11 @@ function MobileNav() {
                     >
                       <Icon size={19} strokeWidth={active ? 2.4 : 2} aria-hidden="true" />
                       <span>{t(key)}</span>
-                      {chat && unread > 0 && (
-                        <span className="ms-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-500 px-1.5 text-[11px] font-bold text-white">
-                          {unread > 99 ? "99+" : unread}
+                      {badge > 0 && (
+                        <span className={`tabular-amount ms-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold leading-none ${
+                          active ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                        } emerald:bg-brand-500 emerald:text-white`}>
+                          {badge > 99 ? "99+" : badge}
                         </span>
                       )}
                     </NavLink>
@@ -121,24 +143,32 @@ function MobileNav() {
                 );
               })}
             </ul>
+            {moreFooter && <div className="pt-3">{moreFooter(closeMore)}</div>}
           </div>
         </div>
       )}
 
       <nav
-        aria-label={t("layout.primaryNav")}
+        aria-label={t(navLabelKey)}
         className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur emerald:border-white/10 emerald:bg-navy-900/95 lg:hidden"
       >
         <ul className="mx-auto grid max-w-xl grid-cols-5">
-          {PRIMARY_ITEMS.map(({ to, key, icon: Icon }) => {
-            const active = isNavItemActive(to, pathname);
+          {primaryItems.map((item) => {
+            const { to, icon: Icon } = item;
+            const active = isActive(to, pathname);
+            const badge = countFor(item);
             return (
               <li key={to}>
                 <NavLink to={to} className={tabClass(active)} aria-current={active ? "page" : undefined}>
-                  <span className={iconWrap(active)}>
+                  <span className={`relative ${iconWrap(active)}`}>
                     <Icon size={19} strokeWidth={active ? 2.4 : 2} />
+                    {badge > 0 && (
+                      <span className="tabular-amount absolute -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-500 px-1 text-[9px] font-bold leading-none text-white ring-2 ring-white inset-e-1 emerald:ring-navy-900">
+                        {badge > 9 ? "9+" : badge}
+                      </span>
+                    )}
                   </span>
-                  <span className="max-w-full truncate">{t(SHORT_LABEL_KEYS[key] || key)}</span>
+                  <span className="max-w-full truncate">{labelFor(item)}</span>
                 </NavLink>
               </li>
             );
@@ -153,11 +183,11 @@ function MobileNav() {
             >
               <span className={`relative ${iconWrap(moreActive || moreOpen)}`}>
                 <Menu size={19} strokeWidth={moreActive || moreOpen ? 2.4 : 2} />
-                {unread > 0 && (
+                {moreHasBadge && (
                   <span className="absolute top-0 inset-e-2 h-2.5 w-2.5 rounded-full bg-brand-500 ring-2 ring-white emerald:ring-navy-900" />
                 )}
               </span>
-              <span className="max-w-full truncate">{t("layout.mobileNav.more")}</span>
+              <span className="max-w-full truncate">{t(moreLabelKey)}</span>
             </button>
           </li>
         </ul>

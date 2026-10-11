@@ -4,7 +4,7 @@ import { notificationsLoaded, notificationsRead } from "../../store/slices/notif
 
 const STORAGE_PREFIX = "appNotifications:";
 const MAX_READ_IDS = 200;
-const EVENT_LINKS = { transfer: "/accounts/transfer", cash: "/cash", expense: "/expenses", debtPayment: "/debts", savings: "/savings" };
+const EVENT_LINKS = { transfer: "/accounts/transfer", cash: "/cash", expense: "/expenses", debtPayment: "/debts", savings: "/savings", renewals: "/admin/renewals" };
 
 /*
   Alerts that only exist in this browser (e.g. trying to spend more than an account holds),

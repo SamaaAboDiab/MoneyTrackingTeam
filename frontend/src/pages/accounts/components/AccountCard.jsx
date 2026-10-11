@@ -1,16 +1,81 @@
 import { Link } from "react-router-dom";
-import { Archive, ArchiveRestore, ArrowLeft, Banknote, Landmark, Smartphone } from "lucide-react";
+import { Archive, ArchiveRestore, ArrowLeft, Banknote, ChevronRight, Landmark, Smartphone } from "lucide-react";
 import AdjustBalanceButton from "./AdjustBalanceModal";
 import { formatMoney } from "../../../utils/formatAmount";
+import Money from "../../../components/common/Money";
+import { useTheme } from "../../../utils/theme";
 
 const ACCOUNT_TYPE_ICONS = { bank: Landmark, wallet: Smartphone, cash: Banknote };
 const FALLBACK_COLOR = "#64748b";
 
-// One account: its color as a soft accent, name and type, the balance up front, then actions.
-function AccountCard({ account, adjustStatus, onAdjust, onToggleArchive, t }) {
-  const Icon = ACCOUNT_TYPE_ICONS[account.type] || Banknote;
-  const color = /^#[0-9a-f]{6}$/i.test(account.color || "") ? account.color : FALLBACK_COLOR;
-  const negative = Number(account.balance) < 0;
+function accountLook(account) {
+  return {
+    Icon: ACCOUNT_TYPE_ICONS[account.type] || Banknote,
+    color: /^#[0-9a-f]{6}$/i.test(account.color || "") ? account.color : FALLBACK_COLOR,
+    negative: Number(account.balance) < 0,
+  };
+}
+
+// Mali: a quiet white card. The account's color is only a small dot; the balance leads.
+function MaliAccountCard({ account, adjustStatus, onAdjust, onToggleArchive, t }) {
+  const { Icon, color, negative } = accountLook(account);
+  const archiveLabel = account.isArchived ? t("accounts.reactivate") : t("accounts.archive");
+
+  return (
+    <article
+      className={`group flex flex-col card-hover rounded-2xl border border-slate-200 bg-white p-5 ${
+        account.isArchived ? "opacity-60" : ""
+      }`}
+    >
+      <Link to={`/accounts/${account._id}/transactions`} className="flex items-center gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+          <Icon size={18} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-slate-900">{account.name}</p>
+          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
+            <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
+            {t(`accounts.${account.type}`)} · {account.currency || "EGP"}
+          </p>
+        </div>
+        <ChevronRight size={16} className="shrink-0 text-slate-300 transition group-hover:text-slate-500 rtl:rotate-180" />
+      </Link>
+
+      <div className="mt-6">
+        <p className="text-[11px] font-medium text-slate-500">{t("accounts.balance")}</p>
+        <p className={`mt-1 text-2xl font-bold tracking-tight ${negative ? "text-expense" : "text-slate-900"}`}>
+          <Money value={account.balance} currency={account.currency} currencyClassName={negative ? "" : undefined} />
+        </p>
+      </div>
+
+      <div className="mt-5 flex items-center gap-1 border-t border-slate-100 pt-3">
+        {!account.isArchived && (
+          <AdjustBalanceButton
+            account={account}
+            onSubmit={onAdjust}
+            disabled={adjustStatus === "loading"}
+            triggerClassName="inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+          />
+        )}
+        <button
+          type="button"
+          onClick={() => onToggleArchive(account._id)}
+          title={archiveLabel}
+          className={`inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold transition ${
+            account.isArchived ? "text-slate-700 hover:bg-slate-100" : "ms-auto text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+          }`}
+        >
+          {account.isArchived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
+          {archiveLabel}
+        </button>
+      </div>
+    </article>
+  );
+}
+
+// Emerald: the account's color as a soft accent, name and type, the balance up front, then actions.
+function EmeraldAccountCard({ account, adjustStatus, onAdjust, onToggleArchive, t }) {
+  const { Icon, color, negative } = accountLook(account);
 
   return (
     <article
@@ -75,6 +140,12 @@ function AccountCard({ account, adjustStatus, onAdjust, onToggleArchive, t }) {
       </div>
     </article>
   );
+}
+
+// The two themes' cards differ in structure, not just color, so each has its own markup.
+function AccountCard(props) {
+  const theme = useTheme();
+  return theme === "emerald" ? <EmeraldAccountCard {...props} /> : <MaliAccountCard {...props} />;
 }
 
 export default AccountCard;

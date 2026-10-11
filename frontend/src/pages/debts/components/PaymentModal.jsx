@@ -127,7 +127,7 @@ function PaymentModal({ paymentModalDebt, setPaymentModalDebt, handleSavePayment
               <button
                 type="button"
                 onClick={() => setPaymentModalDebt(null)}
-                className="min-h-11 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 sm:w-auto"
+                className="min-h-11 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 sm:w-auto"
               >
                 {t("debts.paymentModal.cancel")}
               </button>

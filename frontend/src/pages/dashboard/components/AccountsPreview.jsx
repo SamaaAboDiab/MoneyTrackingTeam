@@ -32,7 +32,7 @@ function AccountsPreview({ status, accounts, t }) {
             <Link
               key={account._id}
               to={`/accounts/${account._id}/transactions`}
-              className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-slate-50 lg:bg-slate-50/70 lg:p-4 lg:ring-1 lg:ring-slate-100 lg:hover:bg-slate-100"
+              className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-slate-100 lg:bg-slate-50/70 lg:p-4 lg:ring-1 lg:ring-slate-100 lg:hover:bg-slate-100"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
                 <Icon size={16} />

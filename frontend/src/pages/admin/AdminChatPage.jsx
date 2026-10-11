@@ -147,7 +147,7 @@ function AdminChatPage() {
   };
 
   return (
-    <div className="mx-auto flex -mb-9 h-[calc(100dvh-10.25rem)] max-w-6xl lg:mb-0 overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm lg:h-[calc(100dvh-7.5rem)]">
+    <div className="mx-auto flex -mb-9 h-[calc(100dvh-10.25rem)] max-w-6xl lg:mb-0 card-shadow overflow-hidden rounded-2xl border border-slate-200 bg-white lg:h-[calc(100dvh-7.5rem)]">
       {/* Contacts: every registered user, recent chats first. Hidden on phones while a chat is open. */}
       <aside
         className={`flex min-h-0 w-full flex-col border-e border-slate-100 bg-white lg:w-88 lg:shrink-0 ${
@@ -212,7 +212,7 @@ function AdminChatPage() {
                   type="button"
                   onClick={() => selectUser(contact._id)}
                   className={`relative flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-start transition ${
-                    active ? "bg-brand-50 ring-1 ring-brand-100" : "hover:bg-slate-50"
+                    active ? "bg-brand-50 ring-1 ring-brand-100" : "hover:bg-slate-100"
                   }`}
                 >
                   <Avatar user={contact} />
@@ -276,8 +276,8 @@ function AdminChatPage() {
           />
         ) : (
           <div className="chat-wallpaper flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
-            <span className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-linear-to-br from-brand-400 to-brand-600 text-white shadow-lg shadow-brand-600/25">
-              <MessagesSquare size={34} />
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+              <MessagesSquare size={28} />
             </span>
             <div>
               <p className="text-lg font-bold text-slate-900">{t("admin.chat.emptyTitle")}</p>

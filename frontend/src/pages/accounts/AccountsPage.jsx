@@ -77,25 +77,29 @@ function AccountsPage() {
   const handleToggleArchive = (accountId) => dispatch(toggleArchiveAccount(accountId));
   const displayedAccounts = items.filter((account) => Boolean(account.isArchived) === showArchived);
 
+  // Phones: this button sits under the total-wealth card; from sm it lives in the page header.
+  const addAccountButton = (extraClass) => (
+    <button
+      type="button"
+      onClick={() => setIsCreateOpen(true)}
+      className={`min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 ${extraClass}`}
+    >
+      <Plus size={18} strokeWidth={2.5} />
+      {t("accounts.submit")}
+    </button>
+  );
+
   return (
     <div className="mx-auto max-w-6xl">
       <PageHeader
         icon={Wallet}
         title={t("accounts.title")}
         subtitle={t("accounts.formDescription")}
-        actions={
-          <button
-            type="button"
-            onClick={() => setIsCreateOpen(true)}
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 sm:w-auto"
-          >
-            <Plus size={18} strokeWidth={2.5} />
-            {t("accounts.submit")}
-          </button>
-        }
+        actions={addAccountButton("hidden sm:inline-flex sm:w-auto")}
       />
 
       <WealthSummary accounts={items} t={t} />
+      {addAccountButton("mt-4 inline-flex sm:hidden")}
       {isCreateOpen && (
         <AccountForm
           form={form}

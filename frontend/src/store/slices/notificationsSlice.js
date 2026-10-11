@@ -49,6 +49,17 @@ const notificationsSlice = createSlice({
         };
       },
     },
+    // Something the user just did that is worth a line in the bell, e.g. a debt payment.
+    // type: a notifications.types key; data.source picks the link (see useLocalAlerts).
+    activityLogged: {
+      reducer(state, action) {
+        state.events.unshift(action.payload);
+        state.events.length = Math.min(state.events.length, MAX_EVENTS);
+      },
+      prepare({ type, data }) {
+        return { payload: { id: `${type}-${nanoid()}`, type, createdAt: new Date().toISOString(), data } };
+      },
+    },
     notificationsRead(state, action) {
       const ids = new Set([...state.readIds, ...action.payload]);
       state.readIds = [...ids];
@@ -56,5 +67,5 @@ const notificationsSlice = createSlice({
   },
 });
 
-export const { notificationsLoaded, insufficientBalanceDetected, notificationsRead } = notificationsSlice.actions;
+export const { notificationsLoaded, insufficientBalanceDetected, activityLogged, notificationsRead } = notificationsSlice.actions;
 export default notificationsSlice.reducer;

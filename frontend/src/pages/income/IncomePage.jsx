@@ -305,22 +305,22 @@ function IncomePage() {
   };
 
 
+  // Phones: this button sits under the total card; from sm it lives in the page header.
+  const addIncomeButton = (extraClass) =>
+    !isCreateOpen && (
+      <button
+        type="button"
+        onClick={openCreateForm}
+        className={`min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 ${extraClass}`}
+      >
+        <Plus size={18} strokeWidth={2.5} />
+        {t("income.formTitle")}
+      </button>
+    );
+
   return (
     <div className="mx-auto max-w-6xl">
-      <IncomeHeader
-        actions={
-          !isCreateOpen && (
-            <button
-              type="button"
-              onClick={openCreateForm}
-              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 sm:w-auto"
-            >
-              <Plus size={18} strokeWidth={2.5} />
-              {t("income.formTitle")}
-            </button>
-          )
-        }
-      />
+      <IncomeHeader actions={addIncomeButton("hidden sm:inline-flex sm:w-auto")} />
 
       <IncomeTotalCard
         displayedTotal={displayedTotal}
@@ -329,6 +329,7 @@ function IncomePage() {
         summaryStatus={summaryStatus}
         summaryError={summaryError}
       />
+      {addIncomeButton("mt-4 inline-flex sm:hidden")}
 
       <IncomeAlerts error={error} updateError={updateError} successMessage={successMessage} />
 

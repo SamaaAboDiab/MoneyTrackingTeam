@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
+  ChevronRight,
   ArrowLeft,
   Ban,
   ChartNoAxesColumn,
@@ -10,7 +11,6 @@ import {
   History,
   MessagesSquare,
   PieChart as PieChartIcon,
-  Sparkles,
   TrendingDown,
   TrendingUp,
   UserCheck,
@@ -22,6 +22,8 @@ import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer,
 import { fetchAdminDashboard, fetchAdminStats } from "../../api/adminAuthApi";
 import { formatMoney } from "../../utils/formatAmount";
 import { toIntlLocale } from "../../i18n/locale";
+import Money from "../../components/common/Money";
+import { useTheme } from "../../utils/theme";
 import ChartTooltip from "../../components/charts/ChartTooltip";
 import { BAR_CURSOR, BAR_RADIUS, CHART_COLORS, GRID_PROPS, useChartLayout } from "../../components/charts/chartTheme";
 
@@ -36,19 +38,21 @@ const PLAN_TYPES = [
 const DONUT_SIZE = 184;
 
 // h-full: cards in the same row line up at the same height.
-const cardClass = "h-full rounded-3xl border border-slate-200/80 bg-white p-4 shadow-sm sm:p-6";
+const cardClass = "card-shadow h-full rounded-2xl border border-slate-200 bg-white p-5 sm:p-6";
+// Always underlined; on hover the link and its underline take the theme color (orange in Mali).
+const viewAllClass =
+  "text-xs font-semibold text-slate-500 underline decoration-slate-300 underline-offset-4 transition hover:text-accent-600 hover:decoration-current emerald:hover:text-brand-600";
 
-function CardTitle({ icon: Icon, tone, title, subtitle, action }) {
+// Card heading: a small muted icon beside the title, the explanation under it.
+function CardTitle({ icon: Icon, title, subtitle, action }) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-3">
-      <div className="flex items-start gap-3">
-        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}>
-          <Icon size={19} />
-        </span>
-        <div>
-          <h2 className="text-base font-bold text-slate-900">{title}</h2>
-          {subtitle && <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>}
-        </div>
+      <div className="min-w-0">
+        <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
+          <Icon size={16} className="shrink-0 text-slate-400" aria-hidden="true" />
+          {title}
+        </h2>
+        {subtitle && <p className="mt-1 text-xs leading-5 text-slate-500">{subtitle}</p>}
       </div>
       {action}
     </div>
@@ -66,41 +70,36 @@ function Hero({ admin, kpis, loading, t, language }) {
   const TrendIcon = growing ? TrendingUp : TrendingDown;
 
   return (
-    <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-navy-800 to-navy-900 p-5 text-white shadow-2xl sm:p-8">
-      <span aria-hidden="true" className="absolute -top-20 h-56 w-56 rounded-full bg-brand-500/20 blur-3xl inset-e-0" />
-      <span aria-hidden="true" className="absolute -bottom-24 h-56 w-56 rounded-full bg-sky-400/10 blur-3xl inset-s-10" />
-      <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+    <section className="rounded-2xl bg-linear-to-br from-navy-800 to-navy-900 p-5 text-white shadow-md sm:p-7">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-brand-300 ring-1 ring-white/10">
-            <Sparkles size={13} />
-            {t("admin.home.heroBadge")}
-          </p>
-          <h1 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-[1.75rem]">
             {t("admin.home.welcome", { name: admin?.name ?? "" })}
           </h1>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300">{t("admin.home.subtitle")}</p>
+          <p className="mt-1.5 max-w-xl text-sm text-slate-300">{t("admin.home.subtitle")}</p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Link
               to="/admin/users"
-              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-brand-500 sm:flex-none px-4 text-sm font-bold text-white shadow-sm transition hover:bg-brand-600"
+              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-semibold text-white transition hover:bg-brand-600 sm:flex-none"
             >
-              <Users size={17} />
+              <Users size={16} />
               {t("admin.home.usersLink")}
             </Link>
             <Link
               to="/admin/chat"
-              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl sm:flex-none bg-white/10 px-4 text-sm font-bold text-white ring-1 ring-white/15 transition hover:bg-white/15"
+              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-white/10 px-4 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15 sm:flex-none"
             >
-              <MessagesSquare size={17} />
+              <MessagesSquare size={16} />
               {t("admin.home.chatLink")}
             </Link>
           </div>
         </div>
 
-        <dl className="grid grid-cols-2 gap-3 lg:w-80">
-          <div className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-            <dt className="text-xs text-slate-400">{t("admin.home.newThisMonth")}</dt>
-            <dd className="mt-1 text-xl font-extrabold tabular-nums sm:text-2xl">{loading ? "…" : numberFormat.format(kpis.thisMonthNew ?? 0)}</dd>
+        {/* Two headline numbers, split by a hairline rather than boxed. */}
+        <dl className="grid grid-cols-2 divide-x divide-white/10 rtl:divide-x-reverse lg:w-96">
+          <div className="pe-6">
+            <dt className="text-xs font-medium text-slate-400">{t("admin.home.newThisMonth")}</dt>
+            <dd className="mt-1 text-3xl font-bold tabular-nums">{loading ? "…" : numberFormat.format(kpis.thisMonthNew ?? 0)}</dd>
             {!loading && (
               <dd className={`mt-1 inline-flex items-center gap-1 text-xs font-semibold ${growing ? "text-emerald-300" : "text-rose-300"}`}>
                 <TrendIcon size={13} />
@@ -108,9 +107,9 @@ function Hero({ admin, kpis, loading, t, language }) {
               </dd>
             )}
           </div>
-          <div className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
-            <dt className="text-xs text-slate-400">{t("admin.home.conversionRate")}</dt>
-            <dd className="mt-1 text-xl font-extrabold tabular-nums sm:text-2xl">
+          <div className="ps-6">
+            <dt className="text-xs font-medium text-slate-400">{t("admin.home.conversionRate")}</dt>
+            <dd className="mt-1 text-3xl font-bold tabular-nums">
               {loading ? "…" : `${numberFormat.format(kpis.conversionRate ?? 0)}%`}
             </dd>
             <dd className="mt-1 text-xs text-slate-400">{t("admin.home.conversionHint")}</dd>
@@ -123,6 +122,7 @@ function Hero({ admin, kpis, loading, t, language }) {
 
 /* ── status cards: number + share of all users, each opens the filtered list ── */
 function StatCards({ stats, loading, error, t, language }) {
+  const theme = useTheme();
   const numberFormat = new Intl.NumberFormat(toIntlLocale(language));
   const cards = [
     { key: "total", icon: Users, tone: "bg-sky-50 text-sky-600", bar: "bg-sky-400", link: "/admin/users" },
@@ -133,6 +133,43 @@ function StatCards({ stats, loading, error, t, language }) {
   ];
 
   if (error) return <ErrorBox>{error}</ErrorBox>;
+
+  // Mali: a white card with a status dot, the number, and a thin share bar in the same color.
+  if (theme !== "emerald") {
+    return (
+      <section aria-label={t("admin.home.statsTitle")} className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+        {cards.map(({ key, bar, link }) => {
+          const value = stats[key] ?? 0;
+          const share = stats.total ? Math.round((value / stats.total) * 100) : 0;
+          return (
+            <Link
+              key={key}
+              to={link}
+              className={`group card-hover flex flex-col rounded-2xl border border-slate-200 bg-white p-4 ${
+                key === "total" ? "col-span-2 md:col-span-1" : ""
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="flex min-w-0 items-center gap-2 text-xs font-medium text-slate-500">
+                  <span aria-hidden="true" className={`h-2 w-2 shrink-0 rounded-full ${bar}`} />
+                  <span className="truncate">{t(`admin.home.stats.${key}`)}</span>
+                </span>
+                <ChevronRight size={14} className="shrink-0 text-slate-300 transition group-hover:text-slate-500 rtl:rotate-180" />
+              </div>
+              <p className="mt-3 text-[1.75rem] font-bold leading-none tabular-nums text-slate-900" aria-live="polite">
+                {loading ? "…" : numberFormat.format(value)}
+              </p>
+              {key !== "total" && (
+                <div className="mt-4 h-1 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
+                  <span className={`block h-full rounded-full ${bar} transition-[width] duration-700`} style={{ width: `${loading ? 0 : share}%` }} />
+                </div>
+              )}
+            </Link>
+          );
+        })}
+      </section>
+    );
+  }
 
   return (
     <section aria-label={t("admin.home.statsTitle")} className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
@@ -187,7 +224,6 @@ function UserGrowthChart({ monthly, loading, error, t, language }) {
     <section aria-labelledby="admin-user-growth-title" className={cardClass}>
       <CardTitle
         icon={ChartNoAxesColumn}
-        tone="bg-brand-50 text-brand-600"
         title={<span id="admin-user-growth-title">{t("admin.home.userGrowthTitle")}</span>}
         subtitle={t("admin.home.userGrowthSubtitle")}
         action={
@@ -226,12 +262,6 @@ function UserGrowthChart({ monthly, loading, error, t, language }) {
           <div className="mt-5 h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 8, right: 4, bottom: 0, left: 4 }}>
-                <defs>
-                  <linearGradient id="admin-growth-bar" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--color-brand-400, #34d399)" />
-                    <stop offset="100%" stopColor="var(--color-brand-600, #059669)" />
-                  </linearGradient>
-                </defs>
                 <CartesianGrid {...GRID_PROPS} />
                 <XAxis dataKey="month" {...xAxisProps} interval="preserveStartEnd" />
                 <YAxis {...yAxisProps} allowDecimals={false} />
@@ -239,9 +269,9 @@ function UserGrowthChart({ monthly, loading, error, t, language }) {
                   cursor={BAR_CURSOR}
                   content={<ChartTooltip showNames={false} title={(label) => label} formatValue={(value) => numberFormat.format(value)} />}
                 />
-                <Bar dataKey="count" radius={BAR_RADIUS} maxBarSize={36} minPointSize={2} isAnimationActive={animate}>
+                <Bar dataKey="count" fill={CHART_COLORS.brand} radius={BAR_RADIUS} maxBarSize={36} minPointSize={2} isAnimationActive={animate}>
                   {chartData.map((month) => (
-                    <Cell key={month.key} fill={month.count > 0 ? "url(#admin-growth-bar)" : CHART_COLORS.empty} />
+                    <Cell key={month.key} fill={month.count > 0 ? CHART_COLORS.brand : CHART_COLORS.empty} />
                   ))}
                 </Bar>
               </BarChart>
@@ -273,7 +303,6 @@ function PlanDistributionChart({ plans, loading, error, t, language }) {
     <section aria-labelledby="admin-plan-distribution-title" className={cardClass}>
       <CardTitle
         icon={PieChartIcon}
-        tone="bg-indigo-50 text-indigo-600"
         title={<span id="admin-plan-distribution-title">{t("admin.home.planDistributionTitle")}</span>}
         subtitle={t("admin.home.planDistributionSubtitle")}
       />
@@ -336,7 +365,7 @@ function PlanDistributionChart({ plans, loading, error, t, language }) {
 
           <ul className="grid w-full grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-1" aria-label={t("admin.home.planDistributionLegend")}>
             {plans.map((plan) => (
-              <li key={plan.type} className="flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition hover:bg-slate-50">
+              <li key={plan.type} className="flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition hover:bg-slate-100">
                 <span className="flex min-w-0 items-center gap-2.5">
                   <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: plan.color }} />
                   <span className="truncate text-sm font-semibold text-slate-700">{t(`admin.home.plans.${plan.type}`)}</span>
@@ -363,7 +392,6 @@ function RevenueCard({ revenue, loading, error, t, language }) {
     <section aria-labelledby="admin-revenue-title" className={cardClass}>
       <CardTitle
         icon={Wallet}
-        tone="bg-emerald-50 text-emerald-600"
         title={<span id="admin-revenue-title">{t("admin.home.revenueTitle")}</span>}
         subtitle={t("admin.home.revenueBasis")}
       />
@@ -376,24 +404,28 @@ function RevenueCard({ revenue, loading, error, t, language }) {
         </div>
       ) : (
         <>
-          <p className="mt-5 text-3xl font-extrabold tabular-nums text-slate-900">{formatMoney(revenue.total, revenue.currency)}</p>
-          <ul className="mt-5 space-y-3">
+          <p className="mt-5 text-[1.75rem] font-bold leading-tight text-slate-900">
+            <Money value={revenue.total} currency={revenue.currency} />
+          </p>
+          <ul className="mt-5 space-y-4">
             {revenue.byPlan.map((plan) => (
               <li key={plan.type}>
-                <div className="flex items-baseline justify-between gap-2 text-sm">
-                  <span className="font-semibold text-slate-700">{t(`admin.home.plans.${plan.type}`)}</span>
-                  <span className="tabular-nums font-bold text-slate-900">{formatMoney(plan.revenue, revenue.currency)}</span>
-                </div>
-                <div className="mt-1.5 flex items-center gap-2">
-                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
-                    <span
-                      className="block h-full rounded-full transition-[width] duration-700"
-                      style={{ width: `${(plan.revenue / max) * 100}%`, backgroundColor: PLAN_TYPES.find((p) => p.type === plan.type)?.color }}
-                    />
-                  </div>
-                  <span className="shrink-0 text-[11px] text-slate-400">
-                    {numberFormat.format(plan.count)} × {formatMoney(plan.price, revenue.currency)}
+                <div className="flex items-baseline justify-between gap-3 text-sm">
+                  <span className="min-w-0 truncate">
+                    <span className="font-medium text-slate-700">{t(`admin.home.plans.${plan.type}`)}</span>
+                    <span className="ms-2 text-xs text-slate-400">
+                      {numberFormat.format(plan.count)} × {formatMoney(plan.price, revenue.currency)}
+                    </span>
                   </span>
+                  <span className="shrink-0 font-semibold text-slate-900">
+                    <Money value={plan.revenue} currency={revenue.currency} />
+                  </span>
+                </div>
+                <div className="mt-2 h-1 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
+                  <span
+                    className="block h-full rounded-full transition-[width] duration-700"
+                    style={{ width: `${(plan.revenue / max) * 100}%`, backgroundColor: PLAN_TYPES.find((p) => p.type === plan.type)?.color }}
+                  />
                 </div>
               </li>
             ))}
@@ -413,12 +445,11 @@ function ExpiringUsersList({ users, total, loading, error, t, language }) {
     <section aria-labelledby="admin-expiring-users-title" className={cardClass}>
       <CardTitle
         icon={Clock3}
-        tone="bg-amber-50 text-amber-600"
         title={<span id="admin-expiring-users-title">{t("admin.home.expiringUsersTitle")}</span>}
         subtitle={t("admin.home.expiringUsersSubtitle")}
         action={
           total > 0 && (
-            <Link to="/admin/users?status=expiring" className="text-xs font-bold text-brand-700 underline underline-offset-4 hover:text-brand-800">
+            <Link to="/admin/users?status=expiring" className={viewAllClass}>
               {t("admin.home.viewAll")}
             </Link>
           )
@@ -433,7 +464,7 @@ function ExpiringUsersList({ users, total, loading, error, t, language }) {
           {[0, 1, 2].map((item) => <span key={item} aria-hidden="true" className="skeleton block h-14 rounded-xl" />)}
         </div>
       ) : users.length === 0 ? (
-        <p className="mt-5 rounded-2xl bg-slate-50 p-5 text-center text-sm text-slate-500">{t("admin.home.noExpiringUsers")}</p>
+        <p className="mt-5 rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-500">{t("admin.home.noExpiringUsers")}</p>
       ) : (
         <ul className="mt-4 space-y-1">
           {users.slice(0, 5).map((user) => (
@@ -473,11 +504,10 @@ function RecentActivity({ logs, loading, error, t, language }) {
     <section aria-labelledby="admin-recent-activity-title" className={cardClass}>
       <CardTitle
         icon={History}
-        tone="bg-slate-100 text-slate-700"
         title={<span id="admin-recent-activity-title">{t("admin.home.recentActivityTitle")}</span>}
         subtitle={t("admin.home.recentActivitySubtitle")}
         action={
-          <Link to="/admin/logs" className="text-xs font-bold text-brand-700 underline underline-offset-4 hover:text-brand-800">
+          <Link to="/admin/logs" className={viewAllClass}>
             {t("admin.home.viewAll")}
           </Link>
         }
@@ -489,12 +519,12 @@ function RecentActivity({ logs, loading, error, t, language }) {
           {[0, 1, 2].map((item) => <span key={item} className="skeleton block h-12 rounded-xl" />)}
         </div>
       ) : logs.length === 0 ? (
-        <p className="mt-5 rounded-2xl bg-slate-50 p-5 text-center text-sm text-slate-500">{t("admin.auditLogs.empty")}</p>
+        <p className="mt-5 rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-500">{t("admin.auditLogs.empty")}</p>
       ) : (
         <ol className="mt-4 space-y-3">
           {logs.slice(0, 5).map((log) => (
             <li key={log._id} className="flex gap-3">
-              <span aria-hidden="true" className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand-400 ring-4 ring-brand-50" />
+              <span aria-hidden="true" className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-300" />
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-slate-700">
                   <span className="font-semibold text-slate-900">{t(`admin.auditLogs.actions.${log.action}`, { defaultValue: log.action })}</span>

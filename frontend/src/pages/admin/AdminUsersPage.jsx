@@ -26,6 +26,7 @@ import {
 } from "../../api/adminUsersApi";
 import PageHeader from "../../components/common/PageHeader";
 import FormModal from "../../components/common/FormModal";
+import Select from "../../components/common/Select";
 import UserActionsMenu from "./users/UserActionsMenu";
 import { fetchRenewals } from "../../api/adminExtrasApi";
 import { fetchChatContacts } from "../../api/chatApi";
@@ -464,13 +465,13 @@ function AdminUsersPage() {
     const unread = unreadByUser[user._id] || 0;
 
     return (
-      <li key={user._id} className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-brand-200 hover:shadow-md">
+      <li key={user._id} className="card-hover flex min-w-0 flex-col rounded-2xl border border-slate-200 bg-white p-4">
         <div className="flex items-start gap-3">
-          <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-base font-bold ${tone}`}>
+          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${tone}`}>
             {name.trim()[0]?.toUpperCase()}
           </span>
           <div className="min-w-0 flex-1">
-            <Link to={`/admin/users/${user._id}`} className="block truncate text-sm font-bold text-slate-900 hover:text-brand-700 hover:underline">
+            <Link to={`/admin/users/${user._id}`} className="block truncate text-sm font-semibold text-slate-900 hover:underline">
               {user.name}
             </Link>
             <p dir="ltr" className="truncate text-xs text-slate-500 rtl:text-right">{user.email}</p>
@@ -518,18 +519,18 @@ function AdminUsersPage() {
             </dt>
             <dd className="mt-0.5 text-sm font-bold text-slate-800">{formatDate(user.subscriptionEnd)}</dd>
             {daysLeft !== null && daysLeft > 0 && (
-              <dd className={`mt-0.5 font-semibold ${daysLeft <= 7 ? "text-amber-600" : "text-emerald-600"}`}>
+              <dd className={`mt-0.5 font-semibold ${daysLeft <= 7 ? "text-amber-600" : "text-income"}`}>
                 {t("admin.home.daysRemaining", { days: daysLeft })}
               </dd>
             )}
           </div>
         </dl>
 
-        <div className="mt-4 flex items-center gap-2">
+        <div className="mt-auto flex items-center gap-2 pt-4">
           <button
             type="button"
             onClick={() => openPlanEditor(user)}
-            className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-brand-50 px-3 text-sm font-bold text-brand-700 ring-1 ring-brand-100 transition hover:bg-brand-100"
+            className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
           >
             <Repeat size={15} aria-hidden="true" />
             {t("admin.users.changePlan")}
@@ -538,7 +539,7 @@ function AdminUsersPage() {
             to={`/admin/chat?user=${user._id}`}
             aria-label={t("admin.users.sendMessage")}
             title={t("admin.users.sendMessage")}
-            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700"
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
           >
             <MessageCircle size={17} />
             {unread > 0 && <span className="absolute -top-1 h-2.5 w-2.5 rounded-full bg-brand-500 ring-2 ring-white inset-e-[-0.25rem]" />}
@@ -670,7 +671,7 @@ function AdminUsersPage() {
             </label>
             <label className="text-sm font-semibold text-slate-700">
               {t("admin.users.planFilter")}
-              <select
+              <Select
                 name="subscriptionType"
                 value={createForm.subscriptionType}
                 onChange={handleCreateChange}
@@ -679,7 +680,7 @@ function AdminUsersPage() {
                 {PLANS.filter((value) => value !== "all").map((value) => (
                   <option key={value} value={value}>{t(`admin.users.plan.${value}`)}</option>
                 ))}
-              </select>
+              </Select>
             </label>
             {createForm.subscriptionType === "custom" && (
               <label className="text-sm font-semibold text-slate-700">
@@ -747,7 +748,7 @@ function AdminUsersPage() {
             <form onSubmit={handleUpdatePlan} className="space-y-4">
               <label className="block text-sm font-semibold text-slate-700">
                 {t("admin.users.newPlan")}
-                <select
+                <Select
                   name="subscriptionType"
                   value={planForm.subscriptionType}
                   onChange={handlePlanChange}
@@ -756,7 +757,7 @@ function AdminUsersPage() {
                   {PLANS.filter((value) => value !== "all").map((value) => (
                     <option key={value} value={value}>{t(`admin.users.plan.${value}`)}</option>
                   ))}
-                </select>
+                </Select>
               </label>
               {planForm.subscriptionType === "custom" && (
                 <label className="block text-sm font-semibold text-slate-700">
@@ -787,7 +788,7 @@ function AdminUsersPage() {
                   type="button"
                   disabled={planStatus === "loading"}
                   onClick={() => setEditingUser(null)}
-                  className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                  className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
                 >
                   {t("common.cancel")}
                 </button>
@@ -863,7 +864,7 @@ function AdminUsersPage() {
                   type="button"
                   disabled={extensionStatus === "loading"}
                   onClick={() => setExtendingUser(null)}
-                  className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                  className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
                 >
                   {t("common.cancel")}
                 </button>
@@ -949,7 +950,7 @@ function AdminUsersPage() {
                   type="button"
                   disabled={freeDaysStatus === "loading"}
                   onClick={() => setFreeDaysUser(null)}
-                  className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                  className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
                 >
                   {t("common.cancel")}
                 </button>
@@ -1031,7 +1032,7 @@ function AdminUsersPage() {
                   type="button"
                   disabled={manualDateStatus === "loading"}
                   onClick={() => setManualDateUser(null)}
-                  className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                  className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
                 >
                   {t("common.cancel")}
                 </button>
@@ -1105,7 +1106,7 @@ function AdminUsersPage() {
                   type="button"
                   disabled={suspendStatus === "loading"}
                   onClick={() => setSuspendingUser(null)}
-                  className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                  className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
                 >
                   {t("common.cancel")}
                 </button>
@@ -1123,34 +1124,33 @@ function AdminUsersPage() {
         </div>
       )}
 
-      <section className="rounded-3xl border border-slate-200 bg-white shadow-sm">
-        <header className="flex flex-wrap items-center justify-between gap-3 rounded-t-3xl border-b border-slate-100 bg-linear-to-b from-slate-50 to-white px-5 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-navy-900 text-white shadow-sm">
-              <Users size={20} />
-            </span>
-            <div>
-              <h2 className="text-base font-bold text-slate-900">{t("admin.users.listTitle")}</h2>
-              <p className="text-xs text-slate-500" aria-live="polite">
-                {t("admin.users.total", { count: pagination.total })}
-              </p>
-            </div>
+      {/* Phones: no outer frame, so the user cards get the full width (no box inside a box). */}
+      <section className="sm:card-shadow sm:rounded-2xl sm:border sm:border-slate-200 sm:bg-white">
+        <header className="flex flex-wrap items-center justify-between gap-3 pb-3 sm:border-b sm:border-slate-100 sm:px-6 sm:py-4">
+          <div>
+            <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
+              <Users size={16} className="text-slate-400" aria-hidden="true" />
+              {t("admin.users.listTitle")}
+            </h2>
+            <p className="mt-0.5 text-xs text-slate-500" aria-live="polite">
+              {t("admin.users.total", { count: pagination.total })}
+            </p>
           </div>
           {!isLoading && request.status === "succeeded" && hasMore && (
             <button
               type="button"
               onClick={() => setShowAll((current) => !current)}
-              className="text-sm font-semibold text-brand-700 underline underline-offset-4 transition hover:text-brand-800"
+              className="text-xs font-semibold text-slate-500 underline decoration-slate-300 underline-offset-4 transition hover:text-accent-600 hover:decoration-current emerald:hover:text-brand-600"
             >
               {showAll ? t("admin.auditLogs.showLess") : t("admin.auditLogs.showAll")}
             </button>
           )}
         </header>
 
-        <div className="p-4 sm:p-6">
+        <div className="sm:p-6">
           {/* Filters: status as tabs, then search and plan. */}
-          <div className="mb-5 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div role="tablist" aria-label={t("admin.users.statusFilter")} className="no-scrollbar flex gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1">
+          <div className="mb-5 flex flex-col gap-3 2xl:flex-row 2xl:items-center 2xl:justify-between">
+            <div role="tablist" aria-label={t("admin.users.statusFilter")} className="no-scrollbar flex max-w-full gap-1 self-start overflow-x-auto rounded-xl bg-slate-100 p-1">
               {STATUSES.map((value) => {
                 const selected = status === value;
                 return (
@@ -1171,11 +1171,10 @@ function AdminUsersPage() {
               })}
             </div>
 
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <form onSubmit={applySearch} className="flex min-w-0 flex-1 sm:w-80">
-                <label className="relative min-w-0 flex-1">
+            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_12rem] 2xl:w-[34rem]">
+              <form onSubmit={applySearch} role="search" className="relative min-w-0">
+                <label className="block min-w-0">
                   <span className="sr-only">{t("admin.users.search")}</span>
-                  <Search size={16} className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     id="admin-user-search"
                     type="search"
@@ -1183,33 +1182,36 @@ function AdminUsersPage() {
                     value={searchInput}
                     onChange={(event) => setSearchInput(event.target.value)}
                     placeholder={t("admin.users.search")}
-                    className="min-h-11 w-full rounded-s-xl rounded-e-none border border-e-0 border-slate-200 bg-slate-50 ps-9 pe-3 text-sm outline-none transition focus:border-brand-500 focus:bg-white"
+                    className="min-h-11 w-full rounded-xl border border-slate-200 bg-white ps-3.5 pe-14 text-sm outline-none transition focus:border-brand-500 sm:pe-24"
                   />
                 </label>
                 <button
                   type="submit"
-                  className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-e-xl rounded-s-none bg-brand-600 px-4 text-sm font-bold text-white transition hover:bg-brand-700"
+                  aria-label={t("admin.users.searchAction")}
+                  className="absolute top-1/2 inline-flex h-8 -translate-y-1/2 items-center gap-1.5 rounded-lg bg-brand-600 px-2.5 text-xs font-semibold text-white transition hover:bg-brand-700 inset-e-1.5 sm:px-3"
                 >
-                  <Search size={15} aria-hidden="true" />
-                  {t("admin.users.searchAction")}
+                  <Search size={14} aria-hidden="true" />
+                  {/* Phones: icon only, to leave the field room. */}
+                  <span className="hidden sm:inline">{t("admin.users.searchAction")}</span>
                 </button>
               </form>
               <label className="sr-only" htmlFor="admin-user-plan">{t("admin.users.planFilter")}</label>
-              <select
+              <Select
                 id="admin-user-plan"
+                name="plan"
                 value={plan}
                 onChange={(event) => { setPlan(event.target.value); setPage(1); setShowAll(false); }}
-                className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-brand-500 sm:w-auto"
+                className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-medium text-slate-700 outline-none transition focus:border-brand-500"
               >
                 {PLANS.map((value) => (
                   <option key={value} value={value}>{t(`admin.users.plan.${value}`)}</option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
 
           {isLoading ? (
-            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label={t("common.loading")}>
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label={t("common.loading")}>
               {[0, 1, 2].map((item) => (
                 <li key={item} className="space-y-3 rounded-2xl border border-slate-100 p-4">
                   <div className="flex items-center gap-3">
@@ -1231,7 +1233,7 @@ function AdminUsersPage() {
               <p className="text-sm text-slate-500">{t("admin.users.empty")}</p>
             </div>
           ) : (
-            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {visibleUsers.map(renderUserCard)}
             </ul>
           )}
@@ -1242,7 +1244,7 @@ function AdminUsersPage() {
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((current) => current - 1)}
-              className="min-h-10 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="min-h-10 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t("admin.users.previous")}
             </button>
@@ -1253,7 +1255,7 @@ function AdminUsersPage() {
               type="button"
               disabled={page >= pagination.pages}
               onClick={() => setPage((current) => current + 1)}
-              className="min-h-10 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="min-h-10 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t("admin.users.next")}
             </button>

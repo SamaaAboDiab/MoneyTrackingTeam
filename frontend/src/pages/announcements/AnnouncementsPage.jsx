@@ -47,7 +47,7 @@ function AnnouncementsPage() {
       ) : (
         <ul className="space-y-3">
           {items.map((item) => (
-            <li key={item._id} className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm">
+            <li key={item._id} className="card-hover rounded-3xl border border-slate-200/80 bg-white p-5">
               <div className="flex items-start gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
                   <Megaphone size={18} />

@@ -17,7 +17,7 @@ function LanguageSwitcher() {
         className={`${baseBtn} ${
           i18n.language === "ar"
             ? "bg-brand-600 text-white emerald:bg-white emerald:text-slate-900 emerald:shadow-sm"
-            : "text-slate-600 hover:bg-slate-50 emerald:text-slate-500 emerald:hover:bg-transparent emerald:hover:text-slate-700"
+            : "text-slate-600 hover:bg-slate-100 emerald:text-slate-500 emerald:hover:bg-transparent emerald:hover:text-slate-700"
         }`}
       >
         AR
@@ -28,7 +28,7 @@ function LanguageSwitcher() {
         className={`${baseBtn} ${
           i18n.language === "en"
             ? "bg-brand-600 text-white emerald:bg-white emerald:text-slate-900 emerald:shadow-sm"
-            : "text-slate-600 hover:bg-slate-50 emerald:text-slate-500 emerald:hover:bg-transparent emerald:hover:text-slate-700"
+            : "text-slate-600 hover:bg-slate-100 emerald:text-slate-500 emerald:hover:bg-transparent emerald:hover:text-slate-700"
         }`}
       >
         EN

@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const { userStatus } = require("../utils/subscription");
 
 // Blocks mutating requests (POST/PUT/DELETE/PATCH) when subscription is expired.
 // GET requests always pass through (read-only access is allowed).
@@ -9,13 +10,8 @@ module.exports = async function subscriptionCheck(req, res, next) {
     const user = await User.findById(req.userId).lean();
     if (!user) return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    if (!user.subscriptionEnd) return next();
-
-    const now = new Date();
-    const end = new Date(user.subscriptionEnd);
-    end.setHours(23, 59, 59, 999);
-
-    if (now > end) {
+    // Same rule as the status shown in the app and the admin panel (utils/subscription).
+    if (userStatus(user) === "expired") {
       return res.status(403).json({
         success: false,
         code: "SUBSCRIPTION_EXPIRED",

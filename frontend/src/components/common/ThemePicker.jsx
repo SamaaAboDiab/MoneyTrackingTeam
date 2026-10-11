@@ -59,7 +59,7 @@ function ThemePicker({ t, placement = "side" }) {
                   setOpen(false);
                   setTheme(id);
                 }}
-                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-start transition ${selected ? "bg-brand-50" : "hover:bg-slate-50"}`}
+                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-start transition ${selected ? "bg-brand-50" : "hover:bg-slate-100"}`}
               >
                 <span className={`flex-1 text-sm font-bold ${selected ? "text-brand-700" : "text-slate-800"}`}>{t(`theme.${id}.name`)}</span>
                 {selected && <Check size={17} className="shrink-0 text-brand-600" aria-hidden="true" />}

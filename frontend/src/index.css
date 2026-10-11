@@ -152,6 +152,45 @@ html[lang="ar"][data-theme="emerald"] {
   }
 }
 
+/* Cards: a soft resting shadow that lifts them off the page (card-shadow, for panels), plus a
+   small rise on hover for item cards in a grid (card-hover). The ring variables are kept in the
+   stack so cards drawn with a ring-1 border keep it. */
+@utility card-shadow {
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+    0 1px 2px 0 rgb(15 23 42 / 0.04), 0 2px 8px -2px rgb(15 23 42 / 0.06);
+}
+
+@utility card-hover {
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+    0 1px 2px 0 rgb(15 23 42 / 0.04), 0 2px 8px -2px rgb(15 23 42 / 0.06);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  &:hover {
+    transform: translateY(-2px);
+    /* A card can pick its own hover border, e.g. an overdue debt stays red. */
+    border-color: var(--card-hover-border, var(--color-slate-300));
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+      0 12px 28px -12px rgb(15 23 42 / 0.2), 0 2px 6px -2px rgb(15 23 42 / 0.06);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+/* Selected text: a soft wash of the Mali orange (emerald has its own below). */
+::selection {
+  background: var(--color-accent-100);
+  color: var(--color-slate-900);
+}
+
+/* Thin, quiet scrollbars for the page, lists and panels. Horizontal strips that hide their
+   scrollbar (.no-scrollbar, overflow-x-auto) keep doing so: a class beats this rule. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-slate-300) transparent;
+}
+
 [data-theme="emerald"] ::selection {
   background: var(--color-brand-100);
   color: var(--color-ink-900);
@@ -271,6 +310,11 @@ input[type="password"]::-ms-clear {
 .reveal {
   opacity: 0;
   transform: translateY(18px);
+}
+
+/* Rows and items inside a card rise less than the card itself. */
+.reveal.reveal-sm {
+  transform: translateY(10px);
 }
 
 .reveal.is-visible {

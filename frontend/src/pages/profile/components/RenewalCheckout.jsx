@@ -3,23 +3,28 @@ import { Check, Copy, CreditCard, ImageUp, Landmark, Smartphone, X } from "lucid
 import FormModal from "../../../components/common/FormModal";
 import { requestRenewal } from "../../../api/userExtrasApi";
 import { formatMoney } from "../../../utils/formatAmount";
+import Money from "../../../components/common/Money";
 
 const MAX_PROOF_BYTES = 4 * 1024 * 1024;
-const METHOD_STYLE = {
-  vodafone_cash: { icon: Smartphone, tone: "bg-rose-50 text-rose-600" },
-  instapay: { icon: Landmark, tone: "bg-violet-50 text-violet-600" },
-  card: { icon: CreditCard, tone: "bg-sky-50 text-sky-600" },
-};
+const METHOD_ICON = { vodafone_cash: Smartphone, instapay: Landmark, card: CreditCard };
+// Months per paid plan, to show each plan's monthly cost.
+const PLAN_MONTHS = { "3months": 3, "6months": 6, yearly: 12 };
 const STEPS = ["plan", "method", "pay"];
 const inputClass =
-  "min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm outline-none transition focus:border-brand-500 focus:bg-white";
+  "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm outline-none transition focus:border-brand-500";
+const primaryButton =
+  "min-h-11 flex-1 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50";
+const secondaryButton =
+  "min-h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-60";
 
 // Renewing: pick a plan → pick how to pay → send the money and attach proof.
 // The plan only starts after an admin confirms the payment.
-function RenewalCheckout({ t, info, onClose, onDone }) {
+// initialPlan: the plan picked on the card; bestPlan: the one tagged "best value"; trial: wording.
+function RenewalCheckout({ t, info, initialPlan, bestPlan, trial = false, onClose, onDone }) {
   const { plans, currency, paymentMethods = [], paymentInstructions } = info;
-  const [step, setStep] = useState(0);
-  const [plan, setPlan] = useState(plans[0]?.plan ?? "3months");
+  // Opened from a plan card: that plan is already chosen, so start at the payment method.
+  const [step, setStep] = useState(initialPlan ? 1 : 0);
+  const [plan, setPlan] = useState(initialPlan ?? plans[0]?.plan ?? "3months");
   const [method, setMethod] = useState(paymentMethods.find((option) => option.available)?.method ?? "");
   const [reference, setReference] = useState("");
   const [sender, setSender] = useState("");
@@ -80,7 +85,7 @@ function RenewalCheckout({ t, info, onClose, onDone }) {
   };
 
   return (
-    <FormModal title={t("subscription.checkout.title")} onClose={onClose} closeDisabled={busy}>
+    <FormModal title={t(trial ? "subscription.checkout.subscribeTitle" : "subscription.checkout.title")} onClose={onClose} closeDisabled={busy}>
       {/* Steps */}
       <ol className="mt-4 flex items-center gap-2" aria-label={t("subscription.checkout.title")}>
         {STEPS.map((key, index) => (
@@ -111,23 +116,37 @@ function RenewalCheckout({ t, info, onClose, onDone }) {
                 onClick={() => setPlan(option.plan)}
                 aria-pressed={selected}
                 className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3.5 text-start transition ${
-                  selected ? "border-brand-500 bg-brand-50 ring-2 ring-brand-500/15" : "border-slate-200 hover:bg-slate-50"
+                  selected ? "border-brand-600 bg-brand-50/60 ring-1 ring-brand-600" : "border-slate-200 hover:bg-slate-100"
                 }`}
               >
-                <span className="flex items-center gap-3">
-                  <span className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${selected ? "border-brand-600 bg-brand-600" : "border-slate-300"}`}>
+                <span className="flex min-w-0 items-center gap-3">
+                  <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${selected ? "border-brand-600 bg-brand-600" : "border-slate-300"}`}>
                     {selected && <Check size={12} className="text-white" />}
                   </span>
-                  <span className="text-sm font-bold text-slate-900">{t(`admin.home.plans.${option.plan}`)}</span>
+                  <span className="min-w-0">
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-semibold text-slate-900">{t(`admin.home.plans.${option.plan}`)}</span>
+                      {option.plan === bestPlan && (
+                        <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-semibold text-white">{t("subscription.bestValue")}</span>
+                      )}
+                    </span>
+                    {PLAN_MONTHS[option.plan] && (
+                      <span className="mt-0.5 block text-xs text-slate-500">
+                        {t("subscription.perMonth", { amount: formatMoney(Math.round(option.price / PLAN_MONTHS[option.plan]), currency) })}
+                      </span>
+                    )}
+                  </span>
                 </span>
-                <span className="text-sm font-extrabold tabular-nums text-slate-900">{formatMoney(option.price, currency)}</span>
+                <span className="shrink-0 text-base font-bold text-slate-900">
+                  <Money value={option.price} currency={currency} />
+                </span>
               </button>
             );
           })}
           <button
             type="button"
             onClick={() => setStep(1)}
-            className="mt-3 min-h-11 w-full rounded-xl bg-brand-600 text-sm font-bold text-white transition hover:bg-brand-700"
+            className={`mt-3 w-full ${primaryButton}`}
           >
             {t("subscription.checkout.continue")}
           </button>
@@ -136,12 +155,17 @@ function RenewalCheckout({ t, info, onClose, onDone }) {
 
       {step === 1 && (
         <div className="mt-5 space-y-2">
-          <p className="text-sm text-slate-600">
-            {t("subscription.checkout.amountToPay")}{" "}
-            <strong className="text-slate-900">{formatMoney(price, currency)}</strong>
-          </p>
+          <div className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm">
+            <span className="flex flex-wrap items-center gap-2 text-slate-600">
+              {t("subscription.checkout.amountToPay")}
+              <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">{t(`admin.home.plans.${plan}`)}</span>
+            </span>
+            <strong className="text-base font-bold text-slate-900">
+              <Money value={price} currency={currency} />
+            </strong>
+          </div>
           {paymentMethods.map((option) => {
-            const { icon: Icon, tone } = METHOD_STYLE[option.method] || METHOD_STYLE.card;
+            const Icon = METHOD_ICON[option.method] || CreditCard;
             const selected = method === option.method;
             return (
               <button
@@ -151,14 +175,14 @@ function RenewalCheckout({ t, info, onClose, onDone }) {
                 onClick={() => setMethod(option.method)}
                 aria-pressed={selected}
                 className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-start transition disabled:cursor-not-allowed disabled:opacity-55 ${
-                  selected ? "border-brand-500 bg-brand-50 ring-2 ring-brand-500/15" : "border-slate-200 enabled:hover:bg-slate-50"
+                  selected ? "border-brand-600 bg-brand-50/60 ring-1 ring-brand-600" : "border-slate-200 enabled:hover:bg-slate-100"
                 }`}
               >
-                <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}>
+                <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${selected ? "bg-white text-slate-800 ring-1 ring-slate-200" : "bg-slate-100 text-slate-500"}`}>
                   <Icon size={19} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-bold text-slate-900">{t(`subscription.methods.${option.method}`)}</span>
+                  <span className="block text-sm font-semibold text-slate-900">{t(`subscription.methods.${option.method}`)}</span>
                   <span className="block text-xs text-slate-500">
                     {option.available ? t(`subscription.methodHints.${option.method}`) : t("subscription.checkout.unavailable")}
                   </span>
@@ -171,14 +195,14 @@ function RenewalCheckout({ t, info, onClose, onDone }) {
             <p className="rounded-xl bg-amber-50 px-4 py-2.5 text-sm text-amber-800">{t("subscription.checkout.noMethods")}</p>
           )}
           <div className="mt-3 flex gap-2">
-            <button type="button" onClick={() => setStep(0)} className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+            <button type="button" onClick={() => setStep(0)} className={secondaryButton}>
               {t("subscription.checkout.back")}
             </button>
             <button
               type="button"
               disabled={!chosen?.available}
               onClick={() => setStep(2)}
-              className="min-h-11 flex-1 rounded-xl bg-brand-600 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-50"
+              className={primaryButton}
             >
               {t("subscription.checkout.continue")}
             </button>
@@ -205,10 +229,14 @@ function RenewalCheckout({ t, info, onClose, onDone }) {
             {chosen.accountName && <p className="mt-0.5 text-xs text-slate-300">{chosen.accountName}</p>}
             <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3 text-sm">
               <span className="text-slate-300">{t("subscription.checkout.amountToPay")}</span>
-              <strong className="text-base font-extrabold text-brand-300">{formatMoney(price, currency)}</strong>
+              <strong className="text-lg font-bold">
+                <Money value={price} currency={currency} currencyClassName="text-hero-accent" />
+              </strong>
             </div>
           </div>
-          {paymentInstructions && <p className="rounded-xl bg-slate-50 px-3.5 py-2.5 text-xs leading-6 text-slate-600">{paymentInstructions}</p>}
+          {paymentInstructions && (
+            <p className="border-s-2 border-slate-200 ps-3 text-xs leading-6 text-slate-600">{paymentInstructions}</p>
+          )}
 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm font-semibold text-slate-700">
@@ -241,9 +269,11 @@ function RenewalCheckout({ t, info, onClose, onDone }) {
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="mt-1.5 flex w-full flex-col items-center gap-1.5 rounded-2xl border-2 border-dashed border-slate-200 px-4 py-5 text-center transition hover:border-brand-300 hover:bg-brand-50/40"
+                className="mt-1.5 flex w-full flex-col items-center gap-1.5 rounded-2xl border-2 border-dashed border-slate-200 px-4 py-6 text-center transition hover:border-slate-300 hover:bg-slate-50"
               >
-                <ImageUp size={22} className="text-slate-400" />
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                  <ImageUp size={19} />
+                </span>
                 <span className="text-sm font-semibold text-slate-700">{t("subscription.checkout.uploadProof")}</span>
                 <span className="text-xs text-slate-400">{t("subscription.checkout.proofHint")}</span>
               </button>
@@ -257,16 +287,16 @@ function RenewalCheckout({ t, info, onClose, onDone }) {
             rows={2}
             placeholder={t("subscription.notePlaceholder")}
             aria-label={t("subscription.notePlaceholder")}
-            className="min-h-0 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm outline-none focus:border-brand-500 focus:bg-white"
+            className="min-h-0 w-full resize-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-brand-500"
           />
 
           {error && <p role="alert" className="rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense">{error}</p>}
 
           <div className="flex gap-2">
-            <button type="button" onClick={() => setStep(1)} disabled={busy} className="min-h-11 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+            <button type="button" onClick={() => setStep(1)} disabled={busy} className={secondaryButton}>
               {t("subscription.checkout.back")}
             </button>
-            <button type="submit" disabled={busy} className="min-h-11 flex-1 rounded-xl bg-brand-600 text-sm font-bold text-white transition hover:bg-brand-700 disabled:opacity-60">
+            <button type="submit" disabled={busy} className={primaryButton}>
               {busy ? t("subscription.sending") : t("subscription.checkout.submit")}
             </button>
           </div>

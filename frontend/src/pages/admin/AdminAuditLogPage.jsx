@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ArrowLeft,
   Ban,
   CalendarClock,
   CalendarPlus,
   CircleCheck,
-  ClipboardList,
   Clock,
   Gift,
   History,
   Inbox,
-  Quote,
   Repeat,
   Search,
   SlidersHorizontal,
@@ -50,7 +47,7 @@ function PersonChip({ person, label, fallback }) {
   const name = person?.name || person?.email || fallback;
   const initial = name.trim()[0]?.toUpperCase() || "?";
   return (
-    <span className="inline-flex min-w-0 items-center gap-2">
+    <span className="flex min-w-0 items-center gap-2">
       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
         {initial}
       </span>
@@ -157,11 +154,12 @@ function AdminAuditLogPage() {
     const entries = details ? Object.entries(details) : [];
     if (entries.length === 0) return null;
     return (
-      <dl className="mt-3 flex flex-wrap gap-2">
+      // Label at the start, value at the end — one row each, so it fits a quarter-width card.
+      <dl className="mt-3 space-y-1.5 rounded-lg bg-slate-50 p-2.5 text-xs">
         {entries.map(([key, value]) => (
-          <div key={key} className="inline-flex items-baseline gap-1.5 rounded-lg bg-slate-50 px-2.5 py-1.5 text-xs ring-1 ring-slate-100">
-            <dt className="text-slate-500">{t(`admin.auditLogs.fields.${key}`, { defaultValue: key })}</dt>
-            <dd className="font-semibold text-slate-800">{formatDetailValue(key, value)}</dd>
+          <div key={key} className="flex items-baseline justify-between gap-3">
+            <dt className="shrink-0 text-slate-500">{t(`admin.auditLogs.fields.${key}`, { defaultValue: key })}</dt>
+            <dd className="min-w-0 break-words text-end font-semibold text-slate-800">{formatDetailValue(key, value)}</dd>
           </div>
         ))}
       </dl>
@@ -183,14 +181,6 @@ function AdminAuditLogPage() {
   };
 
   // Day headings for the timeline: today, yesterday, or the date.
-  const dayKey = (value) => new Date(value).toDateString();
-  const dayLabel = (value) => {
-    const today = new Date(loadedAt);
-    const yesterday = new Date(loadedAt - 24 * 60 * 60 * 1000);
-    if (dayKey(value) === today.toDateString()) return t("chat.today");
-    if (dayKey(value) === yesterday.toDateString()) return t("chat.yesterday");
-    return new Intl.DateTimeFormat(i18n.language, { weekday: "long", day: "numeric", month: "long" }).format(new Date(value));
-  };
   const affectedUsers = new Set(logs.map((entry) => entry.user?._id).filter(Boolean)).size;
 
   // Only the first few entries until "show all" is pressed.
@@ -200,30 +190,27 @@ function AdminAuditLogPage() {
   return (
     <div className="mx-auto max-w-7xl">
       {/* Hero: what this page is, with a few numbers at a glance. */}
-      <section className="relative mb-5 overflow-hidden rounded-3xl bg-linear-to-br from-navy-800 to-navy-900 p-5 text-white shadow-2xl sm:p-8">
-        <span aria-hidden="true" className="absolute -top-16 h-48 w-48 rounded-full bg-brand-500/20 blur-3xl inset-e-0" />
+      <section className="relative mb-5 overflow-hidden rounded-2xl bg-linear-to-br from-navy-800 to-navy-900 p-5 text-white shadow-md sm:p-7">
         <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-4">
-            <span className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15 sm:flex">
-              <ClipboardList size={26} />
-            </span>
             <div>
-              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t("admin.auditLogs.title")}</h1>
+              <h1 className="text-2xl font-bold tracking-tight sm:text-[1.75rem]">{t("admin.auditLogs.title")}</h1>
               <p className="mt-1 max-w-xl text-sm leading-6 text-slate-300">{t("admin.auditLogs.subtitle")}</p>
             </div>
           </div>
-          <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:w-auto">
+          {/* Numbers split by hairlines rather than boxed. */}
+          <dl className="grid grid-cols-2 gap-y-4 sm:grid-cols-3 sm:divide-x sm:divide-white/10 sm:rtl:divide-x-reverse lg:w-auto">
             {[
               { icon: History, label: t("admin.auditLogs.statTotal"), value: pagination.total },
               { icon: Users, label: t("admin.auditLogs.statUsers"), value: affectedUsers },
               { icon: Clock, label: t("admin.auditLogs.statLast"), value: logs[0] ? relativeTime(logs[0].createdAt) : "—" },
             ].map(({ icon: StatIcon, label, value }) => (
-              <div key={label} className="min-w-0 rounded-2xl bg-white/5 px-3 py-3 ring-1 ring-white/10 last:col-span-2 sm:px-4 sm:last:col-span-1">
+              <div key={label} className="min-w-0 last:col-span-2 sm:px-5 sm:first:ps-0 sm:last:col-span-1">
                 <dt className="flex items-center gap-1.5 text-xs text-slate-400">
                   <StatIcon size={13} aria-hidden="true" />
                   <span className="truncate">{label}</span>
                 </dt>
-                <dd className="tabular-amount mt-1 truncate text-base font-extrabold sm:text-lg">{isLoading ? "…" : value}</dd>
+                <dd className="tabular-amount mt-1 truncate text-lg font-bold sm:text-xl">{isLoading ? "…" : value}</dd>
               </div>
             ))}
           </dl>
@@ -231,10 +218,10 @@ function AdminAuditLogPage() {
       </section>
 
       {/* Filters: action chips apply at once; user and dates apply with the button. */}
-      <form onSubmit={applyFilters} className="mb-5 rounded-3xl border border-slate-200 bg-white shadow-sm">
+      <form onSubmit={applyFilters} className="card-shadow mb-5 rounded-2xl border border-slate-200 bg-white">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
               <SlidersHorizontal size={17} />
             </span>
             <h2 className="text-base font-bold text-slate-900">{t("admin.auditLogs.filtersTitle")}</h2>
@@ -250,7 +237,7 @@ function AdminAuditLogPage() {
             <button
               type="button"
               onClick={clearFilters}
-              className="min-h-10 flex-1 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:flex-none"
+              className="min-h-10 flex-1 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 sm:flex-none"
             >
               {t("admin.auditLogs.clear")}
             </button>
@@ -273,7 +260,7 @@ function AdminAuditLogPage() {
                   className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-semibold transition ${
                     selected
                       ? "border-navy-900 bg-navy-900 text-white shadow-sm"
-                      : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                      : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-100"
                   }`}
                 >
                   <ChipIcon size={14} className={selected ? "text-white" : style ? style.tone.split(" ").find((c) => c.startsWith("text-")) : "text-slate-400"} />
@@ -324,18 +311,16 @@ function AdminAuditLogPage() {
         </div>
       </form>
 
-      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-linear-to-b from-slate-50 to-white px-5 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-navy-900 text-white shadow-sm">
-              <History size={20} />
-            </span>
-            <div>
-              <h2 className="text-base font-bold text-slate-900">{t("admin.auditLogs.listTitle")}</h2>
-              <p className="text-xs text-slate-500" aria-live="polite">
-                {t("admin.auditLogs.total", { count: pagination.total })}
-              </p>
-            </div>
+      <section className="card-shadow overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
+          <div>
+            <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
+              <History size={16} className="text-slate-400" aria-hidden="true" />
+              {t("admin.auditLogs.listTitle")}
+            </h2>
+            <p className="mt-0.5 text-xs text-slate-500" aria-live="polite">
+              {t("admin.auditLogs.total", { count: pagination.total })}
+            </p>
           </div>
           {!isLoading && request.status === "succeeded" && hasMore && (
             <button
@@ -371,63 +356,46 @@ function AdminAuditLogPage() {
               <p className="text-sm text-slate-500">{t("admin.auditLogs.empty")}</p>
             </div>
           ) : (
-            /* Timeline: one card per operation, with a coloured icon on the line. */
-            <ol>
-              {visibleLogs.map((entry, index) => {
-                const style = ACTION_STYLES[entry.action] || DEFAULT_ACTION_STYLE;
-                const ActionIcon = style.icon;
-                const last = index === visibleLogs.length - 1;
-                const newDay = index === 0 || dayKey(visibleLogs[index - 1].createdAt) !== dayKey(entry.createdAt);
-                const lineBelow = !last && dayKey(visibleLogs[index + 1].createdAt) === dayKey(entry.createdAt);
-                return (
-                  <li key={entry._id} className="relative pb-5 last:pb-0">
-                    {newDay && (
-                      <div className="mb-4 flex items-center gap-3">
-                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{dayLabel(entry.createdAt)}</span>
-                        <span aria-hidden="true" className="h-px flex-1 bg-slate-100" />
-                      </div>
-                    )}
-                    <div className="relative flex gap-3 sm:gap-4">
-                    {lineBelow && <span aria-hidden="true" className="absolute top-12 -bottom-5 w-px bg-slate-200 inset-s-[1.375rem]" />}
-                    <span className={`relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ring-4 ring-white ${style.tone}`}>
-                      <ActionIcon size={19} />
-                    </span>
+            /* One continuous grid, four cards to a row on wide screens (each card shows its own time). */
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                      {visibleLogs.map((entry) => {
+                        const style = ACTION_STYLES[entry.action] || DEFAULT_ACTION_STYLE;
+                        const ActionIcon = style.icon;
+                        return (
+                          <li key={entry._id} className="min-w-0">
+                            <article className="card-hover flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className={`inline-flex min-w-0 items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${style.pill}`}>
+                                  <ActionIcon size={12} className="shrink-0" aria-hidden="true" />
+                                  <span className="truncate">{t(`admin.auditLogs.actions.${entry.action}`, { defaultValue: entry.action })}</span>
+                                </span>
+                                <time
+                                  dateTime={entry.createdAt}
+                                  title={formatDateTime(entry.createdAt)}
+                                  className="inline-flex shrink-0 items-center gap-1 text-xs text-slate-400"
+                                >
+                                  <Clock size={12} />
+                                  {relativeTime(entry.createdAt)}
+                                </time>
+                              </div>
 
-                    <article className="min-w-0 flex-1 rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm transition hover:border-slate-200 hover:shadow-md sm:p-4">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${style.pill}`}>
-                          {t(`admin.auditLogs.actions.${entry.action}`, { defaultValue: entry.action })}
-                        </span>
-                        <time
-                          dateTime={entry.createdAt}
-                          title={formatDateTime(entry.createdAt)}
-                          className="inline-flex items-center gap-1 text-xs text-slate-400"
-                        >
-                          <Clock size={12} />
-                          {relativeTime(entry.createdAt)}
-                        </time>
-                      </div>
+                              <div className="mt-3 space-y-2">
+                                <PersonChip person={entry.admin} label={t("admin.auditLogs.admin")} fallback={t("admin.auditLogs.deletedPerson")} />
+                                <PersonChip person={entry.user} label={t("admin.auditLogs.targetUser")} fallback={t("admin.auditLogs.deletedPerson")} />
+                              </div>
 
-                      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-                        <PersonChip person={entry.admin} label={t("admin.auditLogs.admin")} fallback={t("admin.auditLogs.deletedPerson")} />
-                        <ArrowLeft size={16} className="shrink-0 text-slate-300 ltr:rotate-180" aria-hidden="true" />
-                        <PersonChip person={entry.user} label={t("admin.auditLogs.targetUser")} fallback={t("admin.auditLogs.deletedPerson")} />
-                      </div>
+                              {renderDetails(entry.details)}
 
-                      {renderDetails(entry.details)}
-
-                      {entry.reason && (
-                        <p className="mt-3 flex gap-2 rounded-xl border-s-4 border-brand-200 bg-brand-50/50 px-3 py-2 text-sm text-slate-700">
-                          <Quote size={14} className="mt-0.5 shrink-0 text-brand-400" aria-hidden="true" />
-                          <span className="whitespace-pre-wrap break-words">{entry.reason}</span>
-                        </p>
-                      )}
-                    </article>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
+                              {entry.reason && (
+                                <p className="mt-3 whitespace-pre-wrap break-words border-s-2 border-slate-200 ps-3 text-sm text-slate-600">
+                                  {entry.reason}
+                                </p>
+                              )}
+                            </article>
+                          </li>
+                        );
+                      })}
+            </ul>
           )}
 
         {!isLoading && request.status === "succeeded" && showAll && pagination.pages > 1 && (
@@ -436,7 +404,7 @@ function AdminAuditLogPage() {
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((current) => current - 1)}
-              className="min-h-10 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="min-h-10 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t("admin.auditLogs.previous")}
             </button>
@@ -447,7 +415,7 @@ function AdminAuditLogPage() {
               type="button"
               disabled={page >= pagination.pages}
               onClick={() => setPage((current) => current + 1)}
-              className="min-h-10 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="min-h-10 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t("admin.auditLogs.next")}
             </button>

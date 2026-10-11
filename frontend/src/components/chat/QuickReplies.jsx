@@ -143,7 +143,7 @@ function QuickReplies({ onPick }) {
                     onPick(item.text);
                     setOpen(false);
                   }}
-                  className="w-full rounded-xl px-3 py-2.5 pe-10 text-start transition hover:bg-slate-50"
+                  className="w-full rounded-xl px-3 py-2.5 pe-10 text-start transition hover:bg-slate-100"
                 >
                   <span className="block text-sm font-bold text-slate-800">{item.title}</span>
                   <span className="mt-0.5 line-clamp-2 block text-xs text-slate-500">{item.text}</span>

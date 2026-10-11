@@ -6,10 +6,11 @@ import { logout } from "../../store/slices/authSlice";
 import ConfirmModal from "../common/ConfirmModal";
 import SidebarHeader from "./sidebar/SidebarHeader";
 import SidebarNav from "./sidebar/SidebarNav";
+import SidebarUpgradeCard from "./sidebar/SidebarUpgradeCard";
 import SidebarUserSection from "./sidebar/SidebarUserSection";
 
 // Shared by the user app and the admin panel; the admin passes its own items, account and logout.
-function Sidebar({ navItems, isItemActive, account, profileTo, tagline, onLogout }) {
+function Sidebar({ navItems, isItemActive, account, profileTo, tagline, onLogout, subscriptionInfo }) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -38,6 +39,8 @@ function Sidebar({ navItems, isItemActive, account, profileTo, tagline, onLogout
       <SidebarNav collapsed={collapsed} pathname={pathname} t={t} items={navItems} isActive={isItemActive} />
 
       <div className="p-3">
+        {/* User app only (the admin panel passes its own account). */}
+        {!account && <SidebarUpgradeCard info={subscriptionInfo} collapsed={collapsed} />}
         <SidebarUserSection
           collapsed={collapsed}
           user={user}

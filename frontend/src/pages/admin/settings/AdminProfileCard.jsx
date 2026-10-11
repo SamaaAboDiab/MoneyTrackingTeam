@@ -55,12 +55,11 @@ function AdminProfileCard({ admin, t }) {
   ];
 
   return (
-    <section className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
+    <section className="card-shadow overflow-hidden rounded-2xl border border-slate-200 bg-white">
       <div className="grid md:grid-cols-[18rem_1fr]">
         {/* Photo on its cover (same size as before) */}
         <div className="border-slate-100 md:border-e">
           <div className="relative h-24 bg-linear-to-br from-navy-800 to-navy-900">
-            <span aria-hidden="true" className="absolute -top-10 h-32 w-32 rounded-full bg-brand-500/25 blur-2xl inset-e-4" />
           </div>
           <div className="-mt-12 flex flex-col items-center px-5 pb-5 text-center">
             <div className="relative">
@@ -111,8 +110,8 @@ function AdminProfileCard({ admin, t }) {
         {/* Details beside it */}
         <div className="flex flex-col justify-center gap-5 border-t border-slate-100 p-5 sm:p-6 md:border-t-0">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">{t("admin.settings.welcomeBack")}</p>
-            <h2 className="mt-1 truncate text-2xl font-extrabold tracking-tight text-slate-900">{admin?.name}</h2>
+            <p className="text-xs font-medium text-slate-500">{t("admin.settings.welcomeBack")}</p>
+            <h2 className="mt-1 truncate text-2xl font-bold tracking-tight text-slate-900">{admin?.name}</h2>
             <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">
               <ShieldCheck size={13} />
               {t("admin.settings.role")}

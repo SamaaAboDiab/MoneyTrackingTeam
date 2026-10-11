@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const TOGGLE_CLASS =
-  "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-50 hover:text-slate-600 emerald:hover:bg-white/10 emerald:hover:text-white";
+  "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 emerald:hover:bg-white/10 emerald:hover:text-white";
 
 // The emerald theme's dark sidebar needs the white logo.
 function SidebarLogo() {

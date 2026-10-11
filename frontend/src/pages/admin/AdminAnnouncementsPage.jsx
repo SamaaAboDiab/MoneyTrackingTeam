@@ -76,7 +76,7 @@ function AdminAnnouncementsPage() {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
         {/* Compose */}
-        <form onSubmit={handleSubmit} className="h-fit rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
+        <form onSubmit={handleSubmit} className="card-shadow h-fit rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
           <h2 className="text-base font-bold text-slate-900">{t("admin.announcements.newTitle")}</h2>
 
           <p className="mt-4 text-sm font-semibold text-slate-700">{t("admin.announcements.audience")}</p>
@@ -91,7 +91,7 @@ function AdminAnnouncementsPage() {
                   aria-checked={selected}
                   onClick={() => setForm((current) => ({ ...current, audience }))}
                   className={`rounded-2xl border px-3 py-2.5 text-start transition ${
-                    selected ? "border-brand-500 bg-brand-50 ring-2 ring-brand-500/15" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                    selected ? "border-brand-500 bg-brand-50 ring-2 ring-brand-500/15" : "border-slate-200 hover:border-slate-300 hover:bg-slate-100"
                   }`}
                 >
                   <span className={`block text-sm font-bold ${selected ? "text-brand-700" : "text-slate-800"}`}>
@@ -149,7 +149,7 @@ function AdminAnnouncementsPage() {
         </form>
 
         {/* Sent */}
-        <section className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
+        <section className="card-shadow rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
           <h2 className="text-base font-bold text-slate-900">{t("admin.announcements.sentTitle")}</h2>
           {status === "loading" ? (
             <div className="mt-4 space-y-3" aria-hidden="true">
@@ -159,7 +159,7 @@ function AdminAnnouncementsPage() {
             <p role="alert" className="mt-4 rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{t("admin.announcements.loadError")}</p>
           ) : items.length === 0 ? (
             <div className="mt-6 flex flex-col items-center gap-3 py-8 text-center">
-              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
                 <Megaphone size={24} />
               </span>
               <p className="text-sm text-slate-500">{t("admin.announcements.empty")}</p>
@@ -167,7 +167,7 @@ function AdminAnnouncementsPage() {
           ) : (
             <ul className="mt-4 space-y-3">
               {items.map((item) => (
-                <li key={item._id} className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
+                <li key={item._id} className="card-hover rounded-xl border border-slate-200 bg-white p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="font-bold text-slate-900">{item.title}</p>

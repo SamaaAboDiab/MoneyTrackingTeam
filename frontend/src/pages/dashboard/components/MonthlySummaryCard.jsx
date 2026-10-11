@@ -134,19 +134,19 @@ function MonthlySummaryCard({
         <StatsSkeleton bare count={3} className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3" label={t("dashboard.summary.loading")} />
       ) : (
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <div className="card-hover rounded-lg border border-slate-200 bg-white p-4">
             <span className="text-xs font-semibold text-slate-500">{t("dashboard.summary.income")}</span>
             <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-slate-900"><Money value={income} currency={currency} /></p>
             {renderComparison(income, prevIncome, "income")}
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <div className="card-hover rounded-lg border border-slate-200 bg-white p-4">
             <span className="text-xs font-semibold text-slate-500">{t("dashboard.summary.expenses")}</span>
             <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-slate-900"><Money value={expenses} currency={currency} /></p>
             {renderComparison(expenses, prevExpenses, "expenses")}
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <div className="card-hover rounded-lg border border-slate-200 bg-white p-4">
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-semibold text-slate-500">
                 {isPositive ? t("dashboard.summary.net") : t("dashboard.summary.deficit")}

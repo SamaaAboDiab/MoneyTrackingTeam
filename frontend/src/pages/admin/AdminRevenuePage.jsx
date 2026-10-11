@@ -6,6 +6,9 @@ import PageHeader from "../../components/common/PageHeader";
 import { fetchRevenueReport } from "../../api/adminExtrasApi";
 import { formatMoney } from "../../utils/formatAmount";
 import { toIntlLocale } from "../../i18n/locale";
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { BAR_CURSOR, BAR_RADIUS, CHART_COLORS, GRID_PROPS, useChartLayout } from "../../components/charts/chartTheme";
+import ChartTooltip from "../../components/charts/ChartTooltip";
 
 const card = "rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6";
 
@@ -18,6 +21,7 @@ function AdminRevenuePage() {
   const monthFormat = new Intl.DateTimeFormat(locale, { month: "short" });
   const longMonthFormat = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" });
   const numberFormat = new Intl.NumberFormat(locale);
+  const { xAxisProps, yAxisProps, animate } = useChartLayout();
 
   const load = useCallback(async () => {
     try {
@@ -50,7 +54,11 @@ function AdminRevenuePage() {
   }
 
   const money = (value) => formatMoney(value, report.currency);
-  const max = Math.max(1, ...report.months.map((month) => month.total));
+  // One bar per month: short name on the axis, full name + count in the tooltip.
+  const chartData = report.months.map((month) => {
+    const date = new Date(month.y, month.m, 1);
+    return { key: `${month.y}-${month.m}`, month: monthFormat.format(date), label: longMonthFormat.format(date), total: month.total, count: month.count };
+  });
   const change = report.lastMonth ? Math.round(((report.thisMonth - report.lastMonth) / report.lastMonth) * 100) : null;
   const summary = [
     { key: "thisMonth", value: money(report.thisMonth), icon: Wallet, tone: "bg-emerald-50 text-emerald-600" },
@@ -100,26 +108,38 @@ function AdminRevenuePage() {
           <Info size={13} className="mt-0.5 shrink-0" aria-hidden="true" />
           {t("admin.revenue.basis")}
         </p>
-        <ul className="mt-6 grid h-64 grid-flow-col auto-cols-fr items-end gap-1.5 sm:gap-3">
-          {report.months.map((month) => {
-            const date = new Date(month.y, month.m, 1);
-            const height = month.total > 0 ? Math.max((month.total / max) * 100, 5) : 2;
-            return (
-              <li key={`${month.y}-${month.m}`} className="group flex h-full min-w-0 flex-col items-center justify-end gap-2">
-                <span className="text-[10px] font-bold tabular-nums text-slate-500 opacity-0 transition group-hover:opacity-100 sm:text-[11px]">
-                  {month.total ? numberFormat.format(month.total) : ""}
-                </span>
-                <span
-                  title={`${longMonthFormat.format(date)}: ${money(month.total)} · ${t("admin.revenue.subscriptions", { count: month.count })}`}
-                  className={`w-full max-w-10 rounded-t-lg transition-[height] duration-700 ${
-                    month.total > 0 ? "bg-linear-to-t from-emerald-500 to-emerald-300 group-hover:from-emerald-600" : "bg-slate-100"
-                  }`}
-                  style={{ height: `${height}%` }}
-                />
-                <span className="w-full truncate text-center text-[11px] text-slate-400">{monthFormat.format(date)}</span>
-              </li>
-            );
-          })}
+        <div className="mt-6 h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} margin={{ top: 8, right: 4, bottom: 0, left: 4 }}>
+              <CartesianGrid {...GRID_PROPS} />
+              <XAxis dataKey="month" {...xAxisProps} interval="preserveStartEnd" />
+              <YAxis {...yAxisProps} allowDecimals={false} />
+              <Tooltip
+                cursor={BAR_CURSOR}
+                content={
+                  <ChartTooltip
+                    showNames={false}
+                    title={(_, payload) => payload[0]?.payload.label}
+                    formatValue={(value) => money(value)}
+                    footer={(payload) => t("admin.revenue.subscriptions", { count: payload[0]?.payload.count ?? 0 })}
+                  />
+                }
+              />
+              <Bar dataKey="total" fill={CHART_COLORS.income} radius={BAR_RADIUS} maxBarSize={36} minPointSize={2} isAnimationActive={animate}>
+                {chartData.map((month) => (
+                  <Cell key={month.key} fill={month.total > 0 ? CHART_COLORS.income : CHART_COLORS.empty} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        {/* The same values for screen readers. */}
+        <ul className="sr-only" aria-label={t("admin.revenue.monthlyTitle")}>
+          {chartData.map((month) => (
+            <li key={month.key}>
+              {month.label}: {money(month.total)} · {t("admin.revenue.subscriptions", { count: month.count })}
+            </li>
+          ))}
         </ul>
       </section>
 

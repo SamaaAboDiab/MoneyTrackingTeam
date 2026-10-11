@@ -9,6 +9,12 @@ const paymentSettingsSchema = new Schema({
   instapayAddress:    { type: String, trim: true, maxlength: 80, default: "" },
   instapayName:       { type: String, trim: true, maxlength: 80, default: "" },
   instructions:       { type: String, trim: true, maxlength: 500, default: "" },
+  // Plan prices set by the admin; an empty one falls back to config/subscriptionPlans.
+  planPrices: {
+    "3months": { type: Number, min: 0 },
+    "6months": { type: Number, min: 0 },
+    yearly:    { type: Number, min: 0 },
+  },
 }, { timestamps: true });
 
 paymentSettingsSchema.statics.get = async function get() {

@@ -21,16 +21,19 @@ function SidebarNav({ collapsed, pathname, t, items = NAV_ITEMS, isActive: isIte
             } ${
               isActive
                 ? "bg-brand-600 text-white emerald:bg-brand-500/10 emerald:text-brand-400 emerald:ring-1 emerald:ring-brand-500/30"
-                : "text-slate-500 hover:bg-slate-50 emerald:text-slate-300 emerald:hover:bg-white/5 emerald:hover:text-white"
+                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 emerald:text-slate-300 emerald:hover:bg-white/5 emerald:hover:text-white"
             }`}
           >
             <Icon size={18} strokeWidth={2} />
             {!collapsed && t(key)}
+            {/* Count: a calm pill — light grey on a normal row, translucent white on the active one. */}
             {badge > 0 &&
               (collapsed ? (
-                <span className="absolute top-1.5 inset-e-1.5 h-2.5 w-2.5 rounded-full bg-brand-500 ring-2 ring-navy-900" />
+                <span className="absolute top-1.5 inset-e-1.5 h-2.5 w-2.5 rounded-full bg-slate-400 ring-2 ring-white emerald:bg-brand-500 emerald:ring-navy-900" />
               ) : (
-                <span className="ms-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-500 px-1.5 text-[11px] font-bold text-white">
+                <span className={`tabular-amount ms-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold leading-none ${
+                  isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                } emerald:bg-brand-500 emerald:text-white`}>
                   {badge > 99 ? "99+" : badge}
                 </span>
               ))}

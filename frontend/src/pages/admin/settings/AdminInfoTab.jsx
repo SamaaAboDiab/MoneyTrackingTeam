@@ -35,9 +35,9 @@ function AdminInfoTab({ admin, t, onEditSecurity }) {
   };
 
   return (
-      <section className="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
+      <section className="card-shadow flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
         <div className="mb-5 flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
             <UserRound size={19} aria-hidden="true" />
           </span>
           <div>

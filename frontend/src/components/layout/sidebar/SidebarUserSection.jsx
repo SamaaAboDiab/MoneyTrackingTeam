@@ -10,7 +10,7 @@ function SidebarUserSection({ collapsed, user, onLogoutClick, t, profileTo = "/p
   return (
     <div className="mt-3 border-t border-slate-100 pt-3 emerald:border-white/10">
       {!collapsed ? (
-        <UserBlock to={profileTo || undefined} className="flex items-center gap-3 rounded-xl px-1 py-1 transition hover:bg-slate-50 emerald:hover:bg-white/5">
+        <UserBlock to={profileTo || undefined} className="flex items-center gap-3 rounded-xl px-1 py-1 transition hover:bg-slate-100 emerald:hover:bg-white/5">
           {user?.avatar ? (
             <img src={user.avatar} alt={displayName} className="h-9 w-9 shrink-0 rounded-full object-cover" />
           ) : (

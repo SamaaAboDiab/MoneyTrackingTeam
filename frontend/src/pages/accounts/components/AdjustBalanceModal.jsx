@@ -4,7 +4,11 @@ import { formatMoney } from "../../../utils/formatAmount";
 import NumberInput from "../../../components/common/NumberInput";
 import { extractError } from "../../../utils/errorHandler";
 
-export default function AdjustBalanceButton({ account, onSubmit, onUpdated }) {
+const DEFAULT_TRIGGER_CLASS =
+  "inline-flex h-10 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-brand-50 px-3 text-sm font-bold text-brand-700 transition hover:bg-brand-100";
+
+// triggerClassName: restyle the opening button (the Mali account card uses a lighter one).
+export default function AdjustBalanceButton({ account, onSubmit, onUpdated, triggerClassName = DEFAULT_TRIGGER_CLASS }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState("form"); // "form" | "confirm"
@@ -64,7 +68,7 @@ export default function AdjustBalanceButton({ account, onSubmit, onUpdated }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-brand-50 px-3 text-sm font-bold text-brand-700 transition hover:bg-brand-100"
+        className={triggerClassName}
       >
         <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 shrink-0">
           <path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-8.5 8.5a2 2 0 0 1-.878.507l-3 .8a.5.5 0 0 1-.612-.612l.8-3a2 2 0 0 1 .507-.878l8.5-8.5Z" />

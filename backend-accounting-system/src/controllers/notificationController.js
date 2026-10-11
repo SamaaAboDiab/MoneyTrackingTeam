@@ -97,13 +97,13 @@ async function userNotifications(userId) {
 
   const end = user?.subscriptionEnd ? new Date(user.subscriptionEnd) : null;
   if (end && end <= now) {
-    items.push({ id: `sub-expired-${end.getTime()}`, type: "subscriptionExpired", params: {}, link: "/profile", at: end });
+    items.push({ id: `sub-expired-${end.getTime()}`, type: "subscriptionExpired", params: {}, link: "/profile?tab=subscription", at: end });
   } else if (end && end.getTime() - now.getTime() <= 7 * DAY) {
     items.push({
       id: `sub-expiring-${end.getTime()}`,
       type: "subscriptionExpiring",
       params: { days: daysUntil(end, now) },
-      link: "/profile",
+      link: "/profile?tab=subscription",
       at: new Date(end.getTime() - 7 * DAY),
     });
   }
@@ -147,7 +147,7 @@ async function userNotifications(userId) {
       id: `renewal-${decision._id}-${decision.status}`,
       type: decision.status === "approved" ? "renewalApproved" : "renewalRejected",
       params: { plan: decision.plan },
-      link: "/profile",
+      link: "/profile?tab=subscription",
       at: decision.handledAt,
     });
   }

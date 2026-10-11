@@ -340,6 +340,18 @@ function ExpensesPage() {
     setDeleteLoading(false);
   };
 
+  // Phones: this button sits under the total card; from sm it lives in the page header.
+  const addExpenseButton = (extraClass) => (
+    <button
+      type="button"
+      onClick={() => setIsCreateOpen(true)}
+      className={`min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 ${extraClass}`}
+    >
+      <Plus size={18} strokeWidth={2.5} />
+      {t("expenses.addFormTitle")}
+    </button>
+  );
+
   return (
     <div className="mx-auto max-w-6xl">
       <ExpenseToast toastMessage={toastMessage} />
@@ -348,19 +360,11 @@ function ExpensesPage() {
         icon={TrendingDown}
         title={t("nav.expenses")}
         subtitle={t("expenses.subtitle")}
-        actions={
-          <button
-            type="button"
-            onClick={() => setIsCreateOpen(true)}
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 sm:w-auto"
-          >
-            <Plus size={18} strokeWidth={2.5} />
-            {t("expenses.addFormTitle")}
-          </button>
-        }
+        actions={addExpenseButton("hidden sm:inline-flex sm:w-auto")}
       />
 
       <ExpensesSummary isFiltered={isFiltered} totalsByCurrency={totalsByCurrency} />
+      {addExpenseButton("mt-4 inline-flex sm:hidden")}
 
       {isCreateOpen && (
         <ExpenseForm

@@ -12,7 +12,7 @@ const Income = require("../models/Income");
 const Expense = require("../models/Expense");
 const Debt = require("../models/Debt");
 const SavingsGoal = require("../models/SavingsGoal");
-const { PLAN_PRICES, SUBSCRIPTION_CURRENCY } = require("../config/subscriptionPlans");
+const { PAID_PLAN_KEYS, pricesFrom, getPlanPrices, SUBSCRIPTION_CURRENCY } = require("../config/subscriptionPlans");
 const { calcEnd, userStatus, DAY } = require("../utils/subscription");
 
 const AUDIENCES = ["all", "active", "expiring", "expired", "trial", "paid"];
@@ -174,6 +174,7 @@ exports.getUserProfile = async (req, res, next) => {
 /* ── 4. Renewal requests ─────────────────────────── */
 exports.listRenewalRequests = async (req, res, next) => {
   try {
+    const prices = await getPlanPrices();
     const status = ["pending", "approved", "rejected"].includes(req.query.status) ? req.query.status : null;
     const filter = status ? { status } : {};
     const [items, pendingCount] = await Promise.all([
@@ -191,7 +192,7 @@ exports.listRenewalRequests = async (req, res, next) => {
       data: items.map((item) => ({
         ...item,
         // What they actually paid (falls back to today's price for requests made before payments).
-        price: item.payment?.amount ?? PLAN_PRICES[item.plan] ?? 0,
+        price: item.payment?.amount ?? prices[item.plan] ?? 0,
         currency: SUBSCRIPTION_CURRENCY,
         handledByName: item.handledBy?.name ?? "",
         user: item.user ? { ...item.user, _status: userStatus(item.user) } : null,
@@ -282,10 +283,20 @@ const PAYMENT_FIELDS = {
   instructions: 500,
 };
 
+// The settings as the admin form reads them: the text fields, plus the prices in force.
+const paymentSettingsView = (settings) => {
+  const prices = pricesFrom(settings);
+  return {
+    ...Object.fromEntries(Object.keys(PAYMENT_FIELDS).map((key) => [key, settings[key] ?? ""])),
+    planPrices: Object.fromEntries(PAID_PLAN_KEYS.map((plan) => [plan, prices[plan]])),
+  };
+};
+const MAX_PLAN_PRICE = 1000000;
+
 exports.getPaymentSettings = async (req, res, next) => {
   try {
     const settings = await PaymentSettings.get();
-    res.json({ success: true, data: Object.fromEntries(Object.keys(PAYMENT_FIELDS).map((key) => [key, settings[key] ?? ""])) });
+    res.json({ success: true, data: paymentSettingsView(settings) });
   } catch (err) { next(err); }
 };
 
@@ -301,18 +312,30 @@ exports.updatePaymentSettings = async (req, res, next) => {
     if (update.vodafoneCashNumber && !/^[0-9+\s-]{8,20}$/.test(update.vodafoneCashNumber)) {
       return bad(res, "رقم فودافون كاش غير صحيح");
     }
+    // Plan prices: whole pounds, 0 … 1,000,000. Requests already sent keep the price they were sent at.
+    const planPrices = req.body?.planPrices;
+    if (planPrices !== undefined) {
+      if (typeof planPrices !== "object" || planPrices === null) return bad(res, "أسعار الباقات غير صالحة");
+      for (const plan of PAID_PLAN_KEYS) {
+        if (planPrices[plan] === undefined) continue;
+        const price = Number(planPrices[plan]);
+        if (!Number.isInteger(price) || price < 0 || price > MAX_PLAN_PRICE) return bad(res, `سعر غير صالح للباقة: ${plan}`);
+        update[`planPrices.${plan}`] = price;
+      }
+    }
     const settings = await PaymentSettings.findOneAndUpdate(
       { key: "main" },
       { $set: update },
       { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
     ).lean();
-    res.json({ success: true, data: Object.fromEntries(Object.keys(PAYMENT_FIELDS).map((key) => [key, settings[key] ?? ""])) });
+    res.json({ success: true, data: paymentSettingsView(settings) });
   } catch (err) { next(err); }
 };
 
 /* ── 7. Revenue by month + what renewals may bring ── */
 exports.getRevenueReport = async (req, res, next) => {
   try {
+    const prices = await getPlanPrices();
     const now = new Date();
     const firstMonth = new Date(now.getFullYear(), now.getMonth() - 11, 1);
 
@@ -334,7 +357,7 @@ exports.getRevenueReport = async (req, res, next) => {
     for (const row of started) {
       const month = months.find((item) => item.y === row._id.y && item.m === row._id.m - 1);
       if (!month) continue;
-      const amount = row.count * (PLAN_PRICES[row._id.plan] ?? 0);
+      const amount = row.count * (prices[row._id.plan] ?? 0);
       month.total += amount;
       month.count += row.count;
       month.byPlan[row._id.plan] = (month.byPlan[row._id.plan] ?? 0) + amount;
@@ -349,7 +372,7 @@ exports.getRevenueReport = async (req, res, next) => {
     const forecast = [30, 60, 90].map((days) => {
       const until = now.getTime() + days * DAY;
       const users = ending.filter((user) => new Date(user.subscriptionEnd).getTime() <= until);
-      return { days, count: users.length, total: users.reduce((sum, user) => sum + (PLAN_PRICES[user.subscriptionType] ?? 0), 0) };
+      return { days, count: users.length, total: users.reduce((sum, user) => sum + (prices[user.subscriptionType] ?? 0), 0) };
     });
 
     const yearTotal = months.reduce((sum, month) => sum + month.total, 0);
@@ -358,7 +381,7 @@ exports.getRevenueReport = async (req, res, next) => {
       success: true,
       data: {
         currency: SUBSCRIPTION_CURRENCY,
-        prices: PLAN_PRICES,
+        prices,
         months,
         yearTotal,
         monthlyAverage: Math.round(yearTotal / 12),
@@ -367,7 +390,7 @@ exports.getRevenueReport = async (req, res, next) => {
         forecast,
         pendingRenewals: {
           count: pendingRenewals.length,
-          total: pendingRenewals.reduce((sum, request) => sum + (request.payment?.amount ?? PLAN_PRICES[request.plan] ?? 0), 0),
+          total: pendingRenewals.reduce((sum, request) => sum + (request.payment?.amount ?? prices[request.plan] ?? 0), 0),
         },
       },
     });

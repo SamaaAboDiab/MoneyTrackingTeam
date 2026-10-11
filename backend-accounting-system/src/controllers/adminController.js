@@ -11,7 +11,7 @@ const Account   = require("../models/Account");
 const SavingsGoal = require("../models/SavingsGoal");
 const Debt      = require("../models/Debt");
 const { sendPasswordResetLink } = require("../services/passwordResetService");
-const { PLAN_PRICES, SUBSCRIPTION_CURRENCY } = require("../config/subscriptionPlans");
+const { getPlanPrices, SUBSCRIPTION_CURRENCY } = require("../config/subscriptionPlans");
 const { calcEnd, planLabel, userStatus } = require("../utils/subscription");
 
 /* ── helpers ─────────────────────────────────────── */
@@ -711,6 +711,7 @@ exports.seedAdmin = async (req, res, next) => {
 /* ── GET /api/admin/dashboard ────────────────────── */
 exports.getDashboard = async (req, res, next) => {
   try {
+    const prices = await getPlanPrices();
     const now            = new Date();
     const thirtyDaysAgo  = new Date(now.getTime() - 30  * 86400000);
     const startOfMonth   = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -982,7 +983,7 @@ exports.getDashboard = async (req, res, next) => {
       const plan = plansByType.get(p);
       const count = plan?.count ?? 0;
       const act = plan?.activeCount ?? 0;
-      const price = PLAN_PRICES[p];
+      const price = prices[p];
       return { type: p, plan: PLAN_LABELS[p], count, percentage: total > 0 ? Number((count / total * 100).toFixed(1)) : 0, activeCount: act, price, revenue: act * price };
     });
 
@@ -990,19 +991,19 @@ exports.getDashboard = async (req, res, next) => {
     const renewalCounts = new Map((aggregates.renewalCounts ?? []).map(({ type, count }) => [type, count]));
     const byPlan = ["trial", "3months", "6months", "yearly", "custom"].map(p => {
       const count = plansByType.get(p)?.activeCount ?? 0;
-      const price = PLAN_PRICES[p];
+      const price = prices[p];
       return { plan: PLAN_LABELS[p], type: p, price, count, revenue: count * price };
     });
     const totalRevenue = byPlan.reduce((s, r) => s + r.revenue, 0);
 
     const expectedRevenue = [...renewalCounts].reduce(
-      (sum, [type, count]) => sum + count * (PLAN_PRICES[type] || 0),
+      (sum, [type, count]) => sum + count * (prices[type] || 0),
       0,
     );
     const upcomingList = (aggregates.upcoming ?? []).map((user) => ({
       ...user,
       daysLeft: Math.ceil((new Date(user.subscriptionEnd) - now) / 86400000),
-      expectedRevenue: PLAN_PRICES[user.subscriptionType] || 0,
+      expectedRevenue: prices[user.subscriptionType] || 0,
     }));
 
     /* ── Conversion funnel ── */

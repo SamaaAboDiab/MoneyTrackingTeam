@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Admin = require("../models/Admin");
 const ExpenseCategory = require("../models/ExpenseCategory");
+const { calcEnd } = require("../utils/subscription");
 const { signAdminToken, ADMIN_TOKEN_TTL } = require("../utils/adminToken");
 const {
   sendPasswordResetLink,
@@ -70,7 +71,17 @@ exports.register = async (req, res, next) => {
     if (exists) {
       return res.status(409).json({ success: false, message: "Email already in use" });
     }
-    const created = await User.create({ name, email, password });
+    // A new account starts on the free trial (14 days, utils/subscription). Without an end date
+    // the trial would never expire.
+    const now = new Date();
+    const created = await User.create({
+      name,
+      email,
+      password,
+      subscriptionType: "trial",
+      subscriptionStart: now,
+      subscriptionEnd: calcEnd("trial", now),
+    });
 
     // Seed default expense categories for the new user
     await ExpenseCategory.insertMany(

@@ -4,7 +4,7 @@ const Announcement = require("../models/Announcement");
 const RenewalRequest = require("../models/RenewalRequest");
 const PaymentProof = require("../models/PaymentProof");
 const PaymentSettings = require("../models/PaymentSettings");
-const { PLAN_PRICES, SUBSCRIPTION_CURRENCY } = require("../config/subscriptionPlans");
+const { pricesFrom, SUBSCRIPTION_CURRENCY } = require("../config/subscriptionPlans");
 const { userStatus } = require("../utils/subscription");
 
 const PAID_PLANS = ["3months", "6months", "yearly"];
@@ -64,7 +64,7 @@ exports.getMyRenewal = async (req, res, next) => {
       success: true,
       data: {
         subscription: user ? { ...user, _status: userStatus(user) } : null,
-        plans: PAID_PLANS.map((plan) => ({ plan, price: PLAN_PRICES[plan] ?? 0 })),
+        plans: PAID_PLANS.map((plan) => ({ plan, price: pricesFrom(settings)[plan] ?? 0 })),
         currency: SUBSCRIPTION_CURRENCY,
         paymentMethods: paymentMethods(settings),
         paymentInstructions: settings.instructions || "",
@@ -110,7 +110,7 @@ exports.requestRenewal = async (req, res, next) => {
       note,
       payment: {
         method: method.method,
-        amount: PLAN_PRICES[plan] ?? 0,
+        amount: pricesFrom(settings)[plan] ?? 0,
         currency: SUBSCRIPTION_CURRENCY,
         reference,
         sender,

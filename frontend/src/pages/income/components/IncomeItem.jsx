@@ -31,7 +31,7 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted,
 
   return (
     <article
-      className={`rounded-xl px-3 py-4 transition-colors hover:bg-slate-50/70 md:px-4 ${INCOME_COLUMNS} ${
+      className={`rounded-xl border border-slate-200 px-3 py-4 transition-colors hover:bg-slate-100/70 md:border-0 md:px-4 ${INCOME_COLUMNS} ${
         isPaused ? "opacity-70" : ""
       }`}
     >
@@ -85,7 +85,7 @@ function IncomeItem({ income, displayAmount, displayCurrency, onEdit, onDeleted,
 
       {/* Row actions: icon buttons, labelled for screen readers and on hover. Fixed width so every
           row keeps the same columns whether or not it has the pause button. */}
-      <div className="mt-3 flex items-center justify-end gap-0.5 md:mt-0 md:w-28">
+      <div className="mt-3 flex items-center justify-end gap-0.5 border-t border-slate-100 pt-2 md:mt-0 md:w-28 md:border-0 md:pt-0">
         {isRecurring && (
           <button
             type="button"

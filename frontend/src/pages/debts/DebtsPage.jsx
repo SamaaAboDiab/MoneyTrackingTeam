@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { insufficientBalanceDetected } from "../../store/slices/notificationsSlice";
+import { activityLogged, insufficientBalanceDetected } from "../../store/slices/notificationsSlice";
 import { Trash2, CheckCircle2, AlertTriangle } from "lucide-react";
 import { getDebtPayments } from "../../api/debtsApi";
 import { fetchAccounts } from "../../store/slices/accountsSlice";
@@ -147,7 +147,12 @@ function DebtsPage() {
 
       setDebtForm({ ...EMPTY_DEBT_FORM, startDate: getTodayString() });
       setShowAddForm(false);
-      setToastMessage(t("debts.createSuccess"));
+      dispatch(
+        activityLogged({
+          type: "debtAdded",
+          data: { source: "debtPayment", creditor: debtForm.creditor.trim(), amount: Number(debtForm.totalAmount), currency: debtForm.currency },
+        })
+      );
       setActiveTab("active");
     } catch (requestError) {
       setError(getErrorMessage(requestError, t("debts.createError")));
@@ -199,7 +204,8 @@ function DebtsPage() {
   async function performMarkPaid(debt) {
     try {
       await dispatch(markDebtPaidThunk(debt._id)).unwrap();
-      setSuccessMessage(t("debts.markPaidSuccess", { creditor: debt.creditor }));
+      // The result goes to the notifications bell, not a banner on the page.
+      dispatch(activityLogged({ type: "debtPaid", data: { source: "debtPayment", creditor: debt.creditor } }));
     } catch (requestError) {
       setError(getErrorMessage(requestError, t("debts.markPaidError")));
     }
@@ -290,14 +296,18 @@ function DebtsPage() {
         })
       ).unwrap();
 
-      // Automatically expand and refresh payment history from backend
-      setExpandedHistoryDebtId(paymentModalDebt._id);
-      await fetchHistory(paymentModalDebt._id);
+      // The history stays as it was (closed by default); refresh it only if it is open.
+      if (expandedHistoryDebtId === paymentModalDebt._id) await fetchHistory(paymentModalDebt._id);
 
       // Update account balance in Redux
       dispatch(fetchAccounts());
 
-      setSuccessMessage(t("debts.paymentSuccess"));
+      dispatch(
+        activityLogged({
+          type: "debtPaymentAdded",
+          data: { source: "debtPayment", creditor: paymentModalDebt.creditor, amount: amountNum, currency: paymentModalDebt.currency || "EGP" },
+        })
+      );
       setPaymentModalDebt(null);
     } catch (requestError) {
       setError(getErrorMessage(requestError, t("debts.paymentError")));

@@ -4,11 +4,12 @@ import { formatAmount, currencyLabel, currencyName } from "../../utils/formatAmo
   The dark "total" card shared by Income, Expenses, Cash, Accounts and Savings.
   totals: [[currency, amount], ...]. One currency shows as a single large amount; several show
   as one tile per currency (amounts in different currencies are never added up).
-  Colors come from the --color-hero-* tokens, so each theme gives it its own look.
+  Colors come from the --color-hero-* tokens, so each theme gives it its own look. Mali keeps the
+  shadow soft; emerald keeps its deeper one.
 */
 function TotalsCard({ title, totals = [], action, emptyText, className = "mt-6", children }) {
   return (
-    <section className={`rounded-2xl bg-linear-to-br from-hero-start to-hero-end p-6 text-white shadow-2xl ${className}`}>
+    <section className={`rounded-2xl bg-linear-to-br from-hero-start to-hero-end p-6 text-white shadow-md shadow-slate-900/10 emerald:shadow-2xl ${className}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs font-medium text-slate-300">{title}</p>
         {action}

@@ -20,7 +20,8 @@
     "added": "تمت الإضافة",
     "colorPicker": {
       "custom": "لون مخصص"
-    }
+    },
+    "skipToContent": "تخطَّ إلى المحتوى"
   },
   "nav": {
     "income": "الدخل",
@@ -211,7 +212,7 @@
     "logoutConfirmMessage": "متأكد إنك عايز تسجل خروج من حسابك؟ هتحتاج تسجل دخولك تاني عشان توصل لبياناتك.",
     "cancel": "إلغاء",
     "upgradeTitle": "الترقية للباقة المميزة",
-    "upgradeSubtitle": "افتح تقارير غير محدودة ومزايا أكثر.",
+    "upgradeSubtitle": "اختار باقة وكمّل استخدام كل المزايا بعد الفترة التجريبية.",
     "upgradeButton": "ترقية الآن",
     "notifications": "الإشعارات",
     "quickActionLabel": "تحويل جديد",
@@ -226,7 +227,15 @@
       "profile": "الملف الشخصي"
     },
     "primaryNav": "القائمة الرئيسية",
-    "theme": "المظهر"
+    "theme": "المظهر",
+    "upgradeExpiringTitle": "اشتراكك قرب يخلص",
+    "upgradeExpiringSubtitle": "بينتهي يوم {{date}}، جدّده قبل ما يخلص.",
+    "upgradeExpiredTitle": "اشتراكك انتهى",
+    "upgradeExpiredSubtitle": "جدّد اشتراكك عشان تكمل تضيف وتعدّل بياناتك.",
+    "renewButton": "جدّد الآن",
+    "upgradePendingTitle": "طلبك قيد المراجعة",
+    "upgradePendingSubtitle": "هنبلّغك أول ما الدفع يتأكد.",
+    "viewRequest": "عرض الطلب"
   },
   "transfer": {
     "backToDashboard": "الرجوع للوحة التحكم",
@@ -655,7 +664,13 @@
       "confirm": "تأكيد الدفعة",
       "saving": "جارٍ الحفظ..."
     },
-    "confirmTitle": "هل أنت متأكد؟"
+    "confirmTitle": "هل أنت متأكد؟",
+    "overdueBy_zero": "متأخر عن موعد السداد — سدّده أو عدّل التاريخ",
+    "overdueBy_one": "متأخر يوم واحد عن موعد السداد — سدّده أو عدّل التاريخ",
+    "overdueBy_two": "متأخر يومين عن موعد السداد — سدّده أو عدّل التاريخ",
+    "overdueBy_few": "متأخر {{count}} أيام عن موعد السداد — سدّده أو عدّل التاريخ",
+    "overdueBy_many": "متأخر {{count}} يومًا عن موعد السداد — سدّده أو عدّل التاريخ",
+    "overdueBy_other": "متأخر {{count}} يوم عن موعد السداد — سدّده أو عدّل التاريخ"
   },
   "profile": {
     "title": "الملف الشخصي",
@@ -1023,7 +1038,7 @@
   },
   "errors": {
     "generic": "حدث خطأ غير متوقع. حاول مرة أخرى.",
-    "subscriptionExpired": "انتهى اشتراكك. جدّد اشتراكك عشان تقدر تعدّل بياناتك.",
+    "subscriptionExpired": "اشتراكك انتهى. جدّد اشتراكك عشان تقدر تضيف أو تعدّل أي حاجة.",
     "accounts": {
       "load": "تعذّر تحميل الحسابات",
       "transfer": "تعذّر إتمام التحويل",
@@ -1504,7 +1519,7 @@
     },
     "renewals": {
       "title": "طلبات التجديد",
-      "subtitle": "المستخدم بيدفع ويرفع إثبات الدفع. اتأكد إن الفلوس وصلت، وبعدها فعّل الاشتراك أو ارفض الطلب.",
+      "subtitle": "راجع طلبات تجديد الاشتراك وإثباتات الدفع المرفقة بيها، وبعد التأكد من وصول المبلغ فعّل الاشتراك أو ارفض الطلب.",
       "tabs": {
         "pending": "قيد المراجعة",
         "approved": "مقبولة",
@@ -1520,16 +1535,16 @@
       "currentPlan": "الباقة الحالية",
       "requestedOn": "تاريخ الطلب",
       "responsePlaceholder": "رسالة للمستخدم (اختياري)",
-      "approve": "موافقة",
-      "reject": "رفض",
+      "approve": "موافقة وتفعيل",
+      "reject": "رفض الطلب",
       "approvedToast": "تم تجديد اشتراك {{name}}",
       "rejectedToast": "تم رفض طلب {{name}}",
       "doneTitle": "تم",
       "actionError": "تعذّر تنفيذ الإجراء",
       "loadError": "تعذّر تحميل الطلبات",
       "handledBy": "بواسطة {{name}} · {{date}}",
-      "confirmPayment": "تأكيد الدفع وتفعيل الاشتراك",
-      "rejectPayment": "الدفع غير صحيح",
+      "confirmPayment": "تفعيل الاشتراك",
+      "rejectPayment": "رفض الطلب",
       "viewProof": "عرض إثبات الدفع",
       "proofTitle": "إثبات دفع {{name}}",
       "proofError": "تعذّر تحميل صورة الإثبات",
@@ -1570,7 +1585,10 @@
       "instructions": "تعليمات إضافية للمستخدم (اختياري)",
       "instructionsPlaceholder": "مثال: اكتب إيميلك في ملاحظة التحويل",
       "saved": "اتحفظت بيانات الدفع",
-      "loadError": "تعذّر تحميل بيانات الدفع"
+      "loadError": "تعذّر تحميل بيانات الدفع",
+      "pricesTitle": "أسعار الباقات",
+      "pricesNote": "السعر الجديد بيظهر للمستخدمين على طول، وبيتطبق على الطلبات اللي هتتبعت من دلوقتي. الطلبات اللي اتبعتت قبل كده بتفضل بسعرها.",
+      "currency": "ج.م"
     }
   },
   "chat": {
@@ -1652,7 +1670,12 @@
       "announcement": "إعلان جديد: {{title}}",
       "renewalRequest": "{{name}} دفع لتجديد باقة {{plan}} ومستني تأكيدك للدفع",
       "renewalApproved": "تمت الموافقة على تجديد اشتراكك ({{plan}})",
-      "renewalRejected": "تم رفض طلب تجديد اشتراكك ({{plan}})"
+      "renewalRejected": "تم رفض طلب تجديد اشتراكك ({{plan}})",
+      "debtPaid": "تم سداد دين \"{{creditor}}\" بالكامل واتنقل للديون المكتملة.",
+      "debtPaymentAdded": "اتسجلت دفعة {{amount}} لدين \"{{creditor}}\".",
+      "debtAdded": "اتضاف دين جديد \"{{creditor}}\" بمبلغ {{amount}}.",
+      "renewalApprovedByAdmin": "تم تجديد اشتراك {{name}} (باقة {{plan}}).",
+      "renewalRejectedByAdmin": "تم رفض طلب تجديد {{name}} (باقة {{plan}})."
     },
     "markAllRead": "قراءة الكل",
     "markRead": "تحديد كمقروء",
@@ -1685,7 +1708,14 @@
         "debtPayment": "تدفع",
         "savings": "تحوّش"
       }
-    }
+    },
+    "filters": {
+      "all": "الكل"
+    },
+    "groups": {
+      "earlier": "أقدم"
+    },
+    "emptyUnread": "مفيش إشعارات غير مقروءة"
   },
   "announcements": {
     "title": "الإعلانات",
@@ -1751,8 +1781,32 @@
       "submit": "تأكيد الدفع وإرسال الطلب",
       "afterSubmit": "الاشتراك هيتفعّل بعد ما الإدارة تتأكد من الدفع، وهيوصلك إشعار.",
       "sent": "استلمنا الدفع وهنتأكد منه في أقرب وقت",
-      "sentTitle": "تم إرسال الطلب"
-    }
+      "sentTitle": "تم إرسال الطلب",
+      "subscribeTitle": "الاشتراك في باقة"
+    },
+    "subscribeNow": "اشترك الآن",
+    "loadError": "تعذّر تحميل بيانات اشتراكك.",
+    "retry": "حاول تاني",
+    "banner": {
+      "expiredTitle": "اشتراكك انتهى",
+      "expiredText": "تقدر تتصفح بياناتك، بس مش هتقدر تضيف أو تعدّل أي حاجة لحد ما تجدّد اشتراكك.",
+      "pendingTitle": "طلب التجديد بتاعك قيد المراجعة",
+      "pendingText": "حسابك هيفضل للعرض بس لحد ما الأدمن يأكد الدفع."
+    },
+    "currentPlan": "باقتك الحالية",
+    "daysLeft_zero": "فاضل أقل من يوم",
+    "daysLeft_one": "فاضل يوم واحد",
+    "daysLeft_two": "فاضل يومين",
+    "daysLeft_few": "فاضل {{count}} أيام",
+    "daysLeft_many": "فاضل {{count}} يوم",
+    "daysLeft_other": "فاضل {{count}} يوم",
+    "endedOn": "انتهى يوم {{date}}",
+    "timeUsed": "المدة اللي عدّت من الباقة",
+    "availablePlans": "الباقات المتاحة",
+    "perMonth": "{{amount}} / شهر",
+    "bestValue": "الأوفر",
+    "howItWorks": "اختار الباقة، حوّل المبلغ وارفع إثبات الدفع، واشتراكك هيتفعّل أول ما الإدارة تتأكد من الدفع.",
+    "renewWithPlan": "جدّد بالباقة دي"
   },
   "theme": {
     "mali": {

@@ -23,7 +23,7 @@ function ThemeMenu() {
         aria-expanded={open}
         aria-label={t("layout.theme")}
         title={t("layout.theme")}
-        className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition hover:bg-slate-50 sm:h-10 sm:w-10"
+        className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition hover:bg-slate-100 sm:h-10 sm:w-10"
       >
         <Palette size={18} />
       </button>
@@ -47,7 +47,7 @@ function ThemeMenu() {
                   setTheme(id);
                   close();
                 }}
-                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-start transition hover:bg-slate-50 ${
+                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-start transition hover:bg-slate-100 ${
                   selected ? "bg-slate-50" : ""
                 }`}
               >

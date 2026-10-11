@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, CreditCard, ShieldCheck, UserRound } from "lucide-react";
 import ProfileForm from "./components/ProfileForm";
@@ -25,7 +26,17 @@ function ProfilePage() {
   const { t, i18n } = useTranslation();
   const changeLanguage = useChangeLanguage();
   const { user } = useSelector((state) => state.auth);
-  const [activeTab, setActiveTab] = useState("information");
+  // ?tab=subscription (from the sidebar card or a notification) opens that section. Each link
+  // click is a new location key, so it re-opens the tab even if the URL didn't change.
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const urlTab = TABS.some(({ key }) => key === searchParams.get("tab")) ? searchParams.get("tab") : null;
+  const [activeTab, setActiveTab] = useState(urlTab || "information");
+  const [seenLocationKey, setSeenLocationKey] = useState(location.key);
+  if (location.key !== seenLocationKey) {
+    setSeenLocationKey(location.key);
+    if (urlTab) setActiveTab(urlTab);
+  }
   const [securityRequest, setSecurityRequest] = useState({ section: null, id: 0 });
 
   const openSecuritySection = (section) => {
@@ -75,7 +86,7 @@ function ProfilePage() {
                     tabIndex={selected ? 0 : -1}
                     onClick={() => setActiveTab(key)}
                     className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-start transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/15 ${
-                      selected ? "bg-slate-100" : "hover:bg-slate-50"
+                      selected ? "bg-slate-100" : "hover:bg-slate-100/60"
                     }`}
                   >
                     <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}>

@@ -1,9 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
-import { CreditCard, Landmark, Smartphone, Wallet } from "lucide-react";
+import { CreditCard, Landmark, Smartphone, Tags, Wallet } from "lucide-react";
 import { fetchPaymentSettings, updatePaymentSettings } from "../../../api/adminExtrasApi";
 import { errorClass, inputClass, labelClass, primaryButton, requestError, successClass } from "./styles";
 
-const EMPTY = { vodafoneCashNumber: "", vodafoneCashName: "", instapayAddress: "", instapayName: "", instructions: "" };
+const PAID_PLANS = ["3months", "6months", "yearly"];
+const EMPTY = {
+  vodafoneCashNumber: "",
+  vodafoneCashName: "",
+  instapayAddress: "",
+  instapayName: "",
+  instructions: "",
+  planPrices: { "3months": "", "6months": "", yearly: "" },
+};
+// Prices travel as strings in the form (so a field can be cleared while typing).
+const fromServer = (data) => ({
+  ...EMPTY,
+  ...data,
+  planPrices: Object.fromEntries(PAID_PLANS.map((plan) => [plan, String(data?.planPrices?.[plan] ?? "")])),
+});
 
 // Where users send money when they renew. A method is offered only once its details are filled in.
 function AdminPaymentsTab({ t }) {
@@ -16,7 +30,7 @@ function AdminPaymentsTab({ t }) {
   const load = useCallback(async () => {
     try {
       const { data } = await fetchPaymentSettings();
-      setForm({ ...EMPTY, ...data.data });
+      setForm(fromServer(data.data));
       setStatus("ready");
     } catch {
       setStatus("error");
@@ -32,14 +46,22 @@ function AdminPaymentsTab({ t }) {
     setForm((current) => ({ ...current, [target.name]: target.value }));
     setSaved(false);
   };
+  const changePrice = (plan, value) => {
+    setForm((current) => ({ ...current, planPrices: { ...current.planPrices, [plan]: value.replace(/[^0-9]/g, "") } }));
+    setSaved(false);
+  };
 
   const submit = async (event) => {
     event.preventDefault();
     setSaving(true);
     setError("");
+    // An empty price isn't sent, so it keeps its current value.
+    const planPrices = Object.fromEntries(
+      PAID_PLANS.filter((plan) => form.planPrices[plan] !== "").map((plan) => [plan, Number(form.planPrices[plan])])
+    );
     try {
-      const { data } = await updatePaymentSettings(form);
-      setForm({ ...EMPTY, ...data.data });
+      const { data } = await updatePaymentSettings({ ...form, planPrices });
+      setForm(fromServer(data.data));
       setSaved(true);
     } catch (saveError) {
       setError(requestError(saveError, t("admin.settings.saveError")));
@@ -47,11 +69,11 @@ function AdminPaymentsTab({ t }) {
     setSaving(false);
   };
 
-  if (status === "loading") return <span className="skeleton block h-96 rounded-3xl" aria-hidden="true" />;
+  if (status === "loading") return <span className="skeleton block h-96 rounded-2xl" aria-hidden="true" />;
   if (status === "error") return <p role="alert" className={errorClass}>{t("admin.payments.loadError")}</p>;
 
   const section = (Icon, tone, title, active, children) => (
-    <div className="rounded-2xl border border-slate-100 p-4">
+    <div className="rounded-xl border border-slate-200 p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
         <p className="flex items-center gap-2 text-sm font-bold text-slate-900">
           <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${tone}`}>
@@ -68,9 +90,9 @@ function AdminPaymentsTab({ t }) {
   );
 
   return (
-    <form onSubmit={submit} className="h-full rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
+    <form onSubmit={submit} className="card-shadow h-full rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
       <div className="mb-5 flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
           <Wallet size={19} aria-hidden="true" />
         </span>
         <div>
@@ -80,7 +102,41 @@ function AdminPaymentsTab({ t }) {
       </div>
 
       <div className="space-y-4">
-        {section(Smartphone, "bg-rose-50 text-rose-600", t("subscription.methods.vodafone_cash"), Boolean(form.vodafoneCashNumber), (
+        {/* Plan prices: what users see and pay from the next request on. */}
+        <div className="rounded-xl border border-slate-200 p-4">
+          <p className="flex items-center gap-2 text-sm font-bold text-slate-900">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+              <Tags size={16} />
+            </span>
+            {t("admin.payments.pricesTitle")}
+          </p>
+          <p className="mt-1.5 text-xs leading-5 text-slate-500">{t("admin.payments.pricesNote")}</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            {PAID_PLANS.map((plan) => (
+              <label key={plan} className={labelClass}>
+                {t(`admin.home.plans.${plan}`)}
+                <span className="relative mt-1.5 block">
+                  <input
+                    value={form.planPrices[plan]}
+                    onChange={(event) => changePrice(plan, event.target.value)}
+                    inputMode="numeric"
+                    dir="ltr"
+                    maxLength={7}
+                    required
+                    aria-describedby="plan-prices-currency"
+                    className={`${inputClass} pr-14 tabular-amount`}
+                  />
+                  <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-xs font-semibold text-slate-400">
+                    {t("admin.payments.currency")}
+                  </span>
+                </span>
+              </label>
+            ))}
+          </div>
+          <span id="plan-prices-currency" className="sr-only">{t("admin.payments.currency")}</span>
+        </div>
+
+        {section(Smartphone, "bg-slate-100 text-slate-500", t("subscription.methods.vodafone_cash"), Boolean(form.vodafoneCashNumber), (
           <>
             <label className={labelClass}>
               {t("admin.payments.walletNumber")}
@@ -93,7 +149,7 @@ function AdminPaymentsTab({ t }) {
           </>
         ))}
 
-        {section(Landmark, "bg-violet-50 text-violet-600", t("subscription.methods.instapay"), Boolean(form.instapayAddress), (
+        {section(Landmark, "bg-slate-100 text-slate-500", t("subscription.methods.instapay"), Boolean(form.instapayAddress), (
           <>
             <label className={labelClass}>
               {t("admin.payments.instapayAddress")}
@@ -107,7 +163,7 @@ function AdminPaymentsTab({ t }) {
         ))}
 
         <div className="flex items-start gap-3 rounded-2xl border border-dashed border-slate-200 p-4">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
             <CreditCard size={16} />
           </span>
           <div>
