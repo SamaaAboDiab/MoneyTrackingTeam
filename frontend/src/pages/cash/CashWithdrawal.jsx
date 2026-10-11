@@ -95,18 +95,18 @@ export default function CashWithdrawal() {
       style={{
         fontFamily:
           "'IBM Plex Sans Arabic', 'Tajawal', system-ui, sans-serif",
-        background: "#EFF2EF",
-        color: "#1B2430",
+        background: "#F1F5F9",
+        color: "#0F172A",
         minHeight: "100%",
         padding: "28px 20px",
       }}
     >
       <style>{`
         .cw-input:focus-visible, .cw-select:focus-visible, .cw-btn:focus-visible {
-          outline: 2px solid #0F6653;
+          outline: 2px solid #059669;
           outline-offset: 2px;
         }
-        .cw-chip:hover { background: #E4E9E5; }
+        .cw-chip:hover { background: #E2E8F0; }
         @media (prefers-reduced-motion: no-preference) {
           .cw-toast { animation: cw-rise .28s ease-out; }
           @keyframes cw-rise {
@@ -123,13 +123,13 @@ export default function CashWithdrawal() {
             icon={<Banknote size={18} />}
             label="رصيد البنوك"
             value={accounts.reduce((s, a) => s + a.balance, 0)}
-            tint="#0F6653"
+            tint="#059669"
           />
           <BalanceCard
             icon={<Wallet size={18} />}
             label="رصيد الكاش"
             value={cashBalance}
-            tint="#C98A2C"
+            tint="#4F46E5"
           />
         </div>
 
@@ -141,7 +141,7 @@ export default function CashWithdrawal() {
             borderRadius: 14,
             padding: "22px 20px",
             boxShadow: "0 1px 0 rgba(27,36,48,0.06)",
-            border: "1px solid #E3E7E3",
+            border: "1px solid #E2E8F0",
           }}
         >
           <div
@@ -157,11 +157,11 @@ export default function CashWithdrawal() {
                 width: 34,
                 height: 34,
                 borderRadius: 9,
-                background: "#0F665314",
+                background: "#05966914",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#0F6653",
+                color: "#059669",
                 flexShrink: 0,
               }}
             >
@@ -169,7 +169,7 @@ export default function CashWithdrawal() {
             </div>
             <div>
               <div style={{ fontSize: 17, fontWeight: 700 }}>سحب كاش</div>
-              <div style={{ fontSize: 13, color: "#5B6570" }}>
+              <div style={{ fontSize: 13, color: "#64748B" }}>
                 تحويل من حساب بنكي لرصيد الكاش
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function CashWithdrawal() {
             style={{
               display: "block",
               fontSize: 13,
-              color: "#5B6570",
+              color: "#64748B",
               marginBottom: 6,
             }}
           >
@@ -193,11 +193,11 @@ export default function CashWithdrawal() {
               width: "100%",
               padding: "11px 12px",
               borderRadius: 10,
-              border: "1px solid #D8DED9",
-              background: "#FBFCFB",
+              border: "1px solid #E2E8F0",
+              background: "#F8FAFC",
               fontSize: 15,
               marginBottom: 16,
-              color: "#1B2430",
+              color: "#0F172A",
               fontFamily: "inherit",
             }}
           >
@@ -212,7 +212,7 @@ export default function CashWithdrawal() {
             style={{
               display: "block",
               fontSize: 13,
-              color: "#5B6570",
+              color: "#64748B",
               marginBottom: 6,
             }}
           >
@@ -233,12 +233,12 @@ export default function CashWithdrawal() {
                 width: "100%",
                 padding: "13px 46px 13px 12px",
                 borderRadius: 10,
-                border: `1px solid ${liveError ? "#C1544B" : "#D8DED9"}`,
+                border: `1px solid ${liveError ? "#DC2626" : "#E2E8F0"}`,
                 fontSize: 22,
                 fontWeight: 600,
                 fontFamily: "inherit",
                 boxSizing: "border-box",
-                color: "#1B2430",
+                color: "#0F172A",
               }}
             />
             <span
@@ -248,7 +248,7 @@ export default function CashWithdrawal() {
                 top: "50%",
                 transform: "translateY(-50%)",
                 fontSize: 13,
-                color: "#8A938C",
+                color: "#94A3B8",
               }}
             >
               ج.م
@@ -269,10 +269,10 @@ export default function CashWithdrawal() {
                 style={{
                   padding: "6px 14px",
                   borderRadius: 999,
-                  border: "1px solid #D8DED9",
-                  background: "#F3F5F3",
+                  border: "1px solid #E2E8F0",
+                  background: "#F1F5F9",
                   fontSize: 13,
-                  color: "#3A4249",
+                  color: "#1E2A38",
                   cursor: "pointer",
                   fontFamily: "inherit",
                 }}
@@ -288,7 +288,7 @@ export default function CashWithdrawal() {
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                color: "#B23A32",
+                color: "#DC2626",
                 fontSize: 13.5,
                 marginBottom: 14,
               }}
@@ -308,7 +308,7 @@ export default function CashWithdrawal() {
               borderRadius: 10,
               border: "none",
               background:
-                !isValidNumber || !!liveError ? "#B7C2BA" : "#0F6653",
+                !isValidNumber || !!liveError ? "#B7C2BA" : "#059669",
               color: "#FFFFFF",
               fontSize: 15.5,
               fontWeight: 700,
@@ -331,8 +331,8 @@ export default function CashWithdrawal() {
               marginTop: 14,
               padding: "12px 14px",
               borderRadius: 10,
-              background: "#0F66530F",
-              color: "#0F6653",
+              background: "#0596690F",
+              color: "#059669",
               fontSize: 14,
             }}
           >
@@ -348,7 +348,7 @@ export default function CashWithdrawal() {
             <div
               style={{
                 fontSize: 13,
-                color: "#5B6570",
+                color: "#64748B",
                 marginBottom: 10,
                 fontWeight: 600,
               }}
@@ -364,7 +364,7 @@ export default function CashWithdrawal() {
                     alignItems: "center",
                     justifyContent: "space-between",
                     background: "#FFFFFF",
-                    border: "1px solid #E3E7E3",
+                    border: "1px solid #E2E8F0",
                     borderRadius: 10,
                     padding: "10px 14px",
                   }}
@@ -373,7 +373,7 @@ export default function CashWithdrawal() {
                     <div style={{ fontSize: 14, fontWeight: 600 }}>
                       {tx.accountName} ← رصيد الكاش
                     </div>
-                    <div style={{ fontSize: 12, color: "#8A938C" }}>
+                    <div style={{ fontSize: 12, color: "#94A3B8" }}>
                       {tx.type} ·{" "}
                       {tx.timestamp.toLocaleTimeString("ar-EG", {
                         hour: "2-digit",
@@ -392,7 +392,7 @@ export default function CashWithdrawal() {
                       style={{
                         fontSize: 14.5,
                         fontWeight: 700,
-                        color: "#C98A2C",
+                        color: "#4F46E5",
                       }}
                     >
                       +{currency(tx.amount)}
@@ -404,7 +404,7 @@ export default function CashWithdrawal() {
                       style={{
                         background: "none",
                         border: "none",
-                        color: "#8A938C",
+                        color: "#94A3B8",
                         cursor: "pointer",
                         display: "flex",
                       }}
@@ -428,7 +428,7 @@ function BalanceCard({ icon, label, value, tint }) {
       style={{
         flex: 1,
         background: "#FFFFFF",
-        border: "1px solid #E3E7E3",
+        border: "1px solid #E2E8F0",
         borderRadius: 12,
         padding: "14px 14px",
       }}
@@ -443,10 +443,10 @@ function BalanceCard({ icon, label, value, tint }) {
         }}
       >
         {icon}
-        <span style={{ fontSize: 12.5, color: "#5B6570" }}>{label}</span>
+        <span style={{ fontSize: 12.5, color: "#64748B" }}>{label}</span>
       </div>
       <div style={{ fontSize: 19, fontWeight: 700 }}>
-        {currency(value)} <span style={{ fontSize: 12, fontWeight: 500, color: "#8A938C" }}>ج.م</span>
+        {currency(value)} <span style={{ fontSize: 12, fontWeight: 500, color: "#94A3B8" }}>ج.م</span>
       </div>
     </div>
   );

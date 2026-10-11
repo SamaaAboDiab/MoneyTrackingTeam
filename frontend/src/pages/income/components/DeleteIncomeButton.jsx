@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Trash2 } from "lucide-react";
 import { extractError } from "../../../utils/errorHandler";
+import ConfirmModal from "../../../components/common/ConfirmModal";
 
-export default function DeleteIncomeButton({ incomeId, incomeName, onConfirmDelete }) {
+// compact: an icon-only trigger (the income list's row actions); the label moves to aria-label/title.
+export default function DeleteIncomeButton({ incomeId, incomeName, onConfirmDelete, compact = false }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
 
   async function handleDelete() {
+    if (deleting) return;
     setDeleting(true);
     setError("");
     try {
@@ -26,7 +30,13 @@ export default function DeleteIncomeButton({ incomeId, incomeName, onConfirmDele
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 px-3 py-1.5 text-sm font-medium text-rose-600 hover:bg-rose-50 active:bg-rose-100 transition-colors"
+        aria-label={compact ? t("income.delete.trigger") : undefined}
+        title={compact ? t("income.delete.trigger") : undefined}
+        className={
+          compact
+            ? "flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+            : "inline-flex items-center gap-1.5 rounded-lg border border-rose-200 px-3 py-1.5 text-sm font-medium text-rose-600 hover:bg-rose-50 active:bg-rose-100 transition-colors"
+        }
       >
         <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
           <path
@@ -35,46 +45,26 @@ export default function DeleteIncomeButton({ incomeId, incomeName, onConfirmDele
             clipRule="evenodd"
           />
         </svg>
-        {t("income.delete.trigger")}
+        {!compact && t("income.delete.trigger")}
       </button>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
-          onClick={() => !deleting && setOpen(false)}
-        >
-          <div
-            className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-base font-semibold text-slate-900">{t("income.delete.confirmTitle")}</h2>
-            <p className="mt-2 text-sm text-slate-600">
-              {t("income.delete.confirmMessage", { name: incomeName })}
-            </p>
-
-            {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
-
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                disabled={deleting}
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50"
-              >
-                {t("income.delete.cancel")}
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={deleting}
-                className="rounded-lg bg-rose-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-60"
-              >
-                {deleting ? t("income.delete.deleting") : t("income.delete.confirm")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* The site's shared confirm dialog; it can't be dismissed while the delete is in flight. */}
+      <ConfirmModal
+        isOpen={open}
+        onClose={() => !deleting && setOpen(false)}
+        onConfirm={handleDelete}
+        icon={Trash2}
+        title={t("income.delete.confirmTitle")}
+        description={
+          <>
+            {t("income.delete.confirmMessage", { name: incomeName })}
+            {error && <span className="mt-2 block font-medium text-expense">{error}</span>}
+          </>
+        }
+        cancelLabel={t("income.delete.cancel")}
+        confirmLabel={deleting ? t("income.delete.deleting") : t("income.delete.confirm")}
+        confirmVariant="destructive"
+      />
     </>
   );
 }

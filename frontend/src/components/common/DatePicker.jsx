@@ -131,7 +131,7 @@ function DatePicker({ value, onChange, min, max, placeholder, className, id, req
               type="button"
               onClick={() => changeMonth(-1)}
               aria-label={t("common.datePicker.prevMonth")}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-50"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100"
             >
               <ChevronLeft size={16} className="rtl:rotate-180" />
             </button>
@@ -140,7 +140,7 @@ function DatePicker({ value, onChange, min, max, placeholder, className, id, req
               type="button"
               onClick={() => changeMonth(1)}
               aria-label={t("common.datePicker.nextMonth")}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-50"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100"
             >
               <ChevronRight size={16} className="rtl:rotate-180" />
             </button>
@@ -170,8 +170,8 @@ function DatePicker({ value, onChange, min, max, placeholder, className, id, req
                       : today
                         ? "font-bold text-brand-600 hover:bg-brand-50"
                         : inMonth
-                          ? "text-slate-700 hover:bg-slate-50"
-                          : "text-slate-300 hover:bg-slate-50"
+                          ? "text-slate-700 hover:bg-slate-100"
+                          : "text-slate-300 hover:bg-slate-100"
                   } ${disabled ? "cursor-not-allowed opacity-30 hover:bg-transparent" : ""}`}
                 >
                   {dayFormatter.format(date.getDate())}

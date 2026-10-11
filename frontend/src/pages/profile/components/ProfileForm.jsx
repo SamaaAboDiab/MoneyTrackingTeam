@@ -42,12 +42,12 @@ function ProfileForm({ user, t, onEditSecurity }) {
   };
 
   return (
-    <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/60 sm:p-6">
+    <section className="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
       <div className="mb-5">
         <h2 className="text-base font-bold text-slate-900">{t("profile.editTitle")}</h2>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <form onSubmit={handleSubmit} className="grid flex-1 grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-rows-[auto_auto_1fr]">
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between gap-3">
             <label htmlFor="name" className={labelClass}>
@@ -151,7 +151,7 @@ function ProfileForm({ user, t, onEditSecurity }) {
           />
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between lg:self-end">
           <div className="space-y-2" aria-live="polite">
             {profileError && <p role="alert" className={errorClass}>{profileError}</p>}
             {saved && <p role="status" className={successClass}>{t("profile.saveSuccess")}</p>}

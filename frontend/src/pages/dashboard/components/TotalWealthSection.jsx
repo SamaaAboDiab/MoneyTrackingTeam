@@ -17,7 +17,7 @@ function TotalWealthSection({
 }) {
   if (status === "loading") {
     return (
-      <div role="status" aria-live="polite" className="h-full rounded-3xl bg-brand-600 p-6 text-white sm:p-8">
+      <div role="status" aria-live="polite" className="h-full rounded-3xl bg-brand-600 p-6 text-white sm:p-8 emerald:bg-navy-900">
         <span className="sr-only">{t("accounts.loading")}</span>
         <p className="text-sm font-medium text-white/70">{t("accounts.totalWealth")}</p>
         <div aria-hidden="true" className="mt-6 flex items-end justify-between gap-4">
@@ -34,7 +34,7 @@ function TotalWealthSection({
 
   if (totalCurrencies.length === 0) {
     return (
-      <div className="h-full rounded-3xl bg-brand-600 p-6 text-white sm:p-8">
+      <div className="h-full rounded-3xl bg-brand-600 p-6 text-white sm:p-8 emerald:bg-navy-900">
         <p className="text-sm font-medium text-white/70">{t("accounts.totalWealth")}</p>
         <p className="mt-2 text-lg font-semibold text-white/90">{t("accounts.noBalance")}</p>
       </div>

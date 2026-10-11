@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Plus } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearIncomeCreateState,
@@ -20,6 +21,18 @@ import IncomeForm from "./components/IncomeForm";
 import IncomeSummaryFilter from "./components/IncomeSummaryFilter";
 import IncomeList from "./components/IncomeList";
 import EditIncomeModal from "./components/EditIncomeModal";
+import SuccessToast from "../../components/common/SuccessToast";
+
+const getEmptyCreateForm = () => ({
+  name: "",
+  category: "",
+  amount: "",
+  currency: "EGP",
+  receivedDate: getTodayString(),
+  recurrence: "once",
+  accountId: "",
+  notes: "",
+});
 
 function IncomePage() {
   const { t } = useTranslation();
@@ -42,20 +55,14 @@ function IncomePage() {
   const [selectedId, setSelectedId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [successMessage, setSuccessMessage] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
+  const closeToast = useCallback(() => setToastMessage(""), []);
 
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
   const [summaryCurrency, setSummaryCurrency] = useState("ALL");
 
-  const [createForm, setCreateForm] = useState({
-    name: "",
-    category: "",
-    amount: "",
-    currency: "EGP",
-    receivedDate: getTodayString(),
-    recurrence: "once",
-    accountId: "",
-    notes: "",
-  });
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [createForm, setCreateForm] = useState(getEmptyCreateForm);
 
   const [availableAccounts, setAvailableAccounts] = useState([]);
 
@@ -231,21 +238,27 @@ function IncomePage() {
     );
 
     if (createIncomeEntry.fulfilled.match(result)) {
-      setCreateForm({
-        name: "",
-        category: "",
-        amount: "",
-        currency: "EGP",
-        receivedDate: getTodayString(),
-        recurrence: "once",
-        accountId: "",
-        notes: "",
-      });
+      setCreateForm(getEmptyCreateForm());
+      setIsCreateOpen(false);
+      setToastMessage(t("income.success"));
 
       dispatch(fetchIncomes());
       refreshSummary();
       loadAccounts();
     }
+  };
+
+  // Show the add form
+  const openCreateForm = () => {
+    setSuccessMessage("");
+    setIsCreateOpen(true);
+  };
+
+  // Cancel: hide the add form and discard what was typed
+  const closeCreateForm = () => {
+    setIsCreateOpen(false);
+    setCreateForm(getEmptyCreateForm());
+    dispatch(clearIncomeCreateState());
   };
 
   // Update income
@@ -292,9 +305,22 @@ function IncomePage() {
   };
 
 
+  // Phones: this button sits under the total card; from sm it lives in the page header.
+  const addIncomeButton = (extraClass) =>
+    !isCreateOpen && (
+      <button
+        type="button"
+        onClick={openCreateForm}
+        className={`min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 ${extraClass}`}
+      >
+        <Plus size={18} strokeWidth={2.5} />
+        {t("income.formTitle")}
+      </button>
+    );
+
   return (
     <div className="mx-auto max-w-6xl">
-      <IncomeHeader />
+      <IncomeHeader actions={addIncomeButton("hidden sm:inline-flex sm:w-auto")} />
 
       <IncomeTotalCard
         displayedTotal={displayedTotal}
@@ -303,18 +329,21 @@ function IncomePage() {
         summaryStatus={summaryStatus}
         summaryError={summaryError}
       />
+      {addIncomeButton("mt-4 inline-flex sm:hidden")}
 
       <IncomeAlerts error={error} updateError={updateError} successMessage={successMessage} />
 
-      <IncomeForm
-        form={createForm}
-        createStatus={createStatus}
-        createError={createError}
-        onChange={handleCreateChange}
-        onSubmit={handleCreateSubmit}
-        availableAccounts={availableAccounts}
-        t={t}
-      />
+      {isCreateOpen && (
+        <IncomeForm
+          form={createForm}
+          createStatus={createStatus}
+          createError={createError}
+          onChange={handleCreateChange}
+          onSubmit={handleCreateSubmit}
+          onCancel={closeCreateForm}
+          t={t}
+        />
+      )}
 
 
       <IncomeSummaryFilter
@@ -337,6 +366,8 @@ function IncomePage() {
         t={t}
       />
 
+
+      <SuccessToast message={toastMessage} onClose={closeToast} />
 
       <EditIncomeModal
         isEditing={isEditing}

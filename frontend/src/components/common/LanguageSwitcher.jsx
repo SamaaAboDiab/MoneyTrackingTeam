@@ -1,38 +1,23 @@
-import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import { saveLocale } from "../../store/slices/authSlice";
+import useChangeLanguage from "../../i18n/useChangeLanguage";
 
+// Compact AR/EN toggle for the auth pages and the admin panel (users switch in Settings).
 function LanguageSwitcher() {
   const { i18n } = useTranslation();
-  const dispatch = useDispatch();
-  const { token } = useSelector((state) => state.auth);
-
-  const changeLanguage = (lng) => {
-    if (i18n.language !== lng) {
-      // Cross-fade old and new language (text + direction) instead of an abrupt jump.
-      // flushSync makes React render the new language inside the transition callback.
-      const apply = () => flushSync(() => i18n.changeLanguage(lng));
-      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-      if (document.startViewTransition && !reduceMotion) document.startViewTransition(apply);
-      else apply();
-      // يتزامن مع حساب المستخدم عشان يفضل نفس اللغة على أي جهاز يسجّل دخول منه.
-      if (token) dispatch(saveLocale(lng));
-    }
-  };
+  const changeLanguage = useChangeLanguage();
 
   const baseBtn =
-    "px-3.5 py-2.5 text-xs font-bold transition-colors sm:px-3 sm:py-1.5";
+    "px-3.5 py-2.5 text-xs font-bold transition-colors sm:px-3 sm:py-1.5 emerald:rounded-lg emerald:py-2 emerald:sm:py-1.5";
 
   return (
-    <div className="inline-flex overflow-hidden rounded-lg border border-slate-200 bg-white">
+    <div className="inline-flex overflow-hidden rounded-lg border border-slate-200 bg-white emerald:gap-1 emerald:overflow-visible emerald:rounded-xl emerald:bg-slate-100 emerald:p-1">
       <button
         type="button"
         onClick={() => changeLanguage("ar")}
         className={`${baseBtn} ${
           i18n.language === "ar"
-            ? "bg-brand-600 text-white"
-            : "text-slate-600 hover:bg-slate-50"
+            ? "bg-brand-600 text-white emerald:bg-white emerald:text-slate-900 emerald:shadow-sm"
+            : "text-slate-600 hover:bg-slate-100 emerald:text-slate-500 emerald:hover:bg-transparent emerald:hover:text-slate-700"
         }`}
       >
         AR
@@ -42,8 +27,8 @@ function LanguageSwitcher() {
         onClick={() => changeLanguage("en")}
         className={`${baseBtn} ${
           i18n.language === "en"
-            ? "bg-brand-600 text-white"
-            : "text-slate-600 hover:bg-slate-50"
+            ? "bg-brand-600 text-white emerald:bg-white emerald:text-slate-900 emerald:shadow-sm"
+            : "text-slate-600 hover:bg-slate-100 emerald:text-slate-500 emerald:hover:bg-transparent emerald:hover:text-slate-700"
         }`}
       >
         EN

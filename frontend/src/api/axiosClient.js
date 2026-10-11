@@ -11,6 +11,8 @@ const axiosClient = axios.create({
 
 
 // قبل ما أي request يخرج من الـ frontend للـ backend، هات الـ token من localStorage وحطه في Authorization Header. 
+export const SUBSCRIPTION_EXPIRED_EVENT = "subscription-expired";
+
 axiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY);
   if (token) {
@@ -27,10 +29,15 @@ axiosClient.interceptors.response.use(
       localStorage.removeItem(TOKEN_KEY);
     }
 
+    // The plan ended while the app was open: let the layout re-read it and show the banner.
+    if (error.response?.data?.code === "SUBSCRIPTION_EXPIRED") {
+      window.dispatchEvent(new Event(SUBSCRIPTION_EXPIRED_EVENT));
+    }
+
     // متخبيش الـ error؛ خلي الـ component اللي استدعى الـ API يعرف إن فيه خطأ.
     return Promise.reject(error);
   }
 );
 
 export default axiosClient;
-export { TOKEN_KEY };
+export { TOKEN_KEY, BASE_URL };

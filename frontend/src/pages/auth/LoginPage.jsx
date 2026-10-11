@@ -1,20 +1,23 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { loginUser, clearAuthError } from "../../store/slices/authSlice";
+import { clearAuthError, loginAccount } from "../../store/slices/authSlice";
+import { clearAdminError } from "../../store/slices/adminAuthSlice";
 import AuthCard from "./components/AuthCard";
 import AuthFormHeader from "./components/AuthFormHeader";
 import AuthBanner from "./components/AuthBanner";
 import PasswordField from "./components/PasswordField";
 import AuthSubmitButton from "./components/AuthSubmitButton";
+import { createPortal } from "react-dom";
 
 function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const { status, error } = useSelector((state) => state.auth);
+  const { status, error, token } = useSelector((state) => state.auth);
+  const { token: adminToken, sessionExpired } = useSelector((state) => state.adminAuth);
 
   const [form, setForm] = useState({
     email: location.state?.email || "",
@@ -34,11 +37,23 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(clearAuthError());
-    const result = await dispatch(loginUser(form));
-    if (loginUser.fulfilled.match(result)) {
-      navigate("/dashboard");
+    dispatch(clearAdminError());
+    const result = await dispatch(loginAccount(form));
+    if (loginAccount.fulfilled.match(result)) {
+      navigate(result.payload.accountType === "admin" ? "/admin" : "/dashboard", { replace: true });
     }
   };
+
+  // Signed in: go straight to the account. For the instant before it appears, cover the whole
+  // login screen with the app's plain background so no (empty) form card flashes.
+  if (adminToken || token) {
+    return (
+      <>
+        <Navigate to={adminToken ? "/admin" : "/dashboard"} replace />
+        {createPortal(<div aria-hidden="true" className="fixed inset-0 z-50 bg-slate-50" />, document.body)}
+      </>
+    );
+  }
 
   return (
     <AuthCard onSubmit={handleSubmit}>
@@ -50,6 +65,7 @@ function LoginPage() {
       {location.state?.passwordReset && (
         <AuthBanner variant="success">{t("auth.login.passwordResetSuccess")}</AuthBanner>
       )}
+      {sessionExpired && <AuthBanner>{t("admin.login.sessionExpired")}</AuthBanner>}
       {error && <AuthBanner>{error}</AuthBanner>}
 
       <label htmlFor="email" className="mb-1.5 mt-3 block text-sm font-semibold text-slate-700">

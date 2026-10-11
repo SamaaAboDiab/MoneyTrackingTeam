@@ -9,7 +9,7 @@ const labelClass = "mb-1.5 mt-4 block text-sm font-semibold text-slate-700";
 function TransferForm({ form, accounts, status, error, formError, lastTransfer, transferStatus, onChange, onSubmit, t }) {
   return (
     <form
-      className="rounded-2xl bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 sm:p-6"
+      className="rounded-2xl bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80 sm:p-6"
       onSubmit={onSubmit}
     >
       {status === "loading" && <p className="text-slate-500">{t("transfer.loadingAccounts")}</p>}

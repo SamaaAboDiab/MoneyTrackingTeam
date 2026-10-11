@@ -15,9 +15,16 @@ const userSchema = new mongoose.Schema(
     subscriptionStart: { type: Date, default: Date.now },
     subscriptionEnd:   { type: Date },
     isSuspended:       { type: Boolean, default: false },
+
+    /* notifications: "read all" mark + ids read one by one since then */
+    notificationsSeenAt: { type: Date, default: null },
+    notificationsReadIds: { type: [String], default: [] },
   },
   { timestamps: true }
 );
+
+userSchema.index({ createdAt: 1 });
+userSchema.index({ subscriptionEnd: 1, isSuspended: 1 });
 
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;

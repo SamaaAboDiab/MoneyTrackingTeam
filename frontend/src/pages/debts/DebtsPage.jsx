@@ -1,6 +1,7 @@
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import { activityLogged, insufficientBalanceDetected } from "../../store/slices/notificationsSlice";
 import { Trash2, CheckCircle2, AlertTriangle } from "lucide-react";
 import { getDebtPayments } from "../../api/debtsApi";
 import { fetchAccounts } from "../../store/slices/accountsSlice";
@@ -19,6 +20,7 @@ import { getErrorMessage } from "./utils";
 import DebtsHeader from "./components/DebtsHeader";
 import DebtNotifications from "./components/DebtNotifications";
 import DebtForm from "./components/DebtForm";
+import SuccessToast from "../../components/common/SuccessToast";
 import DebtTabs from "./components/DebtTabs";
 import DebtsList from "./components/DebtsList";
 import PaymentModal from "./components/PaymentModal";
@@ -32,6 +34,8 @@ function DebtsPage() {
   const [error, setError] = useState("");
   const [confirmAction, setConfirmAction] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
+  const closeToast = useCallback(() => setToastMessage(""), []);
 
   // Tabs: "active" | "completed" | "all"
   const [activeTab, setActiveTab] = useState("active");
@@ -102,6 +106,13 @@ function DebtsPage() {
   }, [dispatch]);
 
   // Handle new debt form input
+  // X on the add form: hide it and discard what was typed
+  function closeAddForm() {
+    setShowAddForm(false);
+    setDebtForm({ ...EMPTY_DEBT_FORM, startDate: getTodayString() });
+    setError("");
+  }
+
   function handleDebtFormChange({ target }) {
     setDebtForm((prev) => ({ ...prev, [target.name]: target.value }));
   }
@@ -136,7 +147,12 @@ function DebtsPage() {
 
       setDebtForm({ ...EMPTY_DEBT_FORM, startDate: getTodayString() });
       setShowAddForm(false);
-      setSuccessMessage(t("debts.createSuccess"));
+      dispatch(
+        activityLogged({
+          type: "debtAdded",
+          data: { source: "debtPayment", creditor: debtForm.creditor.trim(), amount: Number(debtForm.totalAmount), currency: debtForm.currency },
+        })
+      );
       setActiveTab("active");
     } catch (requestError) {
       setError(getErrorMessage(requestError, t("debts.createError")));
@@ -188,7 +204,8 @@ function DebtsPage() {
   async function performMarkPaid(debt) {
     try {
       await dispatch(markDebtPaidThunk(debt._id)).unwrap();
-      setSuccessMessage(t("debts.markPaidSuccess", { creditor: debt.creditor }));
+      // The result goes to the notifications bell, not a banner on the page.
+      dispatch(activityLogged({ type: "debtPaid", data: { source: "debtPayment", creditor: debt.creditor } }));
     } catch (requestError) {
       setError(getErrorMessage(requestError, t("debts.markPaidError")));
     }
@@ -252,6 +269,7 @@ function DebtsPage() {
       (acc) => String(acc._id) === String(paymentForm.accountId)
     );
     if (account && amountNum > Number(account.balance)) {
+      dispatch(insufficientBalanceDetected({ source: "debtPayment", account, amount: amountNum }));
       setBalanceWarning(true);
       return;
     }
@@ -278,14 +296,18 @@ function DebtsPage() {
         })
       ).unwrap();
 
-      // Automatically expand and refresh payment history from backend
-      setExpandedHistoryDebtId(paymentModalDebt._id);
-      await fetchHistory(paymentModalDebt._id);
+      // The history stays as it was (closed by default); refresh it only if it is open.
+      if (expandedHistoryDebtId === paymentModalDebt._id) await fetchHistory(paymentModalDebt._id);
 
       // Update account balance in Redux
       dispatch(fetchAccounts());
 
-      setSuccessMessage(t("debts.paymentSuccess"));
+      dispatch(
+        activityLogged({
+          type: "debtPaymentAdded",
+          data: { source: "debtPayment", creditor: paymentModalDebt.creditor, amount: amountNum, currency: paymentModalDebt.currency || "EGP" },
+        })
+      );
       setPaymentModalDebt(null);
     } catch (requestError) {
       setError(getErrorMessage(requestError, t("debts.paymentError")));
@@ -320,7 +342,6 @@ function DebtsPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-5">
       <DebtsHeader
-        showAddForm={showAddForm}
         setShowAddForm={setShowAddForm}
         setError={setError}
         setSuccessMessage={setSuccessMessage}
@@ -333,14 +354,18 @@ function DebtsPage() {
         setSuccessMessage={setSuccessMessage}
       />
 
-      <DebtForm
-        showAddForm={showAddForm}
-        setShowAddForm={setShowAddForm}
-        debtForm={debtForm}
-        handleDebtFormChange={handleDebtFormChange}
-        handleCreateDebt={handleCreateDebt}
-        savingDebt={savingDebt}
-      />
+      {showAddForm && (
+        <DebtForm
+          onClose={closeAddForm}
+          error={error}
+          debtForm={debtForm}
+          handleDebtFormChange={handleDebtFormChange}
+          handleCreateDebt={handleCreateDebt}
+          savingDebt={savingDebt}
+        />
+      )}
+
+      <SuccessToast message={toastMessage} onClose={closeToast} />
 
       <DebtTabs
         activeTab={activeTab}

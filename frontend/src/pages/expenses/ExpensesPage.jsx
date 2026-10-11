@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import { insufficientBalanceDetected } from "../../store/slices/notificationsSlice";
 import {
   createExpenseEntry,
   fetchExpenses,
@@ -22,7 +23,7 @@ import EditExpenseModal from "./components/EditExpenseModal";
 import DeleteExpenseModal from "./components/DeleteExpenseModal";
 import PageHeader from "../../components/common/PageHeader";
 import ConfirmModal from "../../components/common/ConfirmModal";
-import { TrendingDown, AlertTriangle } from "lucide-react";
+import { TrendingDown, AlertTriangle, Plus } from "lucide-react";
 
 function ExpensesPage() {
   const { t } = useTranslation();
@@ -30,6 +31,7 @@ function ExpensesPage() {
   const { items, status, createStatus, createError } = useSelector((state) => state.expenses);
   const [searchParams] = useSearchParams();
   const [form, setForm] = useState(EMPTY_FORM);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [filters, setFilters] = useState(() => {
     const categoryFromUrl = searchParams.get("category");
     return categoryFromUrl ? { ...EMPTY_FILTERS, category: categoryFromUrl } : EMPTY_FILTERS;
@@ -215,11 +217,19 @@ function ExpensesPage() {
 
     if (createExpenseEntry.fulfilled.match(result)) {
       setForm({ ...EMPTY_FORM, date: todayISODate() });
+      setIsCreateOpen(false);
       showToast(t("expenses.toast.added"));
       loadAccounts();
       loadCategories();
       refetchExpenses();
     }
+  };
+
+  // X on the add form: hide it and discard what was typed
+  const closeCreateForm = () => {
+    setIsCreateOpen(false);
+    setForm({ ...EMPTY_FORM, date: todayISODate() });
+    dispatch(resetExpenseCreateStatus());
   };
 
   const handleSubmit = async (event) => {
@@ -231,6 +241,7 @@ function ExpensesPage() {
 
     const account = findAccount(form.accountId);
     if (account && Number(form.amount) > Number(account.balance)) {
+      dispatch(insufficientBalanceDetected({ source: "expense", account, amount: form.amount }));
       setBalanceWarning("create");
       return;
     }
@@ -301,6 +312,7 @@ function ExpensesPage() {
 
     const account = findAccount(editForm.accountId);
     if (account && Number(editForm.amount) > Number(account.balance)) {
+      dispatch(insufficientBalanceDetected({ source: "expense", account, amount: editForm.amount }));
       setBalanceWarning("edit");
       return;
     }
@@ -328,25 +340,45 @@ function ExpensesPage() {
     setDeleteLoading(false);
   };
 
+  // Phones: this button sits under the total card; from sm it lives in the page header.
+  const addExpenseButton = (extraClass) => (
+    <button
+      type="button"
+      onClick={() => setIsCreateOpen(true)}
+      className={`min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 ${extraClass}`}
+    >
+      <Plus size={18} strokeWidth={2.5} />
+      {t("expenses.addFormTitle")}
+    </button>
+  );
+
   return (
     <div className="mx-auto max-w-6xl">
       <ExpenseToast toastMessage={toastMessage} />
 
-      <PageHeader icon={TrendingDown} title={t("nav.expenses")} subtitle={t("expenses.subtitle")} />
-
-      <ExpensesSummary isFiltered={isFiltered} totalsByCurrency={totalsByCurrency} />
-
-      <ExpenseForm
-        form={form}
-        setForm={setForm}
-        handleChange={handleChange}
-        handleSubmit={handleSubmit}
-        availableAccounts={availableAccounts}
-        createStatus={createStatus}
-        createError={createError}
+      <PageHeader
+        icon={TrendingDown}
+        title={t("nav.expenses")}
+        subtitle={t("expenses.subtitle")}
+        actions={addExpenseButton("hidden sm:inline-flex sm:w-auto")}
       />
 
-      <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+      <ExpensesSummary isFiltered={isFiltered} totalsByCurrency={totalsByCurrency} />
+      {addExpenseButton("mt-4 inline-flex sm:hidden")}
+
+      {isCreateOpen && (
+        <ExpenseForm
+          form={form}
+          setForm={setForm}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          onClose={closeCreateForm}
+          createStatus={createStatus}
+          createError={createError}
+        />
+      )}
+
+      <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
         <ExpenseFilters
           filters={filters}
           setFilters={setFilters}

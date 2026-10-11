@@ -1,17 +1,26 @@
 import { useTranslation } from "react-i18next";
 import { AlertTriangle } from "lucide-react";
-import { formatAmount, formatMoney, formatDate, formatPercent } from "../../../utils/formatAmount";
+import { formatAmount, formatDate, formatMoney, formatPercent } from "../../../utils/formatAmount";
+import ReportStatCard from "./ReportStatCard";
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import ChartTooltip from "../../../components/charts/ChartTooltip";
+import { BAR_CURSOR, BAR_RADIUS, CHART_COLORS, GRID_PROPS, useChartLayout } from "../../../components/charts/chartTheme";
 import { categoryLabel } from "../../categories/components/mandatoryCategories";
 import { weekdayLabel } from "../labels";
 import { ReportSkeleton } from "../../../components/common/Skeleton";
 
 function SpendingHabitsSection({ data, loading }) {
   const { t } = useTranslation();
+  const { xAxisProps, yAxisProps, animate } = useChartLayout();
   if (loading) return <ReportSkeleton label={t("reports.loading")} />;
   if (!data) return null;
 
   const { topCategories = [], topExpenses = [], byDayOfWeek = [], weekdayTotal = 0, weekendTotal = 0, alerts = [] } = data;
-  const maxDayTotal = Math.max(...byDayOfWeek.map((d) => d.total), 1);
+  const chartData = byDayOfWeek.map((d) => ({
+    day: weekdayLabel(d.day),
+    total: d.total,
+    fill: d.isWeekend ? CHART_COLORS.weekend : CHART_COLORS.brand,
+  }));
 
   return (
     <div className="space-y-4">
@@ -27,39 +36,44 @@ function SpendingHabitsSection({ data, loading }) {
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-          <p className="text-xs font-semibold text-slate-400">{t("reports.habits.weekdayTotal")}</p>
-          <p className="tabular-amount mt-2 text-xl font-extrabold text-slate-900">{formatMoney(weekdayTotal)}</p>
-        </div>
-        <div className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-          <p className="text-xs font-semibold text-slate-400">{t("reports.habits.weekendTotal")}</p>
-          <p className="tabular-amount mt-2 text-xl font-extrabold text-slate-900">{formatMoney(weekendTotal)}</p>
-        </div>
+        <ReportStatCard label={t("reports.habits.weekdayTotal")} amount={weekdayTotal} />
+        <ReportStatCard label={t("reports.habits.weekendTotal")} amount={weekendTotal} />
       </div>
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+      <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
         <h3 className="text-base font-bold text-slate-900">{t("reports.habits.byDayTitle")}</h3>
         {byDayOfWeek.length === 0 ? (
           <p className="mt-4 text-sm text-slate-500">{t("reports.empty")}</p>
         ) : (
-          <div className="mt-6 flex items-end justify-between gap-2">
-            {byDayOfWeek.map((d) => (
-              <div key={d.day} className="flex flex-1 flex-col items-center gap-1">
-                <div className="flex h-28 w-full items-end justify-center">
-                  <div
-                    className={`w-6 rounded-t-md ${d.isWeekend ? "bg-amber-400" : "bg-brand-600"}`}
-                    style={{ height: `${Math.max((d.total / maxDayTotal) * 100, 3)}%` }}
-                    title={formatAmount(d.total)}
+          <>
+            <div className="mt-6 h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 4 }}>
+                  <CartesianGrid {...GRID_PROPS} />
+                  <XAxis dataKey="day" {...xAxisProps} />
+                  <YAxis {...yAxisProps} />
+                  <Tooltip
+                    cursor={BAR_CURSOR}
+                    content={<ChartTooltip showNames={false} title={(label) => label} formatValue={(value) => formatMoney(value)} />}
                   />
-                </div>
-                <span className="text-[11px] font-medium text-slate-400">{weekdayLabel(d.day)}</span>
-              </div>
-            ))}
-          </div>
+                  <Bar dataKey="total" radius={BAR_RADIUS} maxBarSize={32} isAnimationActive={animate}>
+                    {chartData.map((d) => (
+                      <Cell key={d.day} fill={d.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            {/* Two colors on one series: name what each means. */}
+            <div className="mt-3 flex items-center gap-4 text-xs font-medium text-slate-500">
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: CHART_COLORS.brand }} />{t("reports.habits.weekdayTotal")}</span>
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: CHART_COLORS.weekend }} />{t("reports.habits.weekendTotal")}</span>
+            </div>
+          </>
         )}
       </div>
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+      <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
         <h3 className="text-base font-bold text-slate-900">{t("reports.habits.topExpensesTitle")}</h3>
         {topExpenses.length === 0 ? (
           <p className="mt-4 text-sm text-slate-500">{t("reports.empty")}</p>
@@ -79,7 +93,7 @@ function SpendingHabitsSection({ data, loading }) {
       </div>
 
       {topCategories.length > 0 && (
-        <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+        <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
           <h3 className="text-base font-bold text-slate-900">{t("reports.habits.topCategoriesTitle")}</h3>
           <div className="mt-4 flex flex-wrap gap-2">
             {topCategories.map((cat) => (

@@ -1,8 +1,10 @@
 const router = require("express").Router();
 const c    = require("../controllers/debtController");
 const auth = require("../middleware/auth");
+const subCheck = require("../middleware/subscriptionCheck");
 
 router.use(auth);
+router.use(subCheck);
 
 router.route("/").get(c.getAll).post(c.create);
 router.get("/:id/forecast", c.getForecast);

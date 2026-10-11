@@ -91,7 +91,7 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
             aria-haspopup="listbox"
             aria-expanded={filterCatOpen}
             onClick={() => setFilterCatOpen((prev) => !prev)}
-            className="flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500 text-start"
+            className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-start text-xs font-medium text-slate-700 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500"
           >
             <span className="flex items-center gap-1.5">
               {filters.category !== "all" && (
@@ -107,7 +107,7 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
               </span>
             </span>
             <svg
-              className={`h-3.5 w-3.5 text-slate-400 transition-transform ${filterCatOpen ? "rotate-180" : ""}`}
+              className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${filterCatOpen ? "rotate-180" : ""}`}
               viewBox="0 0 20 20"
               fill="currentColor"
             >

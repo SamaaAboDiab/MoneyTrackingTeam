@@ -24,6 +24,17 @@ const dashboardRoutes  = require("./routes/dashboard");
 const settingsRoutes   = require("./routes/settings");
 const savingsRoutes    = require("./routes/savings");
 const adminRoutes      = require("./routes/admin");
+const chatRoutes       = require("./routes/chat");
+const notificationRoutes = require("./routes/notifications");
+const userExtrasRoutes = require("./routes/userExtras");
+
+if (!process.env.JWT_ADMIN_SECRET) {
+  console.error("JWT_ADMIN_SECRET is missing in .env — admin tokens need their own secret.");
+  process.exit(1);
+}
+if (process.env.JWT_ADMIN_SECRET === process.env.JWT_SECRET) {
+  console.warn("⚠️  JWT_ADMIN_SECRET should be different from JWT_SECRET.");
+}
 
 const app = express();
 
@@ -60,6 +71,9 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/settings",  settingsRoutes);
 app.use("/api/savings",   savingsRoutes);
 app.use("/api/admin",     adminRoutes);
+app.use("/api/chat",      chatRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api",           userExtrasRoutes);
 
 // Health check
 app.get("/api/health", (_, res) => res.json({ status: "ok" }));

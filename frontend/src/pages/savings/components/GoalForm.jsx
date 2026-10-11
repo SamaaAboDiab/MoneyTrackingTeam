@@ -38,7 +38,7 @@ function GoalForm({ show, onClose, form, onChange, onSubmit, saving, isEdit }) {
                       className={`flex h-11 w-11 items-center justify-center rounded-xl border transition ${
                         form.emoji === key
                           ? "border-brand-500 bg-brand-50 text-brand-600"
-                          : "border-slate-200 text-slate-500 hover:bg-slate-50"
+                          : "border-slate-200 text-slate-500 hover:bg-slate-100"
                       }`}
                     >
                       <Icon size={18} />
@@ -126,7 +126,7 @@ function GoalForm({ show, onClose, form, onChange, onSubmit, saving, isEdit }) {
             <button
               type="button"
               onClick={onClose}
-              className="min-h-11 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 sm:w-auto"
+              className="min-h-11 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 sm:w-auto"
             >
               {t("savings.cancel")}
             </button>

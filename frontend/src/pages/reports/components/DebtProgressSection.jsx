@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { formatAmount, formatMoney, formatPercent } from "../../../utils/formatAmount";
 import { monthYearLabel } from "../labels";
 import { ReportSkeleton } from "../../../components/common/Skeleton";
+import ReportStatCard from "./ReportStatCard";
 
 function DebtProgressSection({ data, loading }) {
   const { t } = useTranslation();
@@ -12,7 +13,7 @@ function DebtProgressSection({ data, loading }) {
 
   if (debts.length === 0) {
     return (
-      <div className="rounded-2xl bg-white p-8 text-center shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+      <div className="rounded-2xl bg-white p-8 text-center shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
         <p className="text-sm text-slate-500">{t("reports.empty")}</p>
       </div>
     );
@@ -21,19 +22,13 @@ function DebtProgressSection({ data, loading }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <p className="text-xs font-semibold text-slate-500">{t("reports.debtProgress.totalPaid")}</p>
-          <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-income">{formatMoney(totalPaid)}</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <p className="text-xs font-semibold text-slate-500">{t("reports.debtProgress.totalRemaining")}</p>
-          <p className="tabular-amount mt-1.5 text-2xl font-extrabold text-expense">{formatMoney(totalRemaining)}</p>
-        </div>
+        <ReportStatCard label={t("reports.debtProgress.totalPaid")} amount={totalPaid} tone="positive" />
+        <ReportStatCard label={t("reports.debtProgress.totalRemaining")} amount={totalRemaining} tone="negative" />
       </div>
 
       <div className="space-y-3">
         {debts.map((debt) => (
-          <div key={debt._id} className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+          <div key={debt._id} className="card-hover rounded-2xl bg-white p-5 ring-1 ring-slate-100 emerald:ring-slate-200/80">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-slate-900">{debt.creditor}</h3>
               <span className="tabular-amount text-sm font-semibold text-slate-500">

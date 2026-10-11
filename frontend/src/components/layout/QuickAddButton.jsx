@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Plus, X } from "lucide-react";
@@ -17,6 +18,7 @@ const inputClass =
 
 function QuickAddButton() {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
   const dispatch = useDispatch();
   const { items: accounts } = useSelector((state) => state.accounts);
 
@@ -84,20 +86,25 @@ function QuickAddButton() {
     }
   };
 
+  // On the chat page the floating button would cover the message box's send button.
+  const onChatPage = pathname.startsWith("/chat");
+
   return createPortal(
     <>
+      {!onChatPage && (
       <button
         type="button"
         onClick={() => setOpen(true)}
         title={t("quickAdd.button")}
         aria-label={t("quickAdd.button")}
-        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] inset-e-2 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-accent-500 text-navy ring-1 ring-white shadow-sm shadow-accent-500/25 transition hover:bg-accent-600 lg:bottom-6 lg:inset-e-3"
+        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] inset-e-5 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-accent-500 text-navy ring-1 ring-white shadow-md shadow-accent-500/30 transition hover:bg-accent-600 emerald:bg-brand-600 emerald:text-white emerald:shadow-[0_8px_24px_-4px_rgb(30_42_56_/_0.35)] emerald:[--tw-shadow-color:initial] emerald:hover:bg-brand-700 lg:bottom-6 lg:inset-e-5"
       >
-        <Plus size={18} />
+        <Plus size={20} />
       </button>
+      )}
 
       {toast && (
-        <div className="fixed bottom-[calc(9.5rem+env(safe-area-inset-bottom,0px))] inset-e-4 z-50 lg:bottom-24 lg:inset-e-6 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-2xl">
+        <div className="fixed bottom-[calc(13.5rem+env(safe-area-inset-bottom,0px))] inset-e-5 z-50 lg:bottom-40 lg:inset-e-5 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-2xl">
           {toast}
         </div>
       )}

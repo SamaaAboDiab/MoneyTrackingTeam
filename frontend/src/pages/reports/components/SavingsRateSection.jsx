@@ -1,7 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { formatMoney, formatPercent } from "../../../utils/formatAmount";
+import { formatPercent } from "../../../utils/formatAmount";
 import { monthLabel } from "../labels";
 import { ReportSkeleton } from "../../../components/common/Skeleton";
+import ReportStatCard from "./ReportStatCard";
+import Money from "../../../components/common/Money";
 
 function SavingsRateSection({ data, loading }) {
   const { t } = useTranslation();
@@ -13,40 +15,44 @@ function SavingsRateSection({ data, loading }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-          <p className="text-xs font-semibold text-slate-400">{t("reports.savingsRate.avgRate")}</p>
-          <p className={`tabular-amount mt-2 text-xl font-extrabold ${avgRate >= targetRate ? "text-income" : "text-slate-900"}`}>{formatPercent(avgRate, 1)}</p>
-          <p className="mt-1 text-xs text-slate-400">{t("reports.savingsRate.targetNote", { rate: formatPercent(targetRate) })}</p>
-        </div>
-        <div className="rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
-          <p className="text-xs font-semibold text-slate-400">{t("reports.savingsRate.avgSavings")}</p>
-          <p className="tabular-amount mt-2 text-xl font-extrabold text-slate-900">{formatMoney(avgSavings)}</p>
-        </div>
+        <ReportStatCard
+          label={t("reports.savingsRate.avgRate")}
+          // Light green on the dark card when the target is met (text-income is too dark here).
+          value={<span className={`tabular-amount ${avgRate >= targetRate ? "text-green-300" : ""}`}>{formatPercent(avgRate, 1)}</span>}
+        >
+          <p className="mt-1 text-xs text-hero-muted">{t("reports.savingsRate.targetNote", { rate: formatPercent(targetRate) })}</p>
+        </ReportStatCard>
+        <ReportStatCard label={t("reports.savingsRate.avgSavings")} amount={avgSavings} />
       </div>
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100">
+      <div className="rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
         <h3 className="text-base font-bold text-slate-900">{t("reports.savingsRate.monthlyTitle")}</h3>
         {monthly.length === 0 ? (
           <p className="mt-4 text-sm text-slate-500">{t("reports.empty")}</p>
         ) : (
-          <div className="mt-4 space-y-3">
+          <ul className="mt-5 space-y-4">
             {monthly.map((m) => (
-              <div key={m.label}>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-semibold text-slate-700">{monthLabel(m.label)}</span>
-                  <span className={`tabular-amount font-bold ${m.rate >= 0 ? "text-income" : "text-expense"}`}>
-                    {formatPercent(m.rate, 1)} · {formatMoney(m.savings)}
+              <li key={m.label}>
+                <div className="flex items-baseline justify-between gap-4 text-sm">
+                  <span className="font-medium text-slate-700">{monthLabel(m.label)}</span>
+                  <span className="flex shrink-0 items-baseline gap-3">
+                    {/* A month that spent more than it earned reads red, currency included. */}
+                    <span className={`font-semibold ${m.savings < 0 ? "text-expense" : "text-slate-900"}`}>
+                      <Money value={m.savings} currencyClassName={m.savings < 0 ? "" : undefined} />
+                    </span>
+                    {/* Fixed width so the rates line up down the list. */}
+                    <span className="tabular-amount w-12 text-end text-xs text-slate-400">{formatPercent(m.rate, 1)}</span>
                   </span>
                 </div>
-                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-slate-100">
                   <div
                     className={`h-full rounded-full ${m.rate >= 0 ? "bg-income" : "bg-expense"}`}
                     style={{ width: `${Math.min(100, Math.max(0, Math.abs(m.rate)))}%` }}
                   />
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
     </div>
