@@ -11,11 +11,11 @@ const TONES = { positive: "text-green-300", negative: "text-red-300" };
 function ReportStatCard({ label, icon: Icon, amount, currency = "EGP", value, tone, large = false, children }) {
   return (
     <div
-      className={`rounded-2xl bg-linear-to-br from-hero-start to-hero-end text-white shadow-sm ${
+      className={`rounded-2xl bg-linear-to-br from-hero-start to-hero-end text-white shadow-(--hero-shadow) ${
         large ? "p-6 sm:p-8" : "p-5"
       }`}
     >
-      <p className={`flex items-center gap-2 text-slate-300 ${large ? "text-xs font-medium" : "text-[11px] font-semibold"}`}>
+      <p className={`flex items-center gap-2 text-hero-muted ${large ? "text-xs font-medium" : "text-[11px] font-semibold"}`}>
         {Icon && <Icon size={14} aria-hidden="true" />}
         {label}
       </p>

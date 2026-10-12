@@ -131,7 +131,7 @@ function SubscriptionCard({ t, language }) {
               className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100"
             >
               <div
-                className={`h-full rounded-full ${expired ? "bg-expense" : subscription._status === "expiring" ? "bg-amber-500" : "bg-brand-600"}`}
+                className={`h-full rounded-full ${expired ? "bg-expense" : subscription._status === "expiring" ? "bg-amber-500" : "bg-accent-500 emerald:bg-brand-600"}`}
                 style={{ width: `${used}%` }}
               />
             </div>

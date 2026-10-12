@@ -18,7 +18,7 @@ export const THEME_OPTIONS = [
       sidebarLine: "#e2e8f0",
       sidebarActive: "#334155",
       heroStart: "#334155",
-      heroEnd: "#1e293b",
+      heroEnd: "#334155",
     },
   },
   {

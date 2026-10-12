@@ -38,7 +38,7 @@ function DebtsPage() {
   const closeToast = useCallback(() => setToastMessage(""), []);
 
   // Tabs: "active" | "completed" | "all"
-  const [activeTab, setActiveTab] = useState("active");
+  const [activeTab, setActiveTab] = useState("all");
 
   // New Debt Form state
   const [showAddForm, setShowAddForm] = useState(false);

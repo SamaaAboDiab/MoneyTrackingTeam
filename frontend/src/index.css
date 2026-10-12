@@ -53,8 +53,9 @@
   --color-ink-500: #64748b;
 
   /* Total cards (TotalsCard): a dark gradient, the currency in the accent, muted secondary text. */
+  /* One flat slate, the same as the dashboard wealth card (brand-600). */
   --color-hero-start: #334155;
-  --color-hero-end: #1e293b;
+  --color-hero-end: #334155;
   --color-hero-accent: #ff9b51;
   --color-hero-muted: #cbd5e1;
 
@@ -85,8 +86,14 @@ html[lang="ar"] {
   --theme-shadow-2xl: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));
 }
 
+/* Under the total cards: a soft, light shadow (emerald keeps its deeper one below). */
+:root {
+  --hero-shadow: 0 4px 6px -1px rgb(15 23 42 / 0.1), 0 2px 4px -2px rgb(15 23 42 / 0.1);
+}
+
 /* ---------- Emerald theme ---------- */
 [data-theme="emerald"] {
+  --hero-shadow: 0 20px 40px -8px rgb(15 23 42 / 0.18), 0 4px 12px -2px rgb(15 23 42 / 0.08);
   --font-sans: "Plus Jakarta Sans", "Cairo", "Segoe UI", sans-serif;
 
   /* Primary brand: emerald green #059669 (= brand-600) for buttons, active states and links;
@@ -450,6 +457,12 @@ button:not(:disabled),
 
 /* Charts: Recharts makes the chart and its slices/bars focusable, so a click left the browser's
    focus box around them. Keyboard users still get the hovered mark and its tooltip. */
+/* Charts on RTL pages: SVG text inherits direction:rtl, which flips text-anchor, so the value
+   axis labels ("٤٥ ألف") were drawn into the plot instead of beside it. Axis ticks read LTR. */
+.recharts-cartesian-axis-tick-value {
+  direction: ltr;
+}
+
 .recharts-wrapper:focus,
 .recharts-wrapper :focus {
   outline: none;
