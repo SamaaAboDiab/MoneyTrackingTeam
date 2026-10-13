@@ -16,7 +16,7 @@ import {
 import { formatAmount, formatMoney, currencyLabel } from "../../utils/formatAmount";
 import ConfirmModal from "../../components/common/ConfirmModal";
 import { getTodayString, EMPTY_DEBT_FORM } from "./constants";
-import { getErrorMessage } from "./utils";
+import { getErrorMessage, isOverdue } from "./utils";
 import DebtsHeader from "./components/DebtsHeader";
 import DebtNotifications from "./components/DebtNotifications";
 import DebtForm from "./components/DebtForm";
@@ -37,7 +37,7 @@ function DebtsPage() {
   const [toastMessage, setToastMessage] = useState("");
   const closeToast = useCallback(() => setToastMessage(""), []);
 
-  // Tabs: "active" | "completed" | "all"
+  // Tabs: "active" | "overdue" | "completed" | "all"
   const [activeTab, setActiveTab] = useState("all");
 
   // New Debt Form state
@@ -81,6 +81,8 @@ function DebtsPage() {
     [debts]
   );
 
+  const overdueDebts = useMemo(() => activeDebts.filter(isOverdue), [activeDebts]);
+
   const completedDebts = useMemo(
     () =>
       debts.filter(
@@ -93,9 +95,10 @@ function DebtsPage() {
 
   const displayedDebts = useMemo(() => {
     if (activeTab === "active") return activeDebts;
+    if (activeTab === "overdue") return overdueDebts;
     if (activeTab === "completed") return completedDebts;
     return debts;
-  }, [activeTab, activeDebts, completedDebts, debts]);
+  }, [activeTab, activeDebts, overdueDebts, completedDebts, debts]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -371,6 +374,7 @@ function DebtsPage() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         activeDebts={activeDebts}
+        overdueDebts={overdueDebts}
         completedDebts={completedDebts}
         debts={debts}
       />

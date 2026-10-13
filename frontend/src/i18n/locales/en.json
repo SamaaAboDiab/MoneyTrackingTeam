@@ -561,6 +561,7 @@
     },
     "tabs": {
       "active": "Active Debts",
+      "overdue": "Overdue Debts",
       "completed": "Completed Debts",
       "all": "All"
     },
@@ -568,9 +569,11 @@
     "empty": {
       "activeTitle": "No active debts right now! Well done",
       "completedTitle": "No fully paid debts yet.",
+      "overdueTitle": "No overdue debts.",
       "allTitle": "No debts recorded.",
       "activeSubtitle": "All your financial commitments are fully paid.",
-      "otherSubtitle": "Tap \"Add New Debt\" to register a new one."
+      "otherSubtitle": "Tap \"Add New Debt\" to register a new one.",
+      "overdueSubtitle": "All your active debts are on schedule."
     },
     "overdueBanner": "Alert: this debt is past its due date!",
     "status": {

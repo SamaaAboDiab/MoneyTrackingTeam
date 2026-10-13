@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { formatMoney } from "../../../utils/formatAmount";
 import NumberInput from "../../../components/common/NumberInput";
@@ -76,7 +77,7 @@ export default function AdjustBalanceButton({ account, onSubmit, onUpdated, trig
         {t("accounts.adjustBalance.trigger")}
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
           onClick={resetAndClose}
@@ -196,7 +197,10 @@ export default function AdjustBalanceButton({ account, onSubmit, onUpdated, trig
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        // Portal to <body>: the card's hover transform would otherwise anchor this
+        // fixed overlay to the card and make it jitter as the cursor moves.
+        document.body
       )}
     </>
   );
