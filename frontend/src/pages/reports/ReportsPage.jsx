@@ -73,7 +73,11 @@ function ReportsPage() {
           <button
             key={key}
             type="button"
-            onClick={() => setActiveTab(key)}
+            onClick={(event) => {
+              setActiveTab(key);
+              // Phones: the tab strip scrolls sideways, so bring the chosen tab into view.
+              event.currentTarget.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+            }}
             className={`shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition ${
               activeTab === key ? "bg-white text-brand-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
             }`}

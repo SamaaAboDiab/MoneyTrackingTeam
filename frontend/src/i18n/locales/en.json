@@ -561,6 +561,7 @@
     },
     "tabs": {
       "active": "Active Debts",
+      "overdue": "Overdue Debts",
       "completed": "Completed Debts",
       "all": "All"
     },
@@ -568,9 +569,11 @@
     "empty": {
       "activeTitle": "No active debts right now! Well done",
       "completedTitle": "No fully paid debts yet.",
+      "overdueTitle": "No overdue debts.",
       "allTitle": "No debts recorded.",
       "activeSubtitle": "All your financial commitments are fully paid.",
-      "otherSubtitle": "Tap \"Add New Debt\" to register a new one."
+      "otherSubtitle": "Tap \"Add New Debt\" to register a new one.",
+      "overdueSubtitle": "All your active debts are on schedule."
     },
     "overdueBanner": "Alert: this debt is past its due date!",
     "status": {
@@ -913,7 +916,9 @@
       "netSavings": "Net savings",
       "totalExpenses": "Total expenses",
       "totalIncome": "Total income",
-      "chartTitle": "Monthly Comparison"
+      "chartTitle": "Monthly Comparison",
+      "net": "Net",
+      "savingsRateNote": "{{rate}} of income"
     },
     "categories": {
       "title": "Expense categories breakdown"
@@ -933,12 +938,20 @@
     },
     "netWorth": {
       "current": "Current net worth",
-      "historyTitle": "Net worth history"
+      "historyTitle": "Net worth history",
+      "assets": "Assets (accounts)",
+      "debts": "Debts",
+      "historyHint": "What you own in your accounts minus what you still owe, at the end of each month.",
+      "positive": "Above zero",
+      "negative": "Below zero"
     },
     "debtProgress": {
       "totalPaid": "Total paid",
       "totalRemaining": "Total remaining",
-      "estPayoff": "Est. payoff"
+      "estPayoff": "Est. payoff",
+      "remaining": "Remaining",
+      "debtsCount_one": "Across {{count}} debt",
+      "debtsCount_other": "Across {{count}} debts"
     },
     "habits": {
       "weekdayTotal": "Weekday spending",
@@ -946,7 +959,8 @@
       "byDayTitle": "Spending by day of week",
       "topExpensesTitle": "Top expenses",
       "topCategoriesTitle": "Top categories",
-      "spikeAlert": "{{category}} spending is up {{pct}} vs the previous period"
+      "spikeAlert": "{{category}} spending is up {{pct}} vs the previous period",
+      "dayAverage": "Daily average"
     }
   },
   "currencies": {
@@ -1209,7 +1223,10 @@
       "conversionHint": "From trial to a paid plan",
       "viewAll": "View all",
       "recentActivityTitle": "Recent activity",
-      "recentActivitySubtitle": "Latest actions taken on users"
+      "recentActivitySubtitle": "Latest actions taken on users",
+      "userGrowthThisMonth": "This month",
+      "planDistributionPaying_one": "{{count}} paying",
+      "planDistributionPaying_other": "{{count}} paying"
     },
     "users": {
       "title": "User management",
@@ -1522,7 +1539,8 @@
       "forecastBasis": "Paid plans ending soon, if renewed on the same plan.",
       "nextDays": "Next {{days}} days",
       "pricesTitle": "Plan prices",
-      "pricesNote": "Prices are set in the server settings."
+      "pricesNote": "What each paid plan costs right now.",
+      "editPrices": "Edit prices"
     },
     "payments": {
       "tab": "Payments",

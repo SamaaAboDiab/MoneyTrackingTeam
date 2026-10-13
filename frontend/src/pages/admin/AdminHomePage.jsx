@@ -18,9 +18,9 @@ import {
   UserX,
   Wallet,
 } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { fetchAdminDashboard, fetchAdminStats } from "../../api/adminAuthApi";
-import { formatMoney } from "../../utils/formatAmount";
+import { formatMoney, formatPercent } from "../../utils/formatAmount";
 import { toIntlLocale } from "../../i18n/locale";
 import Money from "../../components/common/Money";
 import { useTheme } from "../../utils/theme";
@@ -29,10 +29,11 @@ import { BAR_CURSOR, BAR_RADIUS, CHART_COLORS, GRID_PROPS, useChartLayout } from
 
 const EMPTY_STATS = { total: 0, active: 0, expiring: 0, expired: 0, suspended: 0 };
 const PLAN_TYPES = [
-  { type: "trial", color: "#38bdf8" },
+  // Trial is most users; a neutral grey keeps the paid plans readable next to it.
+  { type: "trial", color: "#cbd5e1" },
   { type: "3months", color: "#818cf8" },
   { type: "6months", color: "#34d399" },
-  { type: "yearly", color: "#fbbf24" },
+  { type: "yearly", color: "#f59e0b" },
   { type: "custom", color: "#f472b6" },
 ];
 const DONUT_SIZE = 184;
@@ -70,7 +71,7 @@ function Hero({ admin, kpis, loading, t, language }) {
   const TrendIcon = growing ? TrendingUp : TrendingDown;
 
   return (
-    <section className="rounded-2xl bg-linear-to-br from-navy-800 to-navy-900 p-5 text-white shadow-md sm:p-7">
+    <section className="rounded-2xl bg-linear-to-br from-hero-start to-hero-end p-5 text-white shadow-(--hero-shadow) sm:p-7">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight sm:text-[1.75rem]">
@@ -103,14 +104,14 @@ function Hero({ admin, kpis, loading, t, language }) {
             {!loading && (
               <dd className={`mt-1 inline-flex items-center gap-1 text-xs font-semibold ${growing ? "text-emerald-300" : "text-rose-300"}`}>
                 <TrendIcon size={13} />
-                {t("admin.home.vsLastMonth", { value: `${growing ? "+" : ""}${numberFormat.format(kpis.totalMoM ?? 0)}%` })}
+                {t("admin.home.vsLastMonth", { value: `\u2066${growing ? "+" : ""}${formatPercent(kpis.totalMoM ?? 0)}\u2069` })}
               </dd>
             )}
           </div>
           <div className="ps-6">
             <dt className="text-xs font-medium text-slate-400">{t("admin.home.conversionRate")}</dt>
             <dd className="mt-1 text-3xl font-bold tabular-nums">
-              {loading ? "…" : `${numberFormat.format(kpis.conversionRate ?? 0)}%`}
+              {loading ? "…" : formatPercent(kpis.conversionRate ?? 0)}
             </dd>
             <dd className="mt-1 text-xs text-slate-400">{t("admin.home.conversionHint")}</dd>
           </div>
@@ -214,11 +215,16 @@ function UserGrowthChart({ monthly, loading, error, t, language }) {
   const visibleMonths = monthly.slice(-period);
   const total = visibleMonths.reduce((sum, month) => sum + month.count, 0);
   const { xAxisProps, yAxisProps, animate } = useChartLayout();
-  const chartData = visibleMonths.map((month) => ({
+  const chartData = visibleMonths.map((month, index) => ({
     key: `${month.year}-${month.month}`,
     month: dateFormat.format(new Date(month.year, month.month, 1)),
     count: month.count,
+    current: index === visibleMonths.length - 1,
   }));
+  // This month against last month, for the header.
+  const thisMonth = monthly[monthly.length - 1]?.count ?? 0;
+  const lastMonth = monthly[monthly.length - 2]?.count ?? 0;
+  const change = lastMonth > 0 ? ((thisMonth - lastMonth) / lastMonth) * 100 : null;
 
   return (
     <section aria-labelledby="admin-user-growth-title" className={cardClass}>
@@ -255,10 +261,22 @@ function UserGrowthChart({ monthly, loading, error, t, language }) {
         </div>
       ) : (
         <>
-          <p className="mt-5 flex items-baseline gap-2">
-            <strong className="text-3xl font-extrabold tabular-nums text-slate-900">{numberFormat.format(total)}</strong>
-            <span className="text-sm text-slate-500">{t("admin.home.userGrowthTotal", { months: period })}</span>
-          </p>
+          <div className="mt-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+            <p className="flex items-baseline gap-2">
+              <strong className="text-3xl font-extrabold tabular-nums text-slate-900">{numberFormat.format(total)}</strong>
+              <span className="text-sm text-slate-500">{t("admin.home.userGrowthTotal", { months: period })}</span>
+            </p>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-slate-500">{t("admin.home.userGrowthThisMonth")}</span>
+              <strong className="tabular-nums text-slate-900">{numberFormat.format(thisMonth)}</strong>
+              {change !== null && (
+                <span dir="ltr" className={`rounded-full px-2 py-0.5 text-xs font-semibold ${change >= 0 ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+                  {change >= 0 ? "+" : ""}
+                  {formatPercent(change)}
+                </span>
+              )}
+            </div>
+          </div>
           <div className="mt-5 h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 8, right: 4, bottom: 0, left: 4 }}>
@@ -269,10 +287,25 @@ function UserGrowthChart({ monthly, loading, error, t, language }) {
                   cursor={BAR_CURSOR}
                   content={<ChartTooltip showNames={false} title={(label) => label} formatValue={(value) => numberFormat.format(value)} />}
                 />
-                <Bar dataKey="count" fill={CHART_COLORS.brand} radius={BAR_RADIUS} maxBarSize={36} minPointSize={2} isAnimationActive={animate}>
+                <Bar dataKey="count" fill={CHART_COLORS.brand} radius={BAR_RADIUS} maxBarSize={28} minPointSize={2} isAnimationActive={animate}>
+                  {/* The current month in the brand color, earlier months softer, empty months as a stub. */}
                   {chartData.map((month) => (
-                    <Cell key={month.key} fill={month.count > 0 ? CHART_COLORS.brand : CHART_COLORS.empty} />
+                    <Cell
+                      key={month.key}
+                      fill={month.count === 0 ? CHART_COLORS.empty : month.current ? CHART_COLORS.brand : CHART_COLORS.brandSoft}
+                      fillOpacity={month.count === 0 || month.current ? 1 : 0.55}
+                    />
                   ))}
+                  <LabelList
+                    dataKey="count"
+                    position="top"
+                    offset={6}
+                    className="tabular-nums"
+                    fill="var(--color-slate-500, #64748b)"
+                    fontSize={11}
+                    fontWeight={600}
+                    formatter={(value) => (value > 0 ? numberFormat.format(value) : "")}
+                  />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -298,6 +331,7 @@ function PlanDistributionChart({ plans, loading, error, t, language }) {
   const { animate, donutTooltipProps } = useChartLayout();
   // name / fill ride on each slice for the tooltip; an empty ring shows when nobody subscribed.
   const slices = plans.map((plan) => ({ ...plan, name: t(`admin.home.plans.${plan.type}`), fill: plan.color }));
+  const paying = plans.filter((plan) => plan.type !== "trial").reduce((sum, plan) => sum + plan.count, 0);
 
   return (
     <section aria-labelledby="admin-plan-distribution-title" className={cardClass}>
@@ -351,7 +385,7 @@ function PlanDistributionChart({ plans, loading, error, t, language }) {
                   content={
                     <ChartTooltip
                       formatValue={(value) => numberFormat.format(value)}
-                      footer={(payload) => `${numberFormat.format(payload[0]?.payload?.percentage ?? 0)}%`}
+                      footer={(payload) => formatPercent(payload[0]?.payload?.percentage ?? 0, 1)}
                     />
                   }
                 />
@@ -360,6 +394,9 @@ function PlanDistributionChart({ plans, loading, error, t, language }) {
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
               <strong className="text-3xl font-extrabold tabular-nums text-slate-900">{numberFormat.format(total)}</strong>
               <span className="text-xs font-medium text-slate-500">{t("admin.home.planDistributionTotal")}</span>
+              <span className="mt-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+                {t("admin.home.planDistributionPaying", { count: paying })}
+              </span>
             </div>
           </div>
 
@@ -370,9 +407,12 @@ function PlanDistributionChart({ plans, loading, error, t, language }) {
                   <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: plan.color }} />
                   <span className="truncate text-sm font-semibold text-slate-700">{t(`admin.home.plans.${plan.type}`)}</span>
                 </span>
-                <span className="shrink-0 text-sm tabular-nums text-slate-500">
-                  <strong className="font-bold text-slate-900">{numberFormat.format(plan.count)}</strong>
-                  <span className="ms-2 text-xs">{numberFormat.format(plan.percentage)}%</span>
+                {/* Count, then its share in a fixed-width pill so the column lines up. */}
+                <span className="flex shrink-0 items-center gap-2.5">
+                  <strong className="text-sm font-bold tabular-nums text-slate-900">{numberFormat.format(plan.count)}</strong>
+                  <span className="w-14 rounded-md bg-slate-100 py-0.5 text-center text-xs font-semibold tabular-nums text-slate-600">
+                    {formatPercent(plan.percentage, 1)}
+                  </span>
                 </span>
               </li>
             ))}

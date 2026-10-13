@@ -190,7 +190,7 @@ function AdminAuditLogPage() {
   return (
     <div className="mx-auto max-w-7xl">
       {/* Hero: what this page is, with a few numbers at a glance. */}
-      <section className="relative mb-5 overflow-hidden rounded-2xl bg-linear-to-br from-navy-800 to-navy-900 p-5 text-white shadow-md sm:p-7">
+      <section className="relative mb-5 overflow-hidden rounded-2xl bg-linear-to-br from-hero-start to-hero-end p-5 text-white shadow-(--hero-shadow) sm:p-7">
         <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-4">
             <div>

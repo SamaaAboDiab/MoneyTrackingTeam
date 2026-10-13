@@ -12,7 +12,8 @@ export const CHART_COLORS = {
   expense: "var(--color-expense, #b91c1c)",
   brand: "var(--color-brand-600, #334155)",
   brandSoft: "var(--color-brand-500, #64748b)",
-  weekend: "#fbbf24",
+  // Weekend days in the spending-habits chart: the theme accent (orange in Mali).
+  weekend: "var(--color-accent-500, #ff9b51)",
   empty: "var(--color-slate-200, #e2e8f0)",
 };
 

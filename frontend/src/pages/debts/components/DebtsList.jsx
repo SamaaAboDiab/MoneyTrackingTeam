@@ -20,6 +20,8 @@ function DebtsList({ debtsLoadingStatus, debts, displayedDebts, activeTab, ...ca
         <p className="text-base font-semibold text-slate-700">
           {activeTab === "active"
             ? t("debts.empty.activeTitle")
+            : activeTab === "overdue"
+            ? t("debts.empty.overdueTitle")
             : activeTab === "completed"
             ? t("debts.empty.completedTitle")
             : t("debts.empty.allTitle")}
@@ -27,6 +29,8 @@ function DebtsList({ debtsLoadingStatus, debts, displayedDebts, activeTab, ...ca
         <p className="mt-1 text-sm text-slate-400">
           {activeTab === "active"
             ? t("debts.empty.activeSubtitle")
+            : activeTab === "overdue"
+            ? t("debts.empty.overdueSubtitle")
             : t("debts.empty.otherSubtitle")}
         </p>
       </div>

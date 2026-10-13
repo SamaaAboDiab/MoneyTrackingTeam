@@ -589,6 +589,7 @@
     },
     "tabs": {
       "active": "الديون النشطة",
+      "overdue": "الديون المتأخرة",
       "completed": "الديون المكتملة",
       "all": "الكل"
     },
@@ -596,9 +597,11 @@
     "empty": {
       "activeTitle": "لا توجد ديون نشطة حالياً! أحسنت",
       "completedTitle": "لا توجد ديون مكتملة السداد بعد.",
+      "overdueTitle": "لا توجد ديون متأخرة.",
       "allTitle": "لا توجد ديون مسجلة.",
       "activeSubtitle": "جميع التزاماتك المالية مسددة بالكامل.",
-      "otherSubtitle": "اضغط على \"إضافة دين جديد\" لتسجيل دين جديد."
+      "otherSubtitle": "اضغط على \"إضافة دين جديد\" لتسجيل دين جديد.",
+      "overdueSubtitle": "كل ديونك النشطة في موعدها."
     },
     "overdueBanner": "تنبيه: هذا الدين متأخر عن موعد السداد المحدد!",
     "status": {
@@ -949,7 +952,9 @@
       "netSavings": "صافي الادخار",
       "totalExpenses": "إجمالي المصروفات",
       "totalIncome": "إجمالي الدخل",
-      "chartTitle": "المقارنة الشهرية"
+      "chartTitle": "المقارنة الشهرية",
+      "net": "الصافي",
+      "savingsRateNote": "{{rate}} من الدخل"
     },
     "categories": {
       "title": "توزيع المصروفات على التصنيفات"
@@ -969,12 +974,24 @@
     },
     "netWorth": {
       "current": "صافي الثروة الحالي",
-      "historyTitle": "تاريخ صافي الثروة"
+      "historyTitle": "تاريخ صافي الثروة",
+      "assets": "الأصول (الحسابات)",
+      "debts": "الديون",
+      "historyHint": "فلوسك في الحسابات ناقص الديون اللي لسه عليك، في آخر كل شهر.",
+      "positive": "فوق الصفر",
+      "negative": "تحت الصفر"
     },
     "debtProgress": {
       "totalPaid": "إجمالي المسدد",
       "totalRemaining": "إجمالي المتبقي",
-      "estPayoff": "التوقع الزمني للسداد"
+      "estPayoff": "التوقع الزمني للسداد",
+      "remaining": "المتبقي",
+      "debtsCount_zero": "مفيش ديون",
+      "debtsCount_one": "على دين واحد",
+      "debtsCount_two": "على دينين",
+      "debtsCount_few": "على {{count}} ديون",
+      "debtsCount_many": "على {{count}} دينًا",
+      "debtsCount_other": "على {{count}} دين"
     },
     "habits": {
       "weekdayTotal": "صرف أيام الأسبوع",
@@ -982,7 +999,8 @@
       "byDayTitle": "الصرف حسب يوم الأسبوع",
       "topExpensesTitle": "أعلى المصروفات",
       "topCategoriesTitle": "أعلى التصنيفات",
-      "spikeAlert": "صرف تصنيف {{category}} زاد {{pct}} عن الفترة اللي قبلها"
+      "spikeAlert": "صرف تصنيف {{category}} زاد {{pct}} عن الفترة اللي قبلها",
+      "dayAverage": "متوسط اليوم"
     }
   },
   "currencies": {
@@ -1253,7 +1271,14 @@
       "conversionHint": "من التجريبي لاشتراك مدفوع",
       "viewAll": "عرض الكل",
       "recentActivityTitle": "آخر العمليات",
-      "recentActivitySubtitle": "آخر الإجراءات اللي اتعملت على المستخدمين"
+      "recentActivitySubtitle": "آخر الإجراءات اللي اتعملت على المستخدمين",
+      "userGrowthThisMonth": "الشهر ده",
+      "planDistributionPaying_zero": "مفيش مشتركين مدفوع",
+      "planDistributionPaying_one": "مشترك مدفوع واحد",
+      "planDistributionPaying_two": "مشتركين مدفوع",
+      "planDistributionPaying_few": "{{count}} مشتركين مدفوع",
+      "planDistributionPaying_many": "{{count}} مشترك مدفوع",
+      "planDistributionPaying_other": "{{count}} مشترك مدفوع"
     },
     "users": {
       "title": "إدارة المستخدمين",
@@ -1569,7 +1594,8 @@
       "forecastBasis": "الاشتراكات المدفوعة اللي هتنتهي، لو اتجددت بنفس الباقة.",
       "nextDays": "خلال {{days}} يوم",
       "pricesTitle": "أسعار الباقات",
-      "pricesNote": "الأسعار متظبطة في إعدادات السيرفر."
+      "pricesNote": "سعر كل باقة مدفوعة دلوقتي.",
+      "editPrices": "تعديل الأسعار"
     },
     "payments": {
       "tab": "الدفع",

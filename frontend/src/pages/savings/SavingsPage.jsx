@@ -35,7 +35,7 @@ function SavingsPage() {
 
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [tab, setTab] = useState("active");
+  const [tab, setTab] = useState("all");
 
   const [showForm, setShowForm] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
@@ -250,7 +250,7 @@ function SavingsPage() {
     }
   }
 
-  const TABS = ["active", "completed", "archived", "all"];
+  const TABS = ["all", "active", "completed", "archived"];
 
   return (
     <div className="mx-auto max-w-6xl space-y-5">

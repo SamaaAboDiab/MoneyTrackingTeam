@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, Settings, ShieldCheck, UserRound, Wallet } from "lucide-react";
 import PageHeader from "../../components/common/PageHeader";
@@ -20,7 +21,9 @@ const TABS = [
 function AdminSettingsPage() {
   const { t, i18n } = useTranslation();
   const { admin } = useSelector((state) => state.adminAuth);
-  const [activeTab, setActiveTab] = useState("information");
+  // ?tab=payments (e.g. from the revenue report's "edit prices") opens that tab.
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => (["information", "security", "payments"].includes(searchParams.get("tab")) ? searchParams.get("tab") : "information"));
   const [openSection, setOpenSection] = useState(null);
 
   const openSecuritySection = (section) => {

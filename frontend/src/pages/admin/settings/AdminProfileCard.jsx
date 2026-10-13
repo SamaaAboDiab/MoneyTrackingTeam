@@ -59,7 +59,7 @@ function AdminProfileCard({ admin, t }) {
       <div className="grid md:grid-cols-[18rem_1fr]">
         {/* Photo on its cover (same size as before) */}
         <div className="border-slate-100 md:border-e">
-          <div className="relative h-24 bg-linear-to-br from-navy-800 to-navy-900">
+          <div className="relative h-24 bg-linear-to-br from-hero-start to-hero-end">
           </div>
           <div className="-mt-12 flex flex-col items-center px-5 pb-5 text-center">
             <div className="relative">

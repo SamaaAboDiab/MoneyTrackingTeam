@@ -103,7 +103,7 @@ function AdminUserProfilePage() {
         {back}
         {/* Who they are + subscription */}
         <section className="card-shadow overflow-hidden rounded-3xl border border-slate-200/80 bg-white">
-          <div className="h-24 bg-linear-to-br from-navy-800 to-navy-900" />
+          <div className="h-24 bg-linear-to-br from-hero-start to-hero-end" />
           <div className="flex flex-col gap-4 px-5 pb-5 sm:px-6 lg:flex-row lg:items-start lg:justify-between">
             {/* Only the avatar is pulled up over the strip; the text starts below it. */}
             <div className="flex min-w-0 flex-col items-center gap-3 text-center sm:flex-row sm:items-start sm:gap-4 sm:text-start">
