@@ -319,7 +319,8 @@
     "viewActive": "عرض الحسابات النشطة",
     "viewArchived": "عرض الحسابات المؤرشفة",
     "emptyArchived": "لا توجد حسابات مؤرشفة.",
-    "linkedAccountsCount": "عدد الحسابات المربوطة"
+    "linkedAccountsCount": "عدد الحسابات المربوطة",
+    "historyTitleFallback": "سجل الحركات"
   },
   "income": {
     "title": "مصادر الدخل",
@@ -402,9 +403,11 @@
     "totalLabel": "إجمالي المصروفات",
     "totalFilteredSuffix": "(المفلترة)",
     "addFormTitle": "إضافة مصروف جديد",
+    "formSubtitle": "سجّل تفاصيل المصروف عشان تفضل متابعتك واضحة.",
     "fields": {
       "description": "الوصف",
       "amount": "المبلغ",
+      "currency": "العملة",
       "date": "التاريخ",
       "paymentMethod": "طريقة الدفع",
       "expenseType": "نوع المصروف",
@@ -414,8 +417,9 @@
     },
     "descriptionPlaceholder": "مثال: مشتريات السوبرماركت، فاتورة إنترنت، صيانة السيارة...",
     "noAccountOption": "بدون حساب محدد",
+    "currencyFromAccount": "من الحساب",
     "unknownAccount": "حساب",
-    "notesPlaceholder": "أضف أي تفاصيل أو ملاحظات إضافية هنا (اختياري)...",
+    "notesPlaceholder": "أي ملاحظات؟",
     "paymentMethod": {
       "cash": "كاش",
       "card": "بطاقة",
@@ -823,6 +827,7 @@
       "add": "إضافة",
       "adding": "جارٍ الإضافة...",
       "addOption": "إضافة تصنيف جديد...",
+      "editTitle": "تعديل التصنيف",
       "deleteTitle": "حذف هذا التصنيف"
     }
   },
@@ -1836,7 +1841,7 @@
   },
   "theme": {
     "mali": {
-      "name": "الكلاسيكي",
+      "name": "الرمادي",
       "description": "رمادي وبرتقالي، مع قائمة جانبية بيضاء."
     },
     "emerald": {

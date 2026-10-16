@@ -311,7 +311,7 @@ function IncomePage() {
       <button
         type="button"
         onClick={openCreateForm}
-        className={`min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 ${extraClass}`}
+        className={`mali-primary-action min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 ${extraClass}`}
       >
         <Plus size={18} strokeWidth={2.5} />
         {t("income.formTitle")}

@@ -2,6 +2,7 @@ const nodemailer = require("nodemailer");
 
 const SMTP_PORT = Number(process.env.SMTP_PORT ?? 587);
 const SMTP_FROM = process.env.SMTP_FROM ?? process.env.SMTP_USER;
+const CLIENT_URL = (process.env.CLIENT_URL ?? "http://localhost:5174").split(",")[0].trim();
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST ?? "smtp.gmail.com",
@@ -14,7 +15,7 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendPasswordResetEmail(toEmail, resetToken) {
-  const resetUrl = `${process.env.CLIENT_URL ?? "http://localhost:3000"}/reset-password?token=${resetToken}`;
+  const resetUrl = `${CLIENT_URL}/reset-password?token=${resetToken}`;
 
   await transporter.sendMail({
     from: `"Money Tracker" <${SMTP_FROM}>`,

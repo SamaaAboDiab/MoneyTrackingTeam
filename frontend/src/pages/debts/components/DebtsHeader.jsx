@@ -18,7 +18,7 @@ function DebtsHeader({ setShowAddForm, setError, setSuccessMessage }) {
           setError("");
           setSuccessMessage("");
         }}
-        className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700"
+        className="mali-primary-action inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700"
       >
         <Plus size={18} />
         {t("debts.addNew")}

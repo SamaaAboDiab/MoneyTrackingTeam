@@ -4,6 +4,7 @@ import { formatDate } from "../../../utils/formatAmount";
 import { categoryLabel } from "../../categories/components/mandatoryCategories";
 import { ListSkeleton } from "../../../components/common/Skeleton";
 import Money from "../../../components/common/Money";
+import { TYPE_PILL_STYLES } from "../constants";
 
 // Same column layout as the income list, shared by the header row and every row (md and up).
 const EXPENSE_COLUMNS =
@@ -57,9 +58,15 @@ function ExpensesList({ items, status, isFiltered, resetFilters, getCategoryName
           const categoryColor = getCategoryColor(expense.category);
           const date = formatDate(expense.date, { dateStyle: "medium" });
           const category = (
-            <span className="flex min-w-0 items-center gap-1.5">
+            <span
+              className="inline-flex min-w-0 items-center gap-1.5 rounded-full border px-2 py-0.5"
+              style={{
+                backgroundColor: `${categoryColor}14`,
+                borderColor: `${categoryColor}40`,
+              }}
+            >
               <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: categoryColor }} />
-              <span className="truncate">{categoryName}</span>
+              <span className="truncate text-slate-700">{categoryName}</span>
             </span>
           );
 
@@ -73,7 +80,7 @@ function ExpensesList({ items, status, isFiltered, resetFilters, getCategoryName
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate text-sm font-bold text-slate-900">{expense.description}</h3>
                   <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">
+                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${TYPE_PILL_STYLES[expense.expenseType] || "bg-slate-100 text-slate-600"}`}>
                       {t(`expenses.expenseType.${expense.expenseType}`, expense.expenseType)}
                     </span>
                     {expense.account && (

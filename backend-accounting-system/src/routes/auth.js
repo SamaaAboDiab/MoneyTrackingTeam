@@ -12,10 +12,26 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-router.post("/register", register);
+const registrationLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: { success: false, message: "Too many registration attempts. Try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const passwordRecoveryLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { success: false, message: "Too many password recovery attempts. Try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+router.post("/register", registrationLimiter, register);
 router.post("/login", loginLimiter, adminLoginLimiter, login);
 router.get("/me", auth, me);
-router.post("/forgot-password", forgotPassword);
-router.post("/reset-password", resetPassword);
+router.post("/forgot-password", passwordRecoveryLimiter, forgotPassword);
+router.post("/reset-password", passwordRecoveryLimiter, resetPassword);
 
 module.exports = router;

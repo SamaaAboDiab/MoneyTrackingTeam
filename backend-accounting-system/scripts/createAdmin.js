@@ -11,6 +11,7 @@
 require("dotenv").config({ path: require("path").join(__dirname, "../.env") });
 const mongoose = require("mongoose");
 const Admin    = require("../src/models/Admin");
+const { getPasswordPolicyError } = require("../src/utils/passwordPolicy");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -27,9 +28,8 @@ async function main() {
 
   if (!email || !password) fail("Usage: node scripts/createAdmin.js <email> <password> [name]");
   if (!EMAIL_RE.test(email)) fail("Invalid email format");
-  if (password.length < 8 || !/\d/.test(password) || !/[A-Z]/.test(password)) {
-    fail("Password must be at least 8 characters and contain a digit and an uppercase letter");
-  }
+  const passwordError = getPasswordPolicyError(password);
+  if (passwordError) fail(passwordError);
 
   await mongoose.connect(process.env.MONGODB_URI);
   const exists = await Admin.findOne({ email });

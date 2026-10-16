@@ -15,7 +15,7 @@ function QuickLinks({ t }) {
         <Link
           key={to}
           to={to}
-          className="group flex min-h-24 flex-col justify-between gap-3 rounded-2xl lg:min-h-0 lg:flex-row lg:items-center lg:justify-start bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80 transition hover:-translate-y-0.5 hover:shadow-md hover:ring-brand-300"
+          className="mali-surface mali-surface-hover group flex min-h-24 flex-col justify-between gap-3 rounded-2xl lg:min-h-0 lg:flex-row lg:items-center lg:justify-start bg-white p-4 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80 transition hover:-translate-y-0.5 hover:shadow-md hover:ring-brand-300"
         >
           <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}>
             <Icon size={19} strokeWidth={2} />

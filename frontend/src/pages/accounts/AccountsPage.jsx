@@ -82,7 +82,7 @@ function AccountsPage() {
     <button
       type="button"
       onClick={() => setIsCreateOpen(true)}
-      className={`min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 ${extraClass}`}
+      className={`mali-primary-action min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 ${extraClass}`}
     >
       <Plus size={18} strokeWidth={2.5} />
       {t("accounts.submit")}

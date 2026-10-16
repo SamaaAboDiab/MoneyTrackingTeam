@@ -2,24 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PieChart as PieChartIcon } from "lucide-react";
 import { formatAmount, formatMoney, formatNumber, formatPercent, currencyLabel } from "../../../utils/formatAmount";
-import { categoryLabel } from "../../categories/components/mandatoryCategories";
+import { categoryLabel, getCategoryDisplayColor } from "../../categories/components/mandatoryCategories";
 import { Cell, Pie, PieChart, Tooltip } from "recharts";
 import ChartTooltip from "../../../components/charts/ChartTooltip";
 import { useChartLayout } from "../../../components/charts/chartTheme";
-
-const FALLBACK_PALETTE = [
-  "#ff9b51",
-  "#3b82f6",
-  "#8b5cf6",
-  "#10b981",
-  "#ec4899",
-  "#0ea5e9",
-  "#f59e0b",
-  "#14b8a6",
-  "#ef4444",
-  "#84cc16",
-];
-const NEUTRAL_GRAY = "#6b7280";
 
 const SIZE = 200;
 const OUTER_R = 90;
@@ -30,13 +16,10 @@ function ExpenseCategoryChart({ categories, loading, currency = "EGP", t }) {
   const [hoveredId, setHoveredId] = useState(null);
   const { animate, donutTooltipProps } = useChartLayout();
 
-  const coloredCategories = categories.reduce((acc, cat, index) => {
-    const used = new Set(acc.map((item) => item.color));
-    const own = cat.color && cat.color !== NEUTRAL_GRAY && !used.has(cat.color) ? cat.color : null;
-    const fallback = FALLBACK_PALETTE.find((color) => !used.has(color)) || FALLBACK_PALETTE[index % FALLBACK_PALETTE.length];
-    acc.push({ ...cat, color: own || fallback });
-    return acc;
-  }, []);
+  const coloredCategories = categories.map((cat) => ({
+    ...cat,
+    color: getCategoryDisplayColor(cat),
+  }));
 
   const total = coloredCategories.reduce((sum, cat) => sum + Number(cat.total || 0), 0);
   const topThree = [...coloredCategories].sort((a, b) => b.total - a.total).slice(0, 3);
@@ -55,7 +38,7 @@ function ExpenseCategoryChart({ categories, loading, currency = "EGP", t }) {
   }));
 
   return (
-    <section className="@container h-full rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80 sm:p-6">
+    <section className="mali-surface @container h-full rounded-2xl bg-white p-5 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80 sm:p-6">
       <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
         <PieChartIcon size={18} className="text-brand-600" />
         {t("dashboard.chart.title")}

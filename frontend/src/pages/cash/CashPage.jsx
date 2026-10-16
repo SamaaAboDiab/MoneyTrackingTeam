@@ -125,7 +125,7 @@ function CashPage() {
           <button
             type="button"
             onClick={() => setIsWithdrawOpen(true)}
-            className="inline-flex min-h-12 w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-base font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
+            className="mali-primary-action inline-flex min-h-12 w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-base font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700"
           >
             <ArrowDownLeft size={20} strokeWidth={2.5} />
             {t("cash.withdrawTitle")}

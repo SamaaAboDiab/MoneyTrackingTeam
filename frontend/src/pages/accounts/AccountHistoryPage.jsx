@@ -50,7 +50,10 @@ function AccountHistoryPage() {
       <PageHeader
         backTo="/accounts"
         backLabel={t("accounts.transactions.back")}
-        title={t("accounts.historyTitle", { name: accountName || "..." })}
+        backPlacement="inline"
+        title={accountName
+          ? t("accounts.historyTitle", { name: accountName })
+          : t("accounts.historyTitleFallback")}
       />
 
       <TransactionFilters start={start} end={end} onStartChange={setStart} onEndChange={setEnd} onSubmit={(event) => { event.preventDefault(); loadTransactions(); }} t={t} />

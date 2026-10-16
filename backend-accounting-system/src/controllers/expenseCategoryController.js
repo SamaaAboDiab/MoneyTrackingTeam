@@ -1,4 +1,5 @@
 const ExpenseCategory = require("../models/ExpenseCategory");
+const Expense = require("../models/Expense");
 
 const VALID_TYPES = ["daily", "fixed", "emergency"];
 
@@ -125,6 +126,13 @@ exports.update = async (req, res, next) => {
       payload,
       { new: true, runValidators: true }
     );
+
+    if (payload.name && payload.name !== existing.name) {
+      await Expense.updateMany(
+        { user: req.userId, category: existing.name },
+        { $set: { category: payload.name } }
+      );
+    }
 
     res.json({ success: true, data: cat });
   } catch (err) { next(err); }

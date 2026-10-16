@@ -134,7 +134,7 @@ function PaymentModal({ paymentModalDebt, setPaymentModalDebt, handleSavePayment
               <button
                 type="submit"
                 disabled={savingPayment}
-                className="min-h-11 w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60 sm:w-auto"
+                className="mali-primary-action min-h-11 w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60 sm:w-auto"
               >
                 {savingPayment ? t("debts.paymentModal.saving") : t("debts.paymentModal.confirm")}
               </button>

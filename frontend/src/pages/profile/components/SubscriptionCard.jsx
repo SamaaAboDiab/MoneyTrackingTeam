@@ -60,7 +60,7 @@ function SubscriptionCard({ t, language }) {
   if (status === "loading") return <span className="skeleton block h-80 rounded-3xl" aria-hidden="true" />;
   if (status === "error" || !info?.subscription) {
     return (
-      <section className="card-shadow h-full rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6">
+      <section className="mali-surface card-shadow h-full rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6">
         <h2 className="text-base font-bold text-slate-900">{t("subscription.title")}</h2>
         <p role="alert" className="mt-3 rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense">{t("subscription.loadError")}</p>
         <button
@@ -98,7 +98,7 @@ function SubscriptionCard({ t, language }) {
   const openCheckout = (plan) => setCheckoutPlan(plan);
 
   return (
-    <section className="card-shadow h-full rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6">
+    <section className="mali-surface card-shadow h-full rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6">
       {/* Current plan */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">

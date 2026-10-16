@@ -144,7 +144,7 @@ function ExpenseFilters({ filters, setFilters, handleFilterChange, isFiltered, r
                 >
                   <span
                     className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full"
-                    style={{ backgroundColor: cat.color || getCategoryColor(cat.name) }}
+                    style={{ backgroundColor: getCategoryColor(cat.name) }}
                   />
                   <span>{categoryLabel(cat.name)}</span>
                 </div>

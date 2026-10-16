@@ -155,7 +155,7 @@ function PasswordChangeSection({ t, securityRequest, onClearRequest }) {
             <button
               type="submit"
               disabled={passwordStatus === "loading"}
-              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 disabled:cursor-wait disabled:opacity-65 sm:ms-auto"
+              className="mali-primary-action inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 disabled:cursor-wait disabled:opacity-65 sm:ms-auto"
             >
               {passwordStatus === "loading" ? t("profile.password.submitting") : t("profile.password.submit")}
             </button>

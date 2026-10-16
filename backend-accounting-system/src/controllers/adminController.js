@@ -13,6 +13,7 @@ const Debt      = require("../models/Debt");
 const { sendPasswordResetLink } = require("../services/passwordResetService");
 const { getPlanPrices, SUBSCRIPTION_CURRENCY } = require("../config/subscriptionPlans");
 const { calcEnd, planLabel, userStatus } = require("../utils/subscription");
+const { getPasswordPolicyError } = require("../utils/passwordPolicy");
 
 /* ── helpers ─────────────────────────────────────── */
 function activeUserExpression(now) {
@@ -376,9 +377,8 @@ exports.createUser = async (req, res, next) => {
     if (!EMAIL_RE.test(normalizedEmail)) {
       return res.status(400).json({ success: false, message: "A valid email is required" });
     }
-    if (typeof password !== "string" || password.length < 6) {
-      return res.status(400).json({ success: false, message: "Password must be at least 6 characters" });
-    }
+    const passwordError = getPasswordPolicyError(password);
+    if (passwordError) return res.status(400).json({ success: false, message: passwordError });
     if (!USER_PLANS.includes(subscriptionType)) {
       return res.status(400).json({ success: false, message: "Invalid subscription type" });
     }
@@ -389,7 +389,6 @@ exports.createUser = async (req, res, next) => {
     ) {
       return res.status(400).json({ success: false, message: "customDays must be an integer from 1 to 3650" });
     }
-
     const exists = await User.findOne({ email: normalizedEmail });
     if (exists) return res.status(409).json({ success: false, message: "الإيميل مستخدم بالفعل" });
 
@@ -696,10 +695,12 @@ exports.getUserLogs = async (req, res, next) => {
 exports.seedAdmin = async (req, res, next) => {
   try {
     const { name, email, password } = req.body ?? {};
-    if (typeof name !== "string" || typeof email !== "string" || typeof password !== "string"
-        || !name.trim() || !EMAIL_RE.test(email.trim()) || password.length < 8) {
-      return res.status(400).json({ success: false, message: "name, valid email and password (min 8 chars) are required" });
+    if (typeof name !== "string" || typeof email !== "string"
+        || !name.trim() || !EMAIL_RE.test(email.trim())) {
+      return res.status(400).json({ success: false, message: "name and valid email are required" });
     }
+    const passwordError = getPasswordPolicyError(password);
+    if (passwordError) return res.status(400).json({ success: false, message: passwordError });
     const normalizedEmail = email.trim().toLowerCase();
     const exists = await Admin.findOne({ email: normalizedEmail });
     if (exists) return res.status(409).json({ success: false, message: "Admin already exists" });

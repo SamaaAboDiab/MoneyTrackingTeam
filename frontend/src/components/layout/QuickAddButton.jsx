@@ -1,17 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Plus, X } from "lucide-react";
-import { fetchAccounts } from "../../store/slices/accountsSlice";
-import Select from "../common/Select";
+import CategorySelect from "../../pages/categories/components/CategorySelect";
 import NumberInput from "../common/NumberInput";
 import { createExpense } from "../../api/expenseApi";
-import { listCategories } from "../../api/categoryApi";
 import { extractError } from "../../utils/errorHandler";
 import { todayISODate } from "../../utils/formatAmount";
-import { categoryLabel } from "../../pages/categories/components/mandatoryCategories";
 
 const inputClass =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-brand-500";
@@ -19,27 +15,14 @@ const inputClass =
 function QuickAddButton() {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const dispatch = useDispatch();
-  const { items: accounts } = useSelector((state) => state.accounts);
 
   const [open, setOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
-
-  const cashAccount = accounts.find((account) => account.type === "cash" && !account.isArchived);
-
-  useEffect(() => {
-    if (!open) return;
-    dispatch(fetchAccounts());
-    listCategories()
-      .then((data) => setCategories(Array.isArray(data) ? data : []))
-      .catch(() => {});
-  }, [open, dispatch]);
 
   const close = () => {
     setOpen(false);
@@ -53,11 +36,6 @@ function QuickAddButton() {
       setError(t("quickAdd.required"));
       return;
     }
-    if (!cashAccount) {
-      setError(t("quickAdd.noCashAccount"));
-      return;
-    }
-
     setSaving(true);
     setError("");
     try {
@@ -68,8 +46,7 @@ function QuickAddButton() {
         paymentMethod: "cash",
         expenseType: "daily",
         category,
-        accountId: cashAccount._id,
-        currency: cashAccount.currency || "EGP",
+        currency: "EGP",
         status: "confirmed",
       });
       setAmount("");
@@ -78,7 +55,6 @@ function QuickAddButton() {
       setOpen(false);
       setToast(t("quickAdd.success"));
       setTimeout(() => setToast(""), 3500);
-      dispatch(fetchAccounts());
     } catch (err) {
       setError(extractError(err, t("quickAdd.error")));
     } finally {
@@ -142,14 +118,7 @@ function QuickAddButton() {
 
             <label className="block text-sm font-semibold text-slate-700">
               {t("quickAdd.category")}
-              <Select required value={category} onChange={(event) => setCategory(event.target.value)} className={inputClass}>
-                <option value="">{t("quickAdd.selectCategory")}</option>
-                {categories.map((cat) => (
-                  <option key={cat._id || cat.name} value={cat.name}>
-                    {categoryLabel(cat.name)}
-                  </option>
-                ))}
-              </Select>
+              <CategorySelect required value={category} onChange={setCategory} />
             </label>
 
             <label className="block text-sm font-semibold text-slate-700">

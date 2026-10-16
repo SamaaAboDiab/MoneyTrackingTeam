@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { formatPercent } from "../../../utils/formatAmount";
-import { categoryLabel } from "../../categories/components/mandatoryCategories";
+import { categoryLabel, getCategoryDisplayColor } from "../../categories/components/mandatoryCategories";
 import { ReportSkeleton } from "../../../components/common/Skeleton";
 import Money from "../../../components/common/Money";
 
@@ -32,7 +32,10 @@ function CategoriesSection({ data, loading }) {
         {categories.map((cat) => (
           <li key={cat.categoryId}>
             <div className="flex items-baseline justify-between gap-4 text-sm">
-              <span className="truncate font-medium text-slate-700">{categoryLabel(cat.name)}</span>
+              <span className="flex min-w-0 items-center gap-2 truncate font-medium text-slate-700">
+                <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: getCategoryDisplayColor(cat) }} />
+                <span className="truncate">{categoryLabel(cat.name)}</span>
+              </span>
               <span className="flex shrink-0 items-baseline gap-3">
                 <span className="font-semibold text-slate-900">
                   <Money value={cat.total} />
@@ -42,7 +45,7 @@ function CategoriesSection({ data, loading }) {
               </span>
             </div>
             <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full rounded-full" style={{ width: `${cat.pct}%`, backgroundColor: cat.color }} />
+              <div className="h-full rounded-full" style={{ width: `${cat.pct}%`, backgroundColor: getCategoryDisplayColor(cat) }} />
             </div>
           </li>
         ))}

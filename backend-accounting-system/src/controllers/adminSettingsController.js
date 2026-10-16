@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Admin = require("../models/Admin");
+const { getPasswordPolicyError } = require("../utils/passwordPolicy");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
@@ -98,12 +99,8 @@ exports.changePassword = async (req, res, next) => {
     if (newPassword !== confirmPassword) {
       return res.status(400).json({ success: false, message: "كلمة السر الجديدة مش متطابقة" });
     }
-    if (typeof newPassword !== "string" || newPassword.length < 8 || !/[A-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
-      return res.status(400).json({
-        success: false,
-        message: "كلمة السر لازم تكون 8 حروف على الأقل وفيها حرف كبير ورقم",
-      });
-    }
+    const passwordError = getPasswordPolicyError(newPassword);
+    if (passwordError) return res.status(400).json({ success: false, message: passwordError });
     const admin = await loadAdmin(req, res, true);
     if (!admin) return;
     if (!(await checkCurrentPassword(admin, currentPassword, res))) return;

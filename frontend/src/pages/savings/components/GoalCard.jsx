@@ -28,7 +28,7 @@ function GoalCard({
   const GoalIcon = GOAL_ICON_MAP[goal.emoji] || DEFAULT_GOAL_ICON;
 
   return (
-    <div className="card-hover rounded-2xl bg-white p-5 ring-1 ring-slate-100 emerald:ring-slate-200/80">
+    <div className="mali-surface mali-surface-hover card-hover rounded-2xl bg-white p-5 ring-1 ring-slate-100 emerald:ring-slate-200/80">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-brand-600">

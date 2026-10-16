@@ -88,16 +88,13 @@ function AdminSettingsPage() {
               })}
             </div>
 
-            {/* Language and theme: each opens a small menu in place (not a section). */}
-            <div className="mt-1 space-y-2 border-t border-slate-100 px-3 pt-3 pb-1">
+            {/* Keep language and theme controls visible in the settings card. */}
+            <div className="mt-1 space-y-3 border-t border-slate-100 px-3 pt-3 pb-1">
               <div className="flex items-center justify-between gap-3">
                 <span className="text-xs font-semibold text-slate-500">{t("admin.settings.languageTitle")}</span>
                 <LanguageMenu t={t} i18n={i18n} />
               </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-xs font-semibold text-slate-500">{t("layout.theme")}</span>
-                <ThemePicker t={t} />
-              </div>
+              <ThemePicker t={t} />
             </div>
           </nav>
         </aside>

@@ -85,7 +85,7 @@ function AccountForm({ form, createStatus, createError, onChange, onSubmit, onCl
           <button
             type="submit"
             disabled={createStatus === "loading"}
-            className="inline-flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 active:scale-[0.99] disabled:cursor-wait disabled:opacity-65"
+            className="mali-primary-action inline-flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 active:scale-[0.99] disabled:cursor-wait disabled:opacity-65"
           >
             {createStatus !== "loading" && <Plus size={17} aria-hidden="true" />}
             {createStatus === "loading" ? t("accounts.submitting") : t("accounts.submit")}

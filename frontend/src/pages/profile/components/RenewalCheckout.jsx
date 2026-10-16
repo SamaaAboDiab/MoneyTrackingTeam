@@ -13,7 +13,7 @@ const STEPS = ["plan", "method", "pay"];
 const inputClass =
   "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm outline-none transition focus:border-brand-500";
 const primaryButton =
-  "min-h-11 flex-1 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50";
+  "mali-primary-action min-h-11 flex-1 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50";
 const secondaryButton =
   "min-h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-60";
 

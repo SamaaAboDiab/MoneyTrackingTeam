@@ -2,6 +2,7 @@ const Debt        = require("../models/Debt");
 const DebtPayment = require("../models/DebtPayment");
 const Account     = require("../models/Account");
 const AccountTransaction = require("../models/AccountTransaction");
+const withTransaction = require("../utils/withTransaction");
 
 /* ── helpers ─────────────────────────────────────── */
 function autoStatus(debt) {
@@ -169,13 +170,20 @@ exports.update = async (req, res, next) => {
 // DELETE /api/debts/:id
 exports.remove = async (req, res, next) => {
   try {
-    const debt = await Debt.findOneAndDelete({ _id: req.params.id, userId: req.userId });
-    if (!debt) return res.status(404).json({ success: false, message: "Debt not found" });
-    await DebtPayment.deleteMany({ debt: req.params.id });
+    await withTransaction(async (session) => {
+      const debt = await Debt.findOneAndDelete(
+        { _id: req.params.id, userId: req.userId },
+        { session },
+      );
+      if (!debt) throw Object.assign(new Error("Debt not found"), { status: 404 });
+      await DebtPayment.deleteMany({ debt: debt._id, userId: req.userId }, { session });
+    });
     res.json({ success: true });
-  } catch (err) { next(err); }
+  } catch (err) {
+    if (err.status) return res.status(err.status).json({ success: false, message: err.message });
+    next(err);
+  }
 };
-
 // PATCH /api/debts/:id/paid  — mark fully paid
 exports.markPaid = async (req, res, next) => {
   try {
@@ -192,49 +200,71 @@ exports.markPaid = async (req, res, next) => {
 exports.addPayment = async (req, res, next) => {
   try {
     const { amount, date, accountId, notes } = req.body;
-    const amt = parseFloat(amount);
-    if (!amt || amt <= 0) return res.status(400).json({ success: false, message: "Amount must be positive." });
-
-    const debt = await Debt.findOne({ _id: req.params.id, userId: req.userId });
-    if (!debt) return res.status(404).json({ success: false, message: "Debt not found" });
-    if (debt.status === "paid") return res.status(400).json({ success: false, message: "Debt is already fully paid." });
-
-    // Deduct from linked account
-    if (accountId) {
-      const acc = await Account.findOne({ _id: accountId, user: req.userId });
-      if (!acc) return res.status(404).json({ success: false, message: "Account not found." });
-      if (acc.isArchived || acc.isActive === false) {
-        return res.status(400).json({ success: false, code: "ACCOUNT_FROZEN", message: `Account "${acc.name}" is archived (frozen): you can't withdraw from it.` });
-      }
-      const balBefore = acc.balance;
-      acc.balance -= amt;
-      await acc.save();
-      await AccountTransaction.create({
-        user: req.userId, account: acc._id,
-        type: "debit", amount: amt,
-        description: `Debt payment — ${debt.creditor}`,
-        balanceBefore: balBefore, balanceAfter: acc.balance,
-        date: date ? new Date(date) : new Date(),
-      });
+    const amt = Number(amount);
+    if (!Number.isFinite(amt) || amt <= 0) {
+      return res.status(400).json({ success: false, message: "Amount must be positive." });
+    }
+    if (!accountId) {
+      return res.status(400).json({ success: false, message: "An account is required to record a debt payment." });
+    }
+    const paymentDate = date ? new Date(date) : new Date();
+    if (Number.isNaN(paymentDate.getTime())) {
+      return res.status(400).json({ success: false, message: "Payment date must be valid." });
     }
 
-    // Record payment
-    const payment = await DebtPayment.create({
-      debt: debt._id, userId: req.userId,
-      amount: amt, date: date ? new Date(date) : new Date(),
-      accountId: accountId || null, notes: notes?.trim(),
+    let result;
+    await withTransaction(async (session) => {
+      const debt = await Debt.findOne({ _id: req.params.id, userId: req.userId }).session(session);
+      if (!debt) throw Object.assign(new Error("Debt not found"), { status: 404 });
+      if (debt.status === "paid") {
+        throw Object.assign(new Error("Debt is already fully paid."), { status: 400 });
+      }
+      const remaining = Math.max(0, debt.totalAmount - debt.paidAmount);
+      if (amt > remaining) {
+        throw Object.assign(new Error("Payment exceeds the remaining debt amount."), { status: 400 });
+      }
+
+      const account = await Account.findOne({ _id: accountId, user: req.userId }).session(session);
+      if (!account) throw Object.assign(new Error("Account not found."), { status: 404 });
+      if (account.isArchived || account.isActive === false) {
+        throw Object.assign(new Error("Account is archived (frozen)."), { status: 400, code: "ACCOUNT_FROZEN" });
+      }
+      if (String(account.currency || "EGP").toUpperCase() !== String(debt.currency || "EGP").toUpperCase()) {
+        throw Object.assign(new Error("The account and debt must use the same currency."), { status: 400 });
+      }
+      if (account.balance < amt) {
+        throw Object.assign(new Error("Insufficient account balance."), { status: 400 });
+      }
+
+      const balanceBefore = account.balance;
+      account.balance -= amt;
+      await account.save({ session });
+      await AccountTransaction.create([{
+        user: req.userId, account: account._id,
+        type: "debit", amount: amt,
+        description: "Debt payment — " + debt.creditor,
+        balanceBefore, balanceAfter: account.balance,
+        date: paymentDate,
+      }], { session });
+
+      const [payment] = await DebtPayment.create([{
+        debt: debt._id, userId: req.userId,
+        amount: amt, date: paymentDate,
+        accountId: accountId || null, notes: notes?.trim(),
+      }], { session });
+
+      debt.paidAmount += amt;
+      if (debt.paidAmount >= debt.totalAmount) {
+        debt.paidAmount = debt.totalAmount;
+        debt.status = "paid";
+      } else {
+        debt.status = autoStatus(debt);
+      }
+      await debt.save({ session });
+      result = { debtId: debt._id, payment };
     });
 
-    // Update debt
-    debt.paidAmount += amt;
-    if (debt.paidAmount >= debt.totalAmount) {
-      debt.paidAmount = debt.totalAmount;
-      debt.status     = "paid";
-    } else {
-      debt.status = autoStatus(debt);
-    }
-    await debt.save();
-
+    const debt = await Debt.findOne({ _id: result.debtId, userId: req.userId });
     const payments = await DebtPayment.find({ debt: debt._id, userId: req.userId }).select("amount date").lean();
     res.status(201).json({
       success: true,
@@ -243,13 +273,14 @@ exports.addPayment = async (req, res, next) => {
           ...debt.toObject(),
           paymentForecast: calculatePaymentForecast(debt, payments),
         },
-        payment,
+        payment: result.payment,
       },
     });
-  } catch (err) { next(err); }
+  } catch (err) {
+    if (err.status) return res.status(err.status).json({ success: false, message: err.message, code: err.code });
+    next(err);
+  }
 };
-
-// GET /api/debts/:id/payments
 exports.getPayments = async (req, res, next) => {
   try {
     const payments = await DebtPayment.find({ debt: req.params.id, userId: req.userId })

@@ -1,7 +1,7 @@
 import { Children, useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-function Select({ id, name, value, onChange, children, className, disabled, required, placeholderClassName }) {
+function Select({ id, name, value, onChange, children, className, disabled, required, placeholderClassName, maxVisibleOptions }) {
   const containerRef = useRef(null);
   const buttonRef = useRef(null);
   const listRef = useRef(null);
@@ -139,6 +139,7 @@ function Select({ id, name, value, onChange, children, className, disabled, requ
           role="listbox"
           aria-labelledby={buttonId}
           className="absolute z-40 mt-1.5 max-h-64 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 text-start shadow-lg"
+          style={maxVisibleOptions ? { maxHeight: `${maxVisibleOptions * 36 + 14}px` } : undefined}
         >
           {options.map((opt, index) => {
             const isSelected = index === selectedIndex;

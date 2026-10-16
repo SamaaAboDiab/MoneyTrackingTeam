@@ -259,7 +259,7 @@ function SavingsPage() {
         title={t("savings.title")}
         subtitle={t("savings.subtitle")}
         actions={
-          <button type="button" onClick={() => (showForm ? setShowForm(false) : openCreateForm())} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700">
+          <button type="button" onClick={() => (showForm ? setShowForm(false) : openCreateForm())} className="mali-primary-action inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700">
             <Plus size={16} />
             {t("savings.addGoal")}
           </button>

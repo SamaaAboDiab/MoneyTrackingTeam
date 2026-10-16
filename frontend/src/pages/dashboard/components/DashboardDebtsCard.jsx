@@ -53,7 +53,7 @@ function DashboardDebtsCard({ debts = [], debtSummary, currency: summaryCurrency
   return (
     <Link
       to="/debts"
-      className="card-hover block h-full rounded-2xl bg-white p-5 ring-1 ring-slate-100 emerald:ring-slate-200/80 sm:p-6"
+      className="mali-surface mali-surface-hover card-hover block h-full rounded-2xl bg-white p-5 ring-1 ring-slate-100 emerald:ring-slate-200/80 sm:p-6"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
         <div className="flex items-center gap-2.5">

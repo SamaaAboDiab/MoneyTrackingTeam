@@ -3,14 +3,16 @@ const Expense  = require("../models/Expense");
 const User     = require("../models/User");
 const Account  = require("../models/Account");
 const { recordTxn, reverseTxn, assertAccountsUsable } = require("./accountController");
+const withTransaction = require("../utils/withTransaction");
 
 // Income paid into an account is in that account's currency, whatever the client sent.
-async function accountCurrency(userId, accountId) {
+async function accountCurrency(userId, accountId, session) {
   if (!accountId) return null;
-  const acc = await Account.findOne({ _id: accountId, user: userId }).select("currency").lean();
-  return acc?.currency || null;
+  let query = Account.findOne({ _id: accountId, user: userId }).select("currency");
+  if (session) query = query.session(session);
+  const account = await query.lean();
+  return account?.currency || null;
 }
-
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const SUPPORTED_CURRENCIES = ["EGP", "USD", "EUR", "GBP"];
 
@@ -77,60 +79,63 @@ exports.create = async (req, res, next) => {
       }
     }
 
-    await assertAccountsUsable(req.userId, accountId);
+    let income;
+    await withTransaction(async (session) => {
+      await assertAccountsUsable(req.userId, accountId, session);
+      income = new Income({
+        user: req.userId,
+        name: name.trim(), category,
+        amount: parsedAmount,
+        currency: (await accountCurrency(req.userId, accountId, session)) || currency || "EGP",
+        receivedDate: parsedDate, recurrence: recurrence || "once",
+        status: status || "cleared", notes,
+        account: accountId || null,
+      });
+      await income.save({ session });
 
-    const income = await Income.create({
-      user: req.userId,
-      name: name.trim(), category,
-      amount: parsedAmount,
-      currency: (await accountCurrency(req.userId, accountId)) || currency || "EGP",
-      receivedDate: parsedDate, recurrence: recurrence || "once",
-      status: status || "cleared", notes,
-      account: accountId || null,
+      if (accountId) {
+        await recordTxn(req.userId, accountId, "credit", parsedAmount, name, parsedDate, "Income", income._id, undefined, session);
+      }
     });
 
-    if (accountId) {
-      await recordTxn(req.userId, accountId, "credit", parsedAmount, name, parsedDate, "Income", income._id);
-    }
-
-    res.status(201).json({ success: true, message: "تم إضافة مصدر الدخل بنجاح", data: income });
+    res.status(201).json({ success: true, message: "Income added successfully", data: income });
   } catch (err) { next(err); }
 };
-
-// PUT /api/income/:id
 exports.update = async (req, res, next) => {
   try {
-    const old = await Income.findOne({ _id: req.params.id, user: req.userId });
-    if (!old) return res.status(404).json({ success: false, message: "Income not found" });
-
-    await assertAccountsUsable(req.userId, old.account, req.body.accountId);
-
-    if (old.account) {
-      await reverseTxn(req.userId, "Income", old._id);
-    }
-
     const { name, category, amount, currency, receivedDate, recurrence, status, notes, accountId } = req.body;
+    let income;
+    await withTransaction(async (session) => {
+      const old = await Income.findOne({ _id: req.params.id, user: req.userId }).session(session);
+      if (!old) throw Object.assign(new Error("Income not found"), { status: 404 });
 
-    const income = await Income.findOneAndUpdate(
-      { _id: req.params.id, user: req.userId },
-      {
-        name, category,
-        amount: parseFloat(amount),
-        currency: (await accountCurrency(req.userId, accountId)) || currency || old.currency,
-        receivedDate, recurrence, status, notes,
-        account: accountId || null,
-      },
-      { new: true, runValidators: true }
-    );
+      const targetAccountId = accountId !== undefined ? (accountId || null) : old.account;
+      await assertAccountsUsable(req.userId, old.account, targetAccountId, session);
+      if (old.account) await reverseTxn(req.userId, "Income", old._id, session);
 
-    if (accountId) {
-      await recordTxn(req.userId, accountId, "credit", parseFloat(amount), name, new Date(receivedDate), "Income", income._id);
-    }
+      income = await Income.findOneAndUpdate(
+        { _id: req.params.id, user: req.userId },
+        {
+          name, category,
+          amount: parseFloat(amount),
+          currency: (await accountCurrency(req.userId, targetAccountId, session)) || currency || old.currency,
+          receivedDate, recurrence, status, notes,
+          account: targetAccountId,
+        },
+        { new: true, runValidators: true, session },
+      );
+
+      if (targetAccountId) {
+        await recordTxn(req.userId, targetAccountId, "credit", parseFloat(amount), name, new Date(receivedDate), "Income", income._id, undefined, session);
+      }
+    });
 
     res.json({ success: true, data: income });
-  } catch (err) { next(err); }
+  } catch (err) {
+    if (err.status) return res.status(err.status).json({ success: false, message: err.message, code: err.code });
+    next(err);
+  }
 };
-
 // PATCH /api/income/:id/toggle-recurrence
 // Pauses/resumes a recurring income without deleting it (US-102 AC #3).
 exports.toggleRecurrence = async (req, res, next) => {
@@ -148,20 +153,20 @@ exports.toggleRecurrence = async (req, res, next) => {
 // DELETE /api/income/:id
 exports.remove = async (req, res, next) => {
   try {
-    const income = await Income.findOne({ _id: req.params.id, user: req.userId });
-    if (!income) return res.status(404).json({ success: false, message: "Income not found" });
+    await withTransaction(async (session) => {
+      const income = await Income.findOne({ _id: req.params.id, user: req.userId }).session(session);
+      if (!income) throw Object.assign(new Error("Income not found"), { status: 404 });
 
-    await assertAccountsUsable(req.userId, income.account);
-
-    if (income.account) {
-      await reverseTxn(req.userId, "Income", income._id);
-    }
-
-    await income.deleteOne();
+      await assertAccountsUsable(req.userId, income.account, session);
+      if (income.account) await reverseTxn(req.userId, "Income", income._id, session);
+      await income.deleteOne({ session });
+    });
     res.json({ success: true, message: "Income deleted successfully" });
-  } catch (err) { next(err); }
+  } catch (err) {
+    if (err.status) return res.status(err.status).json({ success: false, message: err.message, code: err.code });
+    next(err);
+  }
 };
-
 // GET /api/income/summary?months=6
 exports.summary = async (req, res, next) => {
   try {

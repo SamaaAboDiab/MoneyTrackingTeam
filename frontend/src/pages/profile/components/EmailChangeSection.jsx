@@ -132,7 +132,7 @@ function EmailChangeSection({ t, currentEmail, securityRequest, onClearRequest }
                   <button
                     type="submit"
                     disabled={emailConfirmStatus === "loading"}
-                    className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 disabled:cursor-wait disabled:opacity-65"
+                    className="mali-primary-action inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 disabled:cursor-wait disabled:opacity-65"
                   >
                     {emailConfirmStatus === "loading" ? t("profile.email.confirming") : t("profile.email.confirm")}
                   </button>
@@ -171,7 +171,7 @@ function EmailChangeSection({ t, currentEmail, securityRequest, onClearRequest }
                   <button
                     type="submit"
                     disabled={emailRequestStatus === "loading"}
-                    className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 disabled:cursor-wait disabled:opacity-65"
+                    className="mali-primary-action inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 disabled:cursor-wait disabled:opacity-65"
                   >
                     {emailRequestStatus === "loading" ? t("profile.email.sending") : t("profile.email.sendCode")}
                   </button>

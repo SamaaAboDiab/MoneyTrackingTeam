@@ -1,9 +1,5 @@
 require("dotenv").config();
 
-const dns = require("dns");
-
-dns.setServers(["8.8.8.8"]);
-
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -28,30 +24,39 @@ const chatRoutes       = require("./routes/chat");
 const notificationRoutes = require("./routes/notifications");
 const userExtrasRoutes = require("./routes/userExtras");
 
-if (!process.env.JWT_ADMIN_SECRET) {
-  console.error("JWT_ADMIN_SECRET is missing in .env — admin tokens need their own secret.");
+const missingSecrets = ["JWT_SECRET", "JWT_ADMIN_SECRET"].filter((name) => !process.env[name]);
+if (missingSecrets.length) {
+  console.error("Missing required environment variables: " + missingSecrets.join(", "));
   process.exit(1);
 }
 if (process.env.JWT_ADMIN_SECRET === process.env.JWT_SECRET) {
-  console.warn("⚠️  JWT_ADMIN_SECRET should be different from JWT_SECRET.");
+  console.warn("JWT_ADMIN_SECRET should be different from JWT_SECRET.");
 }
-
 const app = express();
 
 // Middleware
 app.use(helmet());
-const allowedOrigins = (process.env.CLIENT_URL ?? "http://localhost:3000").split(",").map(s => s.trim());
+const isProduction = process.env.NODE_ENV === "production";
+const defaultClientUrl = isProduction ? "" : "http://localhost:5174";
+const allowedOrigins = new Set(
+  (process.env.CLIENT_URL ?? defaultClientUrl)
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+);
+if (isProduction && allowedOrigins.size === 0) {
+  console.error("CLIENT_URL must be configured in production.");
+  process.exit(1);
+}
 app.use(cors({
   credentials: true,
   origin: (origin, cb) => {
-    // Allow requests with no origin (mobile apps, curl, Postman)
+    // Allow requests with no origin (mobile apps, curl, Postman).
     if (!origin) return cb(null, true);
-    // Allow localhost and any private-network IP (192.168.x.x, 172.x.x.x, 10.x.x.x)
-    if (
-      allowedOrigins.includes(origin) ||
-      /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
-      /^http:\/\/(192\.168\.|172\.\d+\.|10\.)\d+\.\d+(:\d+)?$/.test(origin)
-    ) return cb(null, true);
+    if (allowedOrigins.has(origin)) return cb(null, true);
+    if (!isProduction && /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return cb(null, true);
+    }
     cb(new Error("CORS: origin not allowed"));
   },
 }));

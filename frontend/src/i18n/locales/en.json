@@ -51,15 +51,15 @@
       "passwordLabel": "Password",
       "confirmPasswordLabel": "Confirm password",
       "passwordMismatch": "Password and confirmation do not match",
-      "agreeTerms": "I agree to the Terms & Conditions",
-      "mustAgreeTerms": "You must agree to the Terms & Conditions to continue",
+      "agreeTerms": "I agree to the terms and conditions",
+      "mustAgreeTerms": "You must agree to the terms and conditions to continue",
       "submit": "Create account",
       "submitting": "Creating...",
       "haveAccount": "Already have an account?",
       "loginLink": "Log in"
     },
     "login": {
-      "title": "Welcome Back!",
+      "title": "Welcome back!",
       "subtitle": "Log in to keep track of your money with ease.",
       "registeredSuccess": "Account created successfully, log in now",
       "passwordResetSuccess": "Password changed successfully, log in with your new password",
@@ -178,9 +178,9 @@
   },
   "layout": {
     "brand": "Mali",
-    "tagline": "Personal Finance",
+    "tagline": "Personal finance",
     "logout": "Log out",
-    "logoutConfirmTitle": "Log Out?",
+    "logoutConfirmTitle": "Log out?",
     "logoutConfirmMessage": "Are you sure you want to log out of your account? You'll need to sign in again to access your data.",
     "cancel": "Cancel",
     "userMenu": {
@@ -188,9 +188,9 @@
     },
     "upgradeTitle": "Upgrade to Premium",
     "upgradeSubtitle": "Pick a plan and keep every feature after your free trial.",
-    "upgradeButton": "Upgrade Now",
+    "upgradeButton": "Upgrade now",
     "notifications": "Notifications",
-    "quickActionLabel": "New Transfer",
+    "quickActionLabel": "New transfer",
     "collapseSidebar": "Collapse sidebar",
     "expandSidebar": "Expand sidebar",
     "mobileNav": {
@@ -291,7 +291,8 @@
     "activeTitle": "Active accounts",
     "viewActive": "Show active accounts",
     "viewArchived": "Show archived accounts",
-    "emptyArchived": "No archived accounts."
+    "emptyArchived": "No archived accounts.",
+    "historyTitleFallback": "Transaction history"
   },
   "income": {
     "title": "Income sources",
@@ -374,9 +375,11 @@
     "totalLabel": "Total expenses",
     "totalFilteredSuffix": "(filtered)",
     "addFormTitle": "Add new expense",
+    "formSubtitle": "Add the details you need to keep your spending organized.",
     "fields": {
       "description": "Description",
       "amount": "Amount",
+      "currency": "Currency",
       "date": "Date",
       "paymentMethod": "Payment method",
       "expenseType": "Expense type",
@@ -384,10 +387,11 @@
       "account": "Account to deduct from (optional)",
       "notes": "Notes (optional)"
     },
-    "descriptionPlaceholder": "e.g. Groceries, internet bill, car maintenance...",
+    "descriptionPlaceholder": "e.g. groceries, internet bill, car maintenance...",
     "noAccountOption": "No account selected",
+    "currencyFromAccount": "From account",
     "unknownAccount": "Account",
-    "notesPlaceholder": "Add any extra details or notes here (optional)...",
+    "notesPlaceholder": "Any notes?",
     "paymentMethod": {
       "cash": "Cash",
       "card": "Card",
@@ -455,7 +459,7 @@
       "title": "Insufficient balance",
       "message": "\"{{account}}\" only has {{balance}}, but this expense is {{amount}}. The account will go negative. Continue anyway?",
       "cancel": "Cancel",
-      "confirm": "Continue Anyway"
+      "confirm": "Continue anyway"
     },
     "validation": {
       "typeAndCategoryRequired": "Please select the expense type and category."
@@ -510,7 +514,7 @@
   },
   "debts": {
     "subtitle": "Track your debts, due dates, and payments made to each creditor.",
-    "addNew": "Add New Debt",
+    "addNew": "Add new debt",
     "cancel": "Cancel",
     "createValidationError": "Please fill in all required fields (creditor, amount, currency, start date, due date).",
     "createSuccess": "Debt added successfully",
@@ -537,102 +541,102 @@
       "confirm": "Continue anyway"
     },
     "form": {
-      "title": "Register a New Debt",
+      "title": "Register a new debt",
       "requiredNote": "All fields marked (*) are required",
-      "creditorLabel": "Creditor Name",
+      "creditorLabel": "Creditor name",
       "creditorPlaceholder": "e.g. National Bank, Mohamed Ahmed",
-      "totalAmountLabel": "Total Amount",
+      "totalAmountLabel": "Total amount",
       "currencyLabel": "Currency",
       "categoryLabel": "Category",
-      "startDateLabel": "Debt Start Date",
-      "dueDateLabel": "Expected Due Date",
-      "notesLabel": "Notes (Optional)",
+      "startDateLabel": "Debt start date",
+      "dueDateLabel": "Expected due date",
+      "notesLabel": "Notes (optional)",
       "notesPlaceholder": "Add any other details or payment terms...",
-      "save": "Save Debt",
+      "save": "Save debt",
       "saving": "Saving..."
     },
     "category": {
       "other": "Other",
       "personal": "Personal",
-      "credit_card": "Credit Card",
-      "auto_loan": "Auto Loan",
+      "credit_card": "Credit card",
+      "auto_loan": "Auto loan",
       "mortgage": "Mortgage",
-      "student": "Student Loan"
+      "student": "Student loan"
     },
     "tabs": {
-      "active": "Active Debts",
-      "overdue": "Overdue Debts",
-      "completed": "Completed Debts",
+      "active": "Active debts",
+      "overdue": "Overdue debts",
+      "completed": "Completed debts",
       "all": "All"
     },
-    "loading": "Loading Debts...",
+    "loading": "Loading debts...",
     "empty": {
-      "activeTitle": "No active debts right now! Well done",
+      "activeTitle": "No active debts right now. Well done!",
       "completedTitle": "No fully paid debts yet.",
       "overdueTitle": "No overdue debts.",
       "allTitle": "No debts recorded.",
       "activeSubtitle": "All your financial commitments are fully paid.",
-      "otherSubtitle": "Tap \"Add New Debt\" to register a new one.",
+      "otherSubtitle": "Tap \"Add new debt\" to register a new one.",
       "overdueSubtitle": "All your active debts are on schedule."
     },
     "overdueBanner": "Alert: this debt is past its due date!",
     "status": {
-      "paid": "Paid Off",
+      "paid": "Paid off",
       "overdue": "Overdue",
-      "dueSoon": "Due Soon",
+      "dueSoon": "Due soon",
       "active": "Active"
     },
-    "clickForHistory": "Tap to View Payment History",
+    "clickForHistory": "Tap to view payment history",
     "amounts": {
-      "original": "Original Amount",
-      "paid": "Total Paid",
+      "original": "Original amount",
+      "paid": "Total paid",
       "remaining": "Remaining"
     },
-    "progressLabel": "Repayment Progress",
-    "progressComplete": "100% (Complete)",
-    "startDatePrefix": "Start Date:",
-    "dueDatePrefix": "Expected Due Date:",
+    "progressLabel": "Repayment progress",
+    "progressComplete": "100% (complete)",
+    "startDatePrefix": "Start date:",
+    "dueDatePrefix": "Expected due date:",
     "dueSoonMessage": {
       "today": "Alert: payment due today",
       "tomorrow": "Alert: payment due tomorrow",
       "inDays_one": "Alert: payment due in {{count}} day",
       "inDays_other": "Alert: payment due in {{count}} days"
     },
-    "editDueDate": "Edit Due Date",
-    "saveDate": "Save Date",
+    "editDueDate": "Edit due date",
+    "saveDate": "Save date",
     "forecast": {
       "averageMonthly": "Your average monthly payment: {{amount}}",
       "notEnoughData": "Add more payments to calculate a forecast",
       "payoffBy": "At your current payment rate, you'll pay off this debt by {{date}}"
     },
     "actions": {
-      "addPayment": "Add Payment",
-      "markPaid": "Mark as Paid",
-      "showHistory": "Payment History",
-      "hideHistory": "Hide History",
+      "addPayment": "Add payment",
+      "markPaid": "Mark as paid",
+      "showHistory": "Payment history",
+      "hideHistory": "Hide history",
       "delete": "Delete"
     },
     "history": {
-      "title": "Recorded Payments ({{count}})",
-      "addNew": "+ Add New Payment",
-      "loading": "Loading Payment History...",
+      "title": "Recorded payments ({{count}})",
+      "addNew": "+ Add new payment",
+      "loading": "Loading payment history...",
       "empty": "No payments recorded yet for this debt.",
-      "unknownAccount": "Selected Account"
+      "unknownAccount": "Selected account"
     },
     "paymentModal": {
-      "title": "Record a New Payment",
-      "payingFor": "Paying Creditor:",
-      "remainingLabel": "Remaining Balance on This Debt:",
+      "title": "Record a new payment",
+      "payingFor": "Paying creditor:",
+      "remainingLabel": "Remaining balance on this debt:",
       "amountLabel": "Amount",
       "dateLabel": "Date",
-      "accountLabel": "Account to Pay From",
-      "selectAccount": "Select Account",
+      "accountLabel": "Account to pay from",
+      "selectAccount": "Select account",
       "accountOption": "{{name}} (balance: {{balance}} {{currency}})",
       "accountHint": "The payment amount will be deducted automatically from the selected account's balance.",
       "notesLabel": "Notes (optional)",
       "notesPlaceholder": "e.g. October installment, bank transfer",
       "cancel": "Cancel",
-      "confirm": "Confirm Payment",
+      "confirm": "Confirm payment",
       "saving": "Saving..."
     },
     "confirmTitle": "Are you sure?",
@@ -642,33 +646,33 @@
   "profile": {
     "title": "Profile",
     "subtitle": "View and update your personal information.",
-    "sectionsLabel": "Profile Sections",
+    "sectionsLabel": "Profile sections",
     "tabs": {
-      "information": "Personal Information",
+      "information": "Personal information",
       "security": "Security",
       "preferences": "Preferences",
       "subscription": "Subscription"
     },
-    "changePhoto": "Change Photo",
-    "removePhoto": "Remove Photo",
+    "changePhoto": "Change photo",
+    "removePhoto": "Remove photo",
     "avatarError": "Something went wrong with the photo.",
-    "editTitle": "Personal Information",
-    "nameLabel": "Full Name",
-    "editName": "Edit Name",
-    "editEmail": "Edit Email",
-    "editPassword": "Change Password",
-    "phoneLabel": "Phone Number",
-    "editPhone": "Edit Phone",
+    "editTitle": "Personal information",
+    "nameLabel": "Full name",
+    "editName": "Edit name",
+    "editEmail": "Edit email",
+    "editPassword": "Change password",
+    "phoneLabel": "Phone number",
+    "editPhone": "Edit phone",
     "phonePlaceholder": "e.g. 01000000000",
     "phone": {
-      "sectionTitle": "Phone Number",
+      "sectionTitle": "Phone number",
       "description": "Update the phone number associated with your account.",
       "notSet": "No phone number added",
       "success": "Phone number updated successfully.",
       "cancel": "Cancel"
     },
     "emailLabel": "Email",
-    "save": "Save Changes",
+    "save": "Save changes",
     "saving": "Saving...",
     "saveSuccess": "Your information has been updated.",
     "security": {
@@ -676,18 +680,18 @@
       "subtitle": "Manage your sign-in details and help keep your account secure."
     },
     "email": {
-      "sectionTitle": "Email Address",
-      "title": "Change Email",
+      "sectionTitle": "Email address",
+      "title": "Change email",
       "subtitle": "A verification code will be sent to the new email before it's activated.",
-      "newEmailLabel": "New Email",
-      "sendCode": "Send Verification Code",
+      "newEmailLabel": "New email",
+      "sendCode": "Send verification code",
       "sending": "Sending...",
       "codeSentMessage": "A 6-digit code was sent to the new email. It's valid for 15 minutes.",
       "codeLabel": "Verification code",
-      "confirm": "Confirm Change",
+      "confirm": "Confirm change",
       "confirming": "Confirming...",
       "changeSuccess": "Email changed successfully",
-      "changeEmail": "Change Email",
+      "changeEmail": "Change email",
       "cancel": "Cancel",
       "done": "Done"
     },
@@ -696,12 +700,12 @@
       "hidden": "Password is hidden",
       "description": "Update your password to help keep your account secure.",
       "title": "Change password",
-      "currentLabel": "Current Password",
-      "newLabel": "New Password",
-      "confirmLabel": "Confirm New Password",
+      "currentLabel": "Current password",
+      "newLabel": "New password",
+      "confirmLabel": "Confirm new password",
       "hint": "At least 8 characters, with an uppercase letter and a digit.",
       "mismatch": "The new password and its confirmation don't match",
-      "submit": "Change Password",
+      "submit": "Change password",
       "submitting": "Changing...",
       "success": "Password changed successfully",
       "cancel": "Cancel"
@@ -761,7 +765,7 @@
     "formTitleNew": "New category",
     "formTitleEdit": "Edit category",
     "nameLabel": "Name",
-    "namePlaceholder": "e.g. Maintenance, Subscriptions, Gifts...",
+    "namePlaceholder": "e.g. maintenance, subscriptions, gifts...",
     "nameLocked": "A default category's name can't be changed",
     "typeLabel": "Type",
     "typeLocked": "A default category's type can't be changed",
@@ -783,15 +787,16 @@
       "none": "No categories yet.",
       "loading": "Loading...",
       "newTitle": "New category",
-      "newPlaceholder": "e.g. Subscriptions, Maintenance, Gifts...",
+      "newPlaceholder": "e.g. subscriptions, maintenance, gifts...",
       "add": "Add",
       "adding": "Adding...",
       "addOption": "Add new category...",
+      "editTitle": "Edit this category",
       "deleteTitle": "Delete this category"
     }
   },
   "savings": {
-    "title": "Savings Goals",
+    "title": "Savings goals",
     "subtitle": "Set targets and track your progress toward them.",
     "addGoal": "Add goal",
     "cancel": "Cancel",
@@ -818,7 +823,7 @@
       "requiredNote": "* required",
       "emojiLabel": "Icon",
       "nameLabel": "Goal name",
-      "namePlaceholder": "e.g. New laptop",
+      "namePlaceholder": "e.g. new laptop",
       "targetAmountLabel": "Target amount",
       "currencyLabel": "Currency",
       "targetDateLabel": "Target date",
@@ -891,7 +896,7 @@
     "totalSaved": "Total saved"
   },
   "reports": {
-    "title": "Reports & Analytics",
+    "title": "Reports & analytics",
     "subtitle": "Detailed financial analysis and insights",
     "loading": "Loading report...",
     "loadError": "Could not load this report.",
@@ -903,20 +908,20 @@
       "1m": "1M"
     },
     "tabs": {
-      "incomeExpenses": "Income vs Expenses",
+      "incomeExpenses": "Income vs expenses",
       "categories": "Categories",
-      "cashFlow": "Cash Flow",
-      "savingsRate": "Savings Rate",
-      "netWorth": "Net Worth",
-      "debtProgress": "Debt Progress",
-      "habits": "Spending Habits"
+      "cashFlow": "Cash flow",
+      "savingsRate": "Savings rate",
+      "netWorth": "Net worth",
+      "debtProgress": "Debt progress",
+      "habits": "Spending habits"
     },
     "incomeExpenses": {
       "avgExpenses": "Avg monthly spend",
       "netSavings": "Net savings",
       "totalExpenses": "Total expenses",
       "totalIncome": "Total income",
-      "chartTitle": "Monthly Comparison",
+      "chartTitle": "Monthly comparison",
       "net": "Net",
       "savingsRateNote": "{{rate}} of income"
     },
@@ -1455,7 +1460,7 @@
     "quickReplies": {
       "title": "Quick replies",
       "add": "Add reply",
-      "namePlaceholder": "Name (e.g. How to renew)",
+      "namePlaceholder": "Name (e.g. how to renew)",
       "textPlaceholder": "Reply text",
       "save": "Save reply",
       "saveError": "Couldn't save the reply",
@@ -1773,7 +1778,7 @@
   },
   "theme": {
     "mali": {
-      "name": "Classic",
+      "name": "Gray",
       "description": "Slate gray and orange, with a white sidebar."
     },
     "emerald": {

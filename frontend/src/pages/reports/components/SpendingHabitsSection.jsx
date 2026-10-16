@@ -6,7 +6,7 @@ import { Bar, BarChart, CartesianGrid, Cell, ReferenceLine, ResponsiveContainer,
 import ChartTooltip from "../../../components/charts/ChartTooltip";
 import { BAR_CURSOR, BAR_RADIUS, CHART_COLORS, GRID_PROPS, useChartLayout } from "../../../components/charts/chartTheme";
 import Money from "../../../components/common/Money";
-import { categoryLabel } from "../../categories/components/mandatoryCategories";
+import { categoryLabel, getCategoryDisplayColor } from "../../categories/components/mandatoryCategories";
 import { weekdayLabel } from "../labels";
 import { ReportSkeleton } from "../../../components/common/Skeleton";
 
@@ -104,7 +104,7 @@ function SpendingHabitsSection({ data, loading }) {
                 <li key={cat.id}>
                   <div className="flex items-center justify-between gap-3 text-sm">
                     <span className="flex min-w-0 items-center gap-2 font-medium text-slate-700">
-                      <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: cat.color }} />
+                      <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: getCategoryDisplayColor(cat) }} />
                       <span className="truncate">{categoryLabel(cat.name)}</span>
                     </span>
                     <span className="tabular-amount shrink-0 font-semibold text-slate-900">
@@ -112,7 +112,7 @@ function SpendingHabitsSection({ data, loading }) {
                     </span>
                   </div>
                   <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-full rounded-full" style={{ width: `${(cat.total / topCategoryMax) * 100}%`, backgroundColor: cat.color }} />
+                    <div className="h-full rounded-full" style={{ width: `${(cat.total / topCategoryMax) * 100}%`, backgroundColor: getCategoryDisplayColor(cat) }} />
                   </div>
                 </li>
               ))}

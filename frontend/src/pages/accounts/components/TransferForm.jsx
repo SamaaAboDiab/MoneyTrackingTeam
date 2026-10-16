@@ -70,7 +70,7 @@ function TransferForm({ form, accounts, status, error, formError, lastTransfer, 
       <button
         type="submit"
         disabled={transferStatus === "loading"}
-        className="mt-6 min-h-11 w-full rounded-xl bg-brand-600 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mali-primary-action mt-6 min-h-11 w-full rounded-xl bg-brand-600 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {transferStatus === "loading" ? t("transfer.submitting") : t("transfer.submit")}
       </button>

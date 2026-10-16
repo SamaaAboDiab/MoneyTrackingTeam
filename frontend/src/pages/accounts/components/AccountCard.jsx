@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Archive, ArchiveRestore, ArrowLeft, Banknote, ChevronRight, Landmark, Smartphone } from "lucide-react";
+import { Archive, ArchiveRestore, ArrowLeft, Banknote, Landmark, Smartphone } from "lucide-react";
 import AdjustBalanceButton from "./AdjustBalanceModal";
 import { formatMoney } from "../../../utils/formatAmount";
 import Money from "../../../components/common/Money";
@@ -16,58 +16,74 @@ function accountLook(account) {
   };
 }
 
-// Mali: a quiet white card. The account's color is only a small dot; the balance leads.
+// Gray theme: clear account details with a quiet gray-and-orange palette.
 function MaliAccountCard({ account, adjustStatus, onAdjust, onToggleArchive, t }) {
-  const { Icon, color, negative } = accountLook(account);
+  const { Icon, negative } = accountLook(account);
   const archiveLabel = account.isArchived ? t("accounts.reactivate") : t("accounts.archive");
 
   return (
     <article
-      className={`group flex flex-col card-hover rounded-2xl border border-slate-200 bg-white p-5 ${
+      className={`mali-surface mali-surface-hover group flex min-h-[17rem] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
         account.isArchived ? "opacity-60" : ""
       }`}
     >
-      <Link to={`/accounts/${account._id}/transactions`} className="flex items-center gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
-          <Icon size={18} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-slate-900">{account.name}</p>
-          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
-            <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
-            {t(`accounts.${account.type}`)} · {account.currency || "EGP"}
-          </p>
-        </div>
-        <ChevronRight size={16} className="shrink-0 text-slate-300 transition group-hover:text-slate-500 rtl:rotate-180" />
-      </Link>
-
-      <div className="mt-6">
-        <p className="text-[11px] font-medium text-slate-500">{t("accounts.balance")}</p>
-        <p className={`mt-1 text-2xl font-bold tracking-tight ${negative ? "text-expense" : "text-slate-900"}`}>
-          <Money value={account.balance} currency={account.currency} currencyClassName={negative ? "" : undefined} />
-        </p>
+      <div className="bg-gradient-to-l from-accent-50 to-slate-50/70 px-5 py-5">
+        <Link
+          to={`/accounts/${account._id}/transactions`}
+          className="flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/15"
+        >
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-700 text-white shadow-sm">
+            <Icon size={22} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <strong className="block truncate text-base font-bold text-slate-900">{account.name}</strong>
+            <span className="mt-1.5 flex flex-wrap gap-1.5">
+              <span className="rounded-full border border-slate-200 bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                {t(`accounts.${account.type}`)}
+              </span>
+              <span className="rounded-full border border-slate-200 bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                {account.currency || "EGP"}
+              </span>
+            </span>
+          </span>
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/80 text-slate-400 transition group-hover:text-slate-700">
+            <ArrowLeft size={16} className="ltr:rotate-180" />
+          </span>
+        </Link>
       </div>
 
-      <div className="mt-5 flex items-center gap-1 border-t border-slate-100 pt-3">
-        {!account.isArchived && (
-          <AdjustBalanceButton
-            account={account}
-            onSubmit={onAdjust}
-            disabled={adjustStatus === "loading"}
-            triggerClassName="inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
-          />
-        )}
-        <button
-          type="button"
-          onClick={() => onToggleArchive(account._id)}
-          title={archiveLabel}
-          className={`inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold transition ${
-            account.isArchived ? "text-slate-700 hover:bg-slate-100" : "ms-auto text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-          }`}
-        >
-          {account.isArchived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
-          {archiveLabel}
-        </button>
+      <div className="flex flex-1 flex-col px-5 pb-5">
+        <div className="mt-auto pt-5">
+          <p className="text-xs font-medium text-slate-500">{t("accounts.balance")}</p>
+          <p className={`tabular-amount mt-1 text-[1.75rem] font-bold leading-tight tracking-tight ${negative ? "text-expense" : "text-slate-900"}`}>
+            <Money value={account.balance} currency={account.currency} currencyClassName={negative ? "" : undefined} />
+          </p>
+        </div>
+
+        <div className="mt-5 flex items-center gap-2 border-t border-slate-100 pt-4">
+          {!account.isArchived && (
+            <AdjustBalanceButton
+              account={account}
+              onSubmit={onAdjust}
+              disabled={adjustStatus === "loading"}
+              triggerClassName="inline-flex min-h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-accent-50 px-3 text-sm font-bold text-accent-700 transition hover:bg-accent-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent-500/15"
+            />
+          )}
+          <button
+            type="button"
+            onClick={() => onToggleArchive(account._id)}
+            title={archiveLabel}
+            aria-label={archiveLabel}
+            className={`inline-flex min-h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/15 ${
+              account.isArchived
+                ? "flex-1 border-brand-200 bg-brand-50 text-brand-700 hover:bg-brand-100"
+                : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            {account.isArchived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
+            <span className={account.isArchived ? "" : "hidden sm:inline"}>{archiveLabel}</span>
+          </button>
+        </div>
       </div>
     </article>
   );

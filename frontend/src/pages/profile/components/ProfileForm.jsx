@@ -42,7 +42,7 @@ function ProfileForm({ user, t, onEditSecurity }) {
   };
 
   return (
-    <section className="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
+    <section className="mali-surface flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
       <div className="mb-5">
         <h2 className="text-base font-bold text-slate-900">{t("profile.editTitle")}</h2>
       </div>
@@ -159,7 +159,7 @@ function ProfileForm({ user, t, onEditSecurity }) {
           <button
             type="submit"
             disabled={profileStatus === "loading"}
-            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 disabled:cursor-wait disabled:opacity-65 sm:ms-auto"
+            className="mali-primary-action inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20 disabled:cursor-wait disabled:opacity-65 sm:ms-auto"
           >
             {profileStatus === "loading" ? t("profile.saving") : t("profile.save")}
           </button>

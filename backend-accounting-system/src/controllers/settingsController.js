@@ -1,8 +1,9 @@
 const crypto = require("crypto");
 const User   = require("../models/User");
 const { sendEmailVerificationCode } = require("../services/mailer");
+const { getPasswordPolicyError } = require("../utils/passwordPolicy");
 
-// In-memory email verification codes: userId → { email, code, expiresAt }
+// In-memory verification codes: userId → { email, codeHash, attempts, expiresAt }
 const emailCodes = new Map();
 
 /* ── GET /api/settings/profile ──────────────────────── */
@@ -33,11 +34,11 @@ exports.updateProfile = async (req, res, next) => {
 /* ── POST /api/settings/email/request ───────────────── */
 exports.requestEmailChange = async (req, res, next) => {
   try {
-    const { email } = req.body;
-    if (!email || !email.trim()) {
+    const { email } = req.body ?? {};
+    if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       return res.status(400).json({ success: false, message: "الإيميل مطلوب" });
     }
-    const newEmail = email.toLowerCase().trim();
+    const newEmail = email.trim().toLowerCase();
 
     // Block if same as current
     const current = await User.findById(req.userId).select("email");
@@ -51,8 +52,14 @@ exports.requestEmailChange = async (req, res, next) => {
       return res.status(409).json({ success: false, message: "الإيميل ده مستخدم بالفعل" });
     }
 
-    const code = String(Math.floor(100000 + Math.random() * 900000));
-    emailCodes.set(req.userId, { email: newEmail, code, expiresAt: Date.now() + 15 * 60 * 1000 });
+    const code = String(crypto.randomInt(100000, 1000000));
+    const codeHash = crypto.createHash("sha256").update(code).digest("hex");
+    emailCodes.set(req.userId, {
+      email: newEmail,
+      codeHash,
+      attempts: 0,
+      expiresAt: Date.now() + 15 * 60 * 1000,
+    });
 
     await sendEmailVerificationCode(newEmail, code);
     res.json({ success: true, message: "تم إرسال كود التحقق" });
@@ -62,13 +69,23 @@ exports.requestEmailChange = async (req, res, next) => {
 /* ── POST /api/settings/email/confirm ───────────────── */
 exports.confirmEmailChange = async (req, res, next) => {
   try {
-    const { code } = req.body;
+    const { code } = req.body ?? {};
     const entry = emailCodes.get(req.userId);
 
     if (!entry || Date.now() > entry.expiresAt) {
+      emailCodes.delete(req.userId);
       return res.status(400).json({ success: false, message: "الكود منتهي أو غير صالح، أعد الإرسال" });
     }
-    if (String(code).trim() !== entry.code) {
+    const submittedHash = crypto.createHash("sha256")
+      .update(typeof code === "string" ? code.trim() : "")
+      .digest();
+    const expectedHash = Buffer.from(entry.codeHash, "hex");
+    if (!crypto.timingSafeEqual(submittedHash, expectedHash)) {
+      entry.attempts += 1;
+      if (entry.attempts >= 5) {
+        emailCodes.delete(req.userId);
+        return res.status(429).json({ success: false, message: "Too many incorrect codes. Request a new code." });
+      }
       return res.status(400).json({ success: false, message: "الكود غلط" });
     }
 
@@ -146,16 +163,8 @@ exports.changePassword = async (req, res, next) => {
     if (newPassword !== confirmPassword) {
       return res.status(400).json({ success: false, message: "كلمة السر الجديدة مش متطابقة" });
     }
-    if (newPassword.length < 8) {
-      return res.status(400).json({ success: false, message: "كلمة السر لازم تكون 8 حروف على الأقل" });
-    }
-    if (!/[A-Z]/.test(newPassword)) {
-      return res.status(400).json({ success: false, message: "كلمة السر لازم تحتوي على حرف كبير" });
-    }
-    if (!/[0-9]/.test(newPassword)) {
-      return res.status(400).json({ success: false, message: "كلمة السر لازم تحتوي على رقم" });
-    }
-
+    const passwordError = getPasswordPolicyError(newPassword);
+    if (passwordError) return res.status(400).json({ success: false, message: passwordError });
     const user = await User.findById(req.userId).select("+password");
     if (!user || !(await user.comparePassword(currentPassword))) {
       return res.status(401).json({ success: false, message: "كلمة السر الحالية غير صحيحة" });

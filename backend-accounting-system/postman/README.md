@@ -185,17 +185,17 @@ node scripts/createAdmin.js <email> <password> [name]
 | # | المشكلة | فين |
 |---|---|---|
 | 1 | ~~راوت `seed` للأدمن مفتوح للعامة~~ ✅ اتصلحت (404 في production + `x-seed-secret`) | `POST /api/admin/auth/seed` |
-| 2 | إيقاف اليوزر مبيبطّلش توكنه الحالي | `POST /api/admin/users/:id/suspend` |
-| 3 | التحويلات مفيهاش MongoDB transactions | `POST /api/accounts/transfer` |
-| 4 | الإيداع الزايد عن الهدف بيضيّع فلوس | `POST /api/savings/:id/deposit` |
-| 5 | مفيش تحقق إن `fromId !== toId` في التحويل | `POST /api/accounts/transfer` |
+| 2 | ~~User suspension does not invalidate an existing token~~ ✅ requests from suspended users are rejected by auth middleware | src/middleware/auth.js |
+| 3 | ~~Transfers can partially update balances and ledger entries~~ ✅ account transfers now use MongoDB transactions | POST /api/accounts/transfer |
+| 4 | ~~Savings deposits could exceed the target~~ ✅ deposits above the remaining target are rejected | POST /api/savings/:id/deposit |
+| 5 | ~~Transfers did not reject the same source and destination~~ ✅ same-account transfers are rejected | POST /api/accounts/transfer |
 | 6 | مفيش عداد محاولات لكود تأكيد الإيميل | `POST /api/settings/email/confirm` |
 | 7 | شروط الباسورد في مكان واحد بس من 4 | `PUT /api/settings/password` |
 | 8 | مشكلة N+1 query | `GET /api/reports/categories` |
 | 9 | صور base64 متخزنة في الداتابيز | `POST /api/settings/photo` |
 | 10 | ~~مفيش rate limit على دخول الأدمن~~ ✅ اتصلحت (5 محاولات غلط / 5 دقايق) | `POST /api/admin/auth/login` |
-| 11 | `express.json()` حده 100kb والصور لحد 5MB | `src/index.js` |
-| 12 | الأسعار hard-coded في الـ controller | `GET /api/admin/dashboard` |
+| 11 | ~~The JSON parser limit was documented as 100 KB~~ ✅ current limit is 10 MB; avatar images are capped at 5 MB | src/index.js, src/controllers/settingsController.js |
+| 12 | ~~Plan prices were hard-coded in the dashboard controller~~ ✅ prices come from admin payment settings or environment defaults | src/config/subscriptionPlans.js |
 
 ---
 

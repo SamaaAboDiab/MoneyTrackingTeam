@@ -63,7 +63,7 @@ function DebtCard({ debt, expandedHistoryDebtId, paymentHistory, loadingHistoryD
               className={inputClass}
             />
           </div>
-          <button type="submit" disabled={savingDueDate} className="min-h-11 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60">
+          <button type="submit" disabled={savingDueDate} className="mali-primary-action min-h-11 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60">
             {savingDueDate ? t("debts.form.saving") : t("debts.saveDate")}
           </button>
           <button type="button" onClick={() => setEditingDueDateId(null)} className="min-h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
@@ -207,7 +207,7 @@ function DebtCard({ debt, expandedHistoryDebtId, paymentHistory, loadingHistoryD
 
   return (
     <article
-      className={`@container card-hover relative flex h-full flex-col rounded-2xl border bg-white focus-within:z-20 ${
+      className={`mali-surface mali-surface-hover @container card-hover relative flex h-full flex-col rounded-2xl border bg-white focus-within:z-20 ${
         overdue ? "border-red-300 ring-1 ring-red-200 [--card-hover-border:var(--color-red-400)]" : "border-slate-200"
       }`}
     >
@@ -316,7 +316,7 @@ function DebtCard({ debt, expandedHistoryDebtId, paymentHistory, loadingHistoryD
             <button
               type="button"
               onClick={(e) => openPaymentModal(debt, e)}
-              className="col-span-2 inline-flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-3 text-sm font-semibold text-white shadow-sm shadow-brand-600/20 transition hover:bg-brand-700 active:scale-[0.98] @md:min-h-10 @md:flex-1 @3xl:w-44 @3xl:flex-none"
+              className="mali-primary-action col-span-2 inline-flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-3 text-sm font-semibold text-white shadow-sm shadow-brand-600/20 transition hover:bg-brand-700 active:scale-[0.98] @md:min-h-10 @md:flex-1 @3xl:w-44 @3xl:flex-none"
             >
               <Plus size={16} className="shrink-0" />
               <span className="truncate">{t("debts.actions.addPayment")}</span>

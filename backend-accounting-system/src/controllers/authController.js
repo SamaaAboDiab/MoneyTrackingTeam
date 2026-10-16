@@ -4,6 +4,7 @@ const User = require("../models/User");
 const Admin = require("../models/Admin");
 const ExpenseCategory = require("../models/ExpenseCategory");
 const { calcEnd } = require("../utils/subscription");
+const { getPasswordPolicyError } = require("../utils/passwordPolicy");
 const { signAdminToken, ADMIN_TOKEN_TTL } = require("../utils/adminToken");
 const {
   sendPasswordResetLink,
@@ -66,8 +67,19 @@ function signToken(id, rememberMe = false) {
 
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
-    const exists = await User.findOne({ email });
+    const { name, email, password } = req.body ?? {};
+    const normalizedName = typeof name === "string" ? name.trim() : "";
+    const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+    if (!normalizedName || normalizedName.length > 120) {
+      return res.status(400).json({ success: false, message: "Name must be between 1 and 120 characters." });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      return res.status(400).json({ success: false, message: "A valid email is required." });
+    }
+    const passwordError = getPasswordPolicyError(password);
+    if (passwordError) return res.status(400).json({ success: false, message: passwordError });
+
+    const exists = await User.findOne({ email: normalizedEmail });
     if (exists) {
       return res.status(409).json({ success: false, message: "Email already in use" });
     }
@@ -75,8 +87,8 @@ exports.register = async (req, res, next) => {
     // the trial would never expire.
     const now = new Date();
     const created = await User.create({
-      name,
-      email,
+      name: normalizedName,
+      email: normalizedEmail,
       password,
       subscriptionType: "trial",
       subscriptionStart: now,
@@ -177,8 +189,8 @@ exports.me = async (req, res, next) => {
 
 exports.forgotPassword = async (req, res, next) => {
   try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
+    const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+    const user = email ? await User.findOne({ email }) : null;
 
     // Always return success to avoid email enumeration
     if (user) {
@@ -200,12 +212,14 @@ exports.forgotPassword = async (req, res, next) => {
 
 exports.resetPassword = async (req, res, next) => {
   try {
-    const { token, password } = req.body;
+    const { token, password } = req.body ?? {};
     const entry = getPasswordResetEntry(token);
 
     if (!entry) {
       return res.status(400).json({ success: false, message: "Invalid or expired reset link." });
     }
+    const passwordError = getPasswordPolicyError(password);
+    if (passwordError) return res.status(400).json({ success: false, message: passwordError });
 
     const user = await User.findOne({ email: entry.email });
     if (!user) return res.status(404).json({ success: false, message: "User not found" });

@@ -48,7 +48,7 @@ function UserProfileCard({ user, t }) {
   ];
 
   return (
-    <section className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
+    <section className="mali-surface overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
       <div className="grid md:grid-cols-[18rem_1fr]">
         {/* Photo on its cover */}
         <div className="border-slate-100 md:border-e">

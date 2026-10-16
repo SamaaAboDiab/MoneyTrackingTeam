@@ -93,7 +93,7 @@ function GoalActionModal({ goal, mode, onClose, form, setForm, onSubmit, saving,
           <button type="button" onClick={onClose} disabled={saving} className="min-h-11 w-full rounded-xl px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 sm:w-auto">
             {t("savings.cancel")}
           </button>
-          <button type="submit" disabled={saving} className="min-h-11 w-full rounded-xl bg-brand-600 px-5 py-2 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-60 sm:w-auto">
+          <button type="submit" disabled={saving} className="mali-primary-action min-h-11 w-full rounded-xl bg-brand-600 px-5 py-2 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-60 sm:w-auto">
             {saving ? t("savings.form.saving") : mode === "deposit" ? t("savings.deposit.submit") : t("savings.withdraw.submit")}
           </button>
         </div>

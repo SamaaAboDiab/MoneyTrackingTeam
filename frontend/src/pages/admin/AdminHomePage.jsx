@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
   ChevronRight,
-  ArrowLeft,
   Ban,
   ChartNoAxesColumn,
   Clock3,
@@ -48,12 +47,14 @@ const viewAllClass =
 function CardTitle({ icon: Icon, title, subtitle, action }) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-3">
-      <div className="min-w-0">
-        <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
-          <Icon size={16} className="shrink-0 text-slate-400" aria-hidden="true" />
-          {title}
-        </h2>
-        {subtitle && <p className="mt-1 text-xs leading-5 text-slate-500">{subtitle}</p>}
+      <div className="flex min-w-0 items-start gap-3">
+        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
+          <Icon size={17} aria-hidden="true" />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-base font-bold text-slate-900">{title}</h2>
+          {subtitle && <p className="mt-1 text-xs leading-5 text-slate-500">{subtitle}</p>}
+        </div>
       </div>
       {action}
     </div>
@@ -66,29 +67,36 @@ function ErrorBox({ children }) {
 
 /* ── hero: greeting, quick links and two headline numbers ── */
 function Hero({ admin, kpis, loading, t, language }) {
+  const theme = useTheme();
   const numberFormat = new Intl.NumberFormat(toIntlLocale(language));
   const growing = (kpis.totalMoM ?? 0) >= 0;
   const TrendIcon = growing ? TrendingUp : TrendingDown;
 
   return (
-    <section className="rounded-2xl bg-linear-to-br from-hero-start to-hero-end p-5 text-white shadow-(--hero-shadow) sm:p-7">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div>
+    <section className="relative isolate overflow-hidden rounded-[1.75rem] bg-linear-to-br from-hero-start via-hero-start to-hero-end p-5 text-white shadow-(--hero-shadow) sm:p-7 lg:p-8">
+      <span aria-hidden="true" className="pointer-events-none absolute -end-16 -top-24 h-64 w-64 rounded-full bg-hero-accent/20 blur-3xl" />
+      <span aria-hidden="true" className="pointer-events-none absolute -bottom-28 start-1/3 h-56 w-56 rounded-full bg-white/5 blur-3xl" />
+      <div className="relative flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
+        <div className="min-w-0">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200">
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-hero-accent" />
+            {t("admin.home.heroBadge")}
+          </span>
           <h1 className="text-2xl font-bold tracking-tight sm:text-[1.75rem]">
             {t("admin.home.welcome", { name: admin?.name ?? "" })}
           </h1>
-          <p className="mt-1.5 max-w-xl text-sm text-slate-300">{t("admin.home.subtitle")}</p>
+          <p className="mt-1.5 max-w-xl text-sm leading-6 text-slate-300">{t("admin.home.subtitle")}</p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Link
               to="/admin/users"
-              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-semibold text-white transition hover:bg-brand-600 sm:flex-none"
+              className={"inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 sm:flex-none " + (theme === "emerald" ? "bg-brand-500 text-white hover:bg-brand-600" : "bg-accent-500 text-navy hover:bg-accent-600")}
             >
               <Users size={16} />
               {t("admin.home.usersLink")}
             </Link>
             <Link
               to="/admin/chat"
-              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-white/10 px-4 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15 sm:flex-none"
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-white/10 px-4 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15 sm:flex-none"
             >
               <MessagesSquare size={16} />
               {t("admin.home.chatLink")}
@@ -96,24 +104,21 @@ function Hero({ admin, kpis, loading, t, language }) {
           </div>
         </div>
 
-        {/* Two headline numbers, split by a hairline rather than boxed. */}
-        <dl className="grid grid-cols-2 divide-x divide-white/10 rtl:divide-x-reverse lg:w-96">
-          <div className="pe-6">
-            <dt className="text-xs font-medium text-slate-400">{t("admin.home.newThisMonth")}</dt>
-            <dd className="mt-1 text-3xl font-bold tabular-nums">{loading ? "…" : numberFormat.format(kpis.thisMonthNew ?? 0)}</dd>
+        <dl className="grid w-full grid-cols-2 gap-2.5 sm:gap-3 lg:max-w-[27rem] lg:flex-1">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm sm:p-5">
+            <dt className="text-xs font-medium leading-5 text-slate-300">{t("admin.home.newThisMonth")}</dt>
+            <dd className="mt-2 text-3xl font-bold tabular-nums">{loading ? "…" : numberFormat.format(kpis.thisMonthNew ?? 0)}</dd>
             {!loading && (
-              <dd className={`mt-1 inline-flex items-center gap-1 text-xs font-semibold ${growing ? "text-emerald-300" : "text-rose-300"}`}>
+              <dd className={"mt-2 inline-flex items-center gap-1 text-xs font-semibold " + (growing ? "text-emerald-300" : "text-rose-300")}>
                 <TrendIcon size={13} />
-                {t("admin.home.vsLastMonth", { value: `\u2066${growing ? "+" : ""}${formatPercent(kpis.totalMoM ?? 0)}\u2069` })}
+                {t("admin.home.vsLastMonth", { value: "\u2066" + (growing ? "+" : "") + formatPercent(kpis.totalMoM ?? 0) + "\u2069" })}
               </dd>
             )}
           </div>
-          <div className="ps-6">
-            <dt className="text-xs font-medium text-slate-400">{t("admin.home.conversionRate")}</dt>
-            <dd className="mt-1 text-3xl font-bold tabular-nums">
-              {loading ? "…" : formatPercent(kpis.conversionRate ?? 0)}
-            </dd>
-            <dd className="mt-1 text-xs text-slate-400">{t("admin.home.conversionHint")}</dd>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm sm:p-5">
+            <dt className="text-xs font-medium leading-5 text-slate-300">{t("admin.home.conversionRate")}</dt>
+            <dd className="mt-2 text-3xl font-bold tabular-nums">{loading ? "…" : formatPercent(kpis.conversionRate ?? 0)}</dd>
+            <dd className="mt-2 text-xs leading-5 text-slate-400">{t("admin.home.conversionHint")}</dd>
           </div>
         </dl>
       </div>
@@ -121,12 +126,18 @@ function Hero({ admin, kpis, loading, t, language }) {
   );
 }
 
-/* ── status cards: number + share of all users, each opens the filtered list ── */
+/* User status: counts, shares, and shortcuts to filtered lists. */
 function StatCards({ stats, loading, error, t, language }) {
   const theme = useTheme();
   const numberFormat = new Intl.NumberFormat(toIntlLocale(language));
   const cards = [
-    { key: "total", icon: Users, tone: "bg-sky-50 text-sky-600", bar: "bg-sky-400", link: "/admin/users" },
+    {
+      key: "total",
+      icon: Users,
+      tone: theme === "emerald" ? "bg-brand-50 text-brand-700" : "bg-accent-50 text-accent-700",
+      bar: theme === "emerald" ? "bg-brand-500" : "bg-accent-500",
+      link: "/admin/users",
+    },
     { key: "active", icon: UserCheck, tone: "bg-emerald-50 text-emerald-600", bar: "bg-emerald-400", link: "/admin/users?status=active" },
     { key: "expiring", icon: Clock3, tone: "bg-amber-50 text-amber-600", bar: "bg-amber-400", link: "/admin/users?status=expiring" },
     { key: "expired", icon: UserX, tone: "bg-slate-100 text-slate-600", bar: "bg-slate-400", link: "/admin/users?status=expired" },
@@ -134,43 +145,6 @@ function StatCards({ stats, loading, error, t, language }) {
   ];
 
   if (error) return <ErrorBox>{error}</ErrorBox>;
-
-  // Mali: a white card with a status dot, the number, and a thin share bar in the same color.
-  if (theme !== "emerald") {
-    return (
-      <section aria-label={t("admin.home.statsTitle")} className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-        {cards.map(({ key, bar, link }) => {
-          const value = stats[key] ?? 0;
-          const share = stats.total ? Math.round((value / stats.total) * 100) : 0;
-          return (
-            <Link
-              key={key}
-              to={link}
-              className={`group card-hover flex flex-col rounded-2xl border border-slate-200 bg-white p-4 ${
-                key === "total" ? "col-span-2 md:col-span-1" : ""
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex min-w-0 items-center gap-2 text-xs font-medium text-slate-500">
-                  <span aria-hidden="true" className={`h-2 w-2 shrink-0 rounded-full ${bar}`} />
-                  <span className="truncate">{t(`admin.home.stats.${key}`)}</span>
-                </span>
-                <ChevronRight size={14} className="shrink-0 text-slate-300 transition group-hover:text-slate-500 rtl:rotate-180" />
-              </div>
-              <p className="mt-3 text-[1.75rem] font-bold leading-none tabular-nums text-slate-900" aria-live="polite">
-                {loading ? "…" : numberFormat.format(value)}
-              </p>
-              {key !== "total" && (
-                <div className="mt-4 h-1 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
-                  <span className={`block h-full rounded-full ${bar} transition-[width] duration-700`} style={{ width: `${loading ? 0 : share}%` }} />
-                </div>
-              )}
-            </Link>
-          );
-        })}
-      </section>
-    );
-  }
 
   return (
     <section aria-label={t("admin.home.statsTitle")} className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
@@ -181,25 +155,28 @@ function StatCards({ stats, loading, error, t, language }) {
           <Link
             key={key}
             to={link}
-            className={`group rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md ${
-              key === "total" ? "col-span-2 md:col-span-1" : ""
-            }`}
+            className="group card-hover flex min-h-36 flex-col rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5"
           >
             <div className="flex items-center justify-between gap-2">
-              <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${tone}`}>
-                <Icon size={18} />
+              <span className={"flex h-10 w-10 items-center justify-center rounded-xl ring-1 ring-inset ring-black/5 " + tone}>
+                <Icon size={18} aria-hidden="true" />
               </span>
-              <ArrowLeft size={15} className="text-slate-300 transition group-hover:text-slate-500 ltr:rotate-180" />
+              <ChevronRight size={16} className="shrink-0 text-slate-300 transition group-hover:text-slate-500 rtl:rotate-180" aria-hidden="true" />
             </div>
-            <p className="mt-3 text-2xl font-extrabold tabular-nums text-slate-900" aria-live="polite">
-              {loading ? "…" : numberFormat.format(value)}
-            </p>
-            <p className="mt-0.5 text-xs font-semibold text-slate-500">{t(`admin.home.stats.${key}`)}</p>
-            {key !== "total" && (
-              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
-                <span className={`block h-full rounded-full ${bar} transition-[width] duration-700`} style={{ width: `${loading ? 0 : share}%` }} />
+            <div className="mt-4 flex items-end justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-3xl font-bold leading-none tabular-nums tracking-tight text-slate-900" aria-live="polite">
+                  {loading ? "…" : numberFormat.format(value)}
+                </p>
+                <p className="mt-2 truncate text-xs font-semibold text-slate-500">{t("admin.home.stats." + key)}</p>
               </div>
-            )}
+              <span className="shrink-0 rounded-lg bg-slate-50 px-2 py-1 text-[11px] font-bold tabular-nums text-slate-500">
+                {loading ? "—" : formatPercent(share, 0)}
+              </span>
+            </div>
+            <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
+              <span className={"block h-full rounded-full transition-[width] duration-700 " + bar} style={{ width: (loading ? 0 : share) + "%" }} />
+            </div>
           </Link>
         );
       })}
@@ -207,7 +184,7 @@ function StatCards({ stats, loading, error, t, language }) {
   );
 }
 
-/* ── new users per month ── */
+/* New users per month. */
 function UserGrowthChart({ monthly, loading, error, t, language }) {
   const [period, setPeriod] = useState(12);
   const numberFormat = new Intl.NumberFormat(toIntlLocale(language));
@@ -690,12 +667,19 @@ function AdminHomePage() {
     <div className="mx-auto max-w-7xl space-y-6 pb-8">
       <Hero admin={admin} kpis={kpis} loading={dashboardLoading} {...shared} />
 
-      <StatCards
-        stats={stats}
-        loading={request.status === "loading"}
-        error={request.status === "failed" ? request.error : ""}
-        {...shared}
-      />
+      <section className="space-y-3">
+        <div className="flex items-center gap-3 px-1">
+          <span aria-hidden="true" className="h-6 w-1 rounded-full bg-accent-500" />
+          <h2 className="text-base font-bold text-slate-900">{t("admin.home.statsTitle")}</h2>
+          <span aria-hidden="true" className="h-px flex-1 bg-slate-200" />
+        </div>
+        <StatCards
+          stats={stats}
+          loading={request.status === "loading"}
+          error={request.status === "failed" ? request.error : ""}
+          {...shared}
+        />
+      </section>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">

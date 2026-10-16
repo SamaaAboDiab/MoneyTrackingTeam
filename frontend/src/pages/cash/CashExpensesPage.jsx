@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { WalletCards } from "lucide-react";
@@ -6,7 +6,7 @@ import { fetchAccounts } from "../../store/slices/accountsSlice";
 import { getExpenses } from "../../api/expenseApi";
 import { listCategories } from "../../api/categoryApi";
 import { formatMoney, formatDate } from "../../utils/formatAmount";
-import { categoryLabel } from "../categories/components/mandatoryCategories";
+import { categoryLabel, getCategoryDisplayColor } from "../categories/components/mandatoryCategories";
 import DatePicker from "../../components/common/DatePicker";
 import Select from "../../components/common/Select";
 import { ListSkeleton } from "../../components/common/Skeleton";
@@ -29,6 +29,12 @@ function CashExpensesPage() {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const loadCategories = useCallback(() => {
+    listCategories()
+      .then((data) => setCategories(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
+
   const cashAccount = useMemo(
     () => accounts.find((account) => account.type === "cash" && !account.isArchived),
     [accounts]
@@ -37,10 +43,10 @@ function CashExpensesPage() {
 
   useEffect(() => {
     dispatch(fetchAccounts());
-    listCategories()
-      .then((data) => setCategories(Array.isArray(data) ? data : []))
-      .catch(() => {});
-  }, [dispatch]);
+    loadCategories();
+    window.addEventListener("expense-categories:changed", loadCategories);
+    return () => window.removeEventListener("expense-categories:changed", loadCategories);
+  }, [dispatch, loadCategories]);
 
   useEffect(() => {
     if (!cashAccountId) return;
@@ -83,12 +89,12 @@ function CashExpensesPage() {
       />
 
       {!cashAccount ? (
-        <p className="rounded-2xl bg-white p-5 text-slate-500 shadow-sm ring-1 ring-slate-100">
+        <p className="mali-surface rounded-2xl bg-white p-5 text-slate-500 shadow-sm ring-1 ring-slate-100">
           {t("cash.expenses.noCashAccount")}
         </p>
       ) : (
         <>
-          <div className="grid gap-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:grid-cols-2">
+          <div className="mali-surface grid gap-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:grid-cols-2">
             <label className="text-sm font-semibold text-slate-700">
               {t("cash.expenses.period")}
               <Select value={period} onChange={(event) => setPeriod(event.target.value)} className={inputClass}>
@@ -124,12 +130,12 @@ function CashExpensesPage() {
             )}
           </div>
 
-          <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+          <div className="mali-surface rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
             <p className="text-sm text-slate-500">{t("cash.expenses.total")}</p>
             <p className="tabular-amount mt-1 text-3xl font-extrabold text-expense">{formatMoney(total, cashAccount.currency)}</p>
           </div>
 
-          <div className="rounded-2xl bg-white p-2 shadow-sm ring-1 ring-slate-100">
+          <div className="mali-surface rounded-2xl bg-white p-2 shadow-sm ring-1 ring-slate-100">
             {loading ? (
               <ListSkeleton rows={4} className="px-3" label={t("cash.expenses.loading")} />
             ) : expenses.length === 0 ? (
@@ -140,8 +146,19 @@ function CashExpensesPage() {
                   <li key={expense._id} className="flex items-center justify-between gap-3 px-3 py-3">
                     <div className="min-w-0">
                       <p className="truncate font-semibold text-slate-900">{expense.description}</p>
-                      <p className="text-xs text-slate-500">
-                        {categoryLabel(expense.category)} · {formatDate(expense.date)}
+                      <p className="mt-1 flex min-w-0 flex-wrap items-center gap-1.5 text-xs text-slate-500">
+                        <span
+                          className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5"
+                          style={{
+                            backgroundColor: `${getCategoryDisplayColor(expense.category)}14`,
+                            borderColor: `${getCategoryDisplayColor(expense.category)}40`,
+                          }}
+                        >
+                          <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: getCategoryDisplayColor(expense.category) }} />
+                          <span className="text-slate-700">{categoryLabel(expense.category)}</span>
+                        </span>
+                        <span aria-hidden="true">·</span>
+                        <span>{formatDate(expense.date)}</span>
                       </p>
                     </div>
                     <span className="tabular-amount shrink-0 font-bold text-expense">

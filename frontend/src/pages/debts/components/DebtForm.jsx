@@ -137,7 +137,7 @@ function DebtForm({ onClose, error, debtForm, handleDebtFormChange, handleCreate
           <button
             type="submit"
             disabled={savingDebt}
-            className="min-h-11 w-full rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:opacity-60"
+            className="mali-primary-action min-h-11 w-full rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:opacity-60"
           >
             {savingDebt ? t("debts.form.saving") : t("debts.form.save")}
           </button>

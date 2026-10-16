@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 
 // Add/create form shown as a dialog over the page: title and an X to close at the top.
 // Clicking the backdrop closes it too, unless `closeDisabled` (e.g. while saving).
-function FormModal({ title, onClose, closeDisabled = false, children }) {
+function FormModal({ title, onClose, closeDisabled = false, children, panelClassName = "max-w-lg" }) {
   const { t } = useTranslation();
   const titleId = useId();
   const close = () => {
@@ -17,7 +17,7 @@ function FormModal({ title, onClose, closeDisabled = false, children }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:rounded-3xl sm:p-6"
+        className={`max-h-[calc(100dvh-1.5rem)] w-full ${panelClassName} overscroll-contain overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:rounded-3xl sm:p-6`}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-3">

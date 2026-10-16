@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { listCategories, createCategory, deleteCategory } from "../../../api/categoryApi";
-import Select from "../../../components/common/Select";
+import { listCategories, createCategory, updateCategory, deleteCategory } from "../../../api/categoryApi";
 import { extractError } from "../../../utils/errorHandler";
 
 const DEFAULT_COLOR = "#6b7280";
@@ -12,7 +11,7 @@ const TYPE_OPTIONS = [
   { value: "emergency" },
 ];
 
-import { MANDATORY_CATEGORIES, categoryLabel } from "./mandatoryCategories";
+import { MANDATORY_CATEGORIES, categoryLabel, getCategoryDisplayColor } from "./mandatoryCategories";
 
 export default function CategorySelect({
   id = "category",
@@ -28,6 +27,7 @@ export default function CategorySelect({
   const [loading,    setLoading]    = useState(true);
   const [isOpen,     setIsOpen]     = useState(false);
   const [adding,     setAdding]     = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
   const [newName,    setNewName]    = useState("");
   const [newType,    setNewType]    = useState(expenseType || "daily");
   const [newColor,   setNewColor]   = useState(DEFAULT_COLOR);
@@ -38,12 +38,29 @@ export default function CategorySelect({
 
   const containerRef = useRef(null);
 
+  function scrollExpenseDialog(event) {
+    if (event.target instanceof Element && event.target.closest("select")) return;
+
+    const dialog = containerRef.current?.closest('[role="dialog"]');
+    if (!dialog) return;
+
+    const maxScroll = dialog.scrollHeight - dialog.clientHeight;
+    if (maxScroll <= 0 || event.deltaY === 0) return;
+
+    const nextScroll = Math.max(0, Math.min(maxScroll, dialog.scrollTop + event.deltaY));
+    if (nextScroll === dialog.scrollTop) return;
+
+    dialog.scrollTop = nextScroll;
+    event.preventDefault();
+  }
+
   // إغلاق القائمة عند الضغط خارجها
   useEffect(() => {
     function handleClickOutside(e) {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
         setIsOpen(false);
         setAdding(false);
+        setEditingCategory(null);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -55,7 +72,6 @@ export default function CategorySelect({
     let isMounted = true;
 
     async function loadApiCategories() {
-      setLoading(true);
       try {
         const data = await listCategories();
         if (!isMounted) return;
@@ -67,10 +83,13 @@ export default function CategorySelect({
       }
     }
 
+    setLoading(true);
     loadApiCategories();
+    window.addEventListener("expense-categories:changed", loadApiCategories);
 
     return () => {
       isMounted = false;
+      window.removeEventListener("expense-categories:changed", loadApiCategories);
     };
   }, []);
 
@@ -81,7 +100,7 @@ export default function CategorySelect({
   }
 
   // إضافة تصنيف مخصص جديد عبر POST /api/expense-categories
-  async function handleCreate(e) {
+  async function handleSaveCategory(e) {
     e.preventDefault();
     const trimmed = newName.trim();
     if (!trimmed) {
@@ -93,29 +112,39 @@ export default function CategorySelect({
     setError("");
 
     try {
-      const created = await createCategory({
+      const payload = {
         name:  trimmed,
         type:  newType,
         color: newColor,
-      });
+      };
+      const saved = editingCategory
+        ? await updateCategory(editingCategory._id, payload)
+        : await createCategory(payload);
 
       // إضافة التصنيف الجديد العائد من الباك إند للقائمة فوراً
       setCategories((prev) => {
-        const exists = prev.some((c) => c._id === created._id || c.name === created.name);
-        return exists ? prev : [...prev, created];
+        if (editingCategory) {
+          return prev.map((category) => category._id === saved._id ? saved : category);
+        }
+        const exists = prev.some((category) => category._id === saved._id || category.name === saved.name);
+        return exists ? prev : [...prev, saved];
       });
 
       // تحديد الاسم مباشرة في الفورم
-      onChange?.(created.name || trimmed);
+      if (!editingCategory || value === editingCategory.name || String(value) === String(editingCategory._id)) {
+        onChange?.(saved.name || trimmed);
+      }
 
       setAdding(false);
+      setEditingCategory(null);
       setIsOpen(false);
       setNewName("");
       setNewType(expenseType || "daily");
       setNewColor(DEFAULT_COLOR);
+      window.dispatchEvent(new Event("expense-categories:changed"));
     } catch (err) {
       setError(
-        extractError(err, t("categoriesPage.createError"))
+        extractError(err, t(editingCategory ? "categoriesPage.saveError" : "categoriesPage.createError"))
       );
     } finally {
       setSaving(false);
@@ -133,6 +162,7 @@ export default function CategorySelect({
       await deleteCategory(cat._id);
 
       setCategories((prev) => prev.filter((c) => c._id !== cat._id));
+      window.dispatchEvent(new Event("expense-categories:changed"));
 
       if (value === cat.name || String(value) === String(cat._id)) {
         onChange?.("");
@@ -183,6 +213,7 @@ export default function CategorySelect({
         onClick={() => {
           setIsOpen(!isOpen);
           setAdding(false);
+          setEditingCategory(null);
         }}
         className={`min-h-11 ${className || defaultButtonClass}`}
       >
@@ -191,7 +222,7 @@ export default function CategorySelect({
             <span className="flex items-center gap-1.5 font-medium text-slate-800">
               <span
                 className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full"
-                style={{ backgroundColor: selectedCategory?.color || "#6b7280" }}
+                style={{ backgroundColor: getCategoryDisplayColor(selectedCategory || value) }}
               />
               {displayLabel}
             </span>
@@ -218,76 +249,105 @@ export default function CategorySelect({
 
       {/* القائمة المنسدلة بدون كلمة "اختر التصنيف" وبأيقونات SVG */}
       {isOpen && (
-        <div className="absolute z-50 mt-1.5 w-full rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
-          {adding ? (
-            <div className="rounded-lg bg-slate-50 p-2.5">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-700">{t("categoriesPage.select.newTitle")}</span>
+        <div className="absolute z-50 mt-1 w-full rounded-xl border border-slate-200 bg-white p-0.5 shadow-lg">
+          {adding || editingCategory ? (
+            <div className="relative rounded-lg border border-slate-100 bg-slate-50/80 p-1.5" onWheel={scrollExpenseDialog}>
+              <div className={editingCategory ? "flex items-center justify-between gap-2" : "absolute left-1.5 top-1.5"}>
+                {editingCategory && <span className="text-xs font-bold text-slate-800">{t("categoriesPage.select.editTitle")}</span>}
                 <button
                   type="button"
-                  onClick={() => { setAdding(false); setError(""); }}
-                  className="rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
+                  onClick={() => { setAdding(false); setEditingCategory(null); setError(""); }}
+                  aria-label={t("common.close")}
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-slate-400 transition hover:bg-white hover:text-slate-700"
                 >
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                  <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
                   </svg>
                 </button>
               </div>
 
-              <input
-                type="text"
-                autoFocus
-                placeholder={t("categoriesPage.select.newPlaceholder")}
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleCreate(e);
-                  }
-                }}
-                className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs focus:border-brand-500 focus:outline-none"
-              />
-
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                <Select
-                  value={newType}
-                  onChange={(e) => setNewType(e.target.value)}
-                  className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs focus:outline-none"
-                >
-                  {TYPE_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{t(`categoriesPage.type.${opt.value}`)}</option>
-                  ))}
-                </Select>
-
-                <div className="flex items-center gap-1.5">
+              <div className={editingCategory ? "mt-2 space-y-1.5" : "space-y-1"}>
+                <div>
+                  <label htmlFor={`${id}-custom-name`} className="mb-0.5 block text-[10px] font-semibold text-slate-600">
+                    {t("categoriesPage.nameLabel")}
+                  </label>
                   <input
-                    type="color"
-                    value={newColor}
-                    onChange={(e) => setNewColor(e.target.value)}
-                    className="h-7 w-8 cursor-pointer rounded border border-slate-300 p-0.5"
+                    id={`${id}-custom-name`}
+                    type="text"
+                    autoFocus
+                    maxLength={50}
+                    placeholder={t("categoriesPage.select.newPlaceholder")}
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleSaveCategory(e);
+                      }
+                    }}
+                    className="min-h-8 w-full rounded-md border border-slate-200 bg-white px-2.5 text-xs text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
                   />
-                  <span className="text-xs text-slate-400">{newColor}</span>
+                </div>
+
+                <div>
+                  <label htmlFor={`${id}-custom-type`} className="mb-0.5 block text-[10px] font-semibold text-slate-600">
+                    {t("categoriesPage.typeLabel")}
+                  </label>
+                  <div
+                    id={`${id}-custom-type`}
+                    role="group"
+                    aria-label={t("categoriesPage.typeLabel")}
+                    className="grid grid-cols-3 gap-1"
+                  >
+                    {TYPE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        aria-pressed={newType === opt.value}
+                        onClick={() => setNewType(opt.value)}
+                        className={`min-h-8 min-w-0 rounded-md px-1 text-[10px] font-semibold transition ${
+                          newType === opt.value
+                            ? "bg-brand-600 text-white shadow-sm"
+                            : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-100"
+                        }`}
+                      >
+                        {t(`categoriesPage.type.${opt.value}`)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {error && <p className="mt-1.5 text-xs text-rose-600">{error}</p>}
+              {error && <p role="alert" className="mt-1 rounded-md bg-rose-50 px-2 py-1.5 text-[10px] font-medium text-rose-700">{error}</p>}
 
-              <div className="mt-2.5 flex justify-end gap-1.5">
+              <div className="mt-1 flex items-center gap-2 border-t border-slate-200/80 pt-1">
+                <div className="flex items-center gap-1.5">
+                  <label
+                    htmlFor={`${id}-custom-color`}
+                    title={t("categoriesPage.colorLabel")}
+                    className="relative block h-7 w-7 shrink-0 cursor-pointer overflow-hidden rounded-full border-2 border-white shadow-sm ring-1 ring-slate-300"
+                    style={{ backgroundColor: newColor }}
+                  >
+                    <input
+                      id={`${id}-custom-color`}
+                      type="color"
+                      value={newColor}
+                      onChange={(e) => setNewColor(e.target.value)}
+                      aria-label={t("categoriesPage.colorLabel")}
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    />
+                  </label>
+                  <span className="text-[10px] font-medium text-slate-500">{t("categoriesPage.colorLabel")}</span>
+                </div>
                 <button
                   type="button"
-                  onClick={() => { setAdding(false); setError(""); }}
-                  className="min-h-10 rounded-md px-2.5 py-1 text-xs font-medium text-slate-500 hover:bg-slate-200"
-                >
-                  {t("common.cancel")}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCreate}
+                  onClick={handleSaveCategory}
                   disabled={saving}
-                  className="min-h-10 rounded-md bg-brand-600 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
+                  className="min-h-8 min-w-20 rounded-md bg-brand-600 px-3 text-[11px] font-bold text-white shadow-sm transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-60"
                 >
-                  {saving ? t("categoriesPage.select.adding") : t("categoriesPage.select.add")}
+                  {saving
+                    ? t(editingCategory ? "categoriesPage.saving" : "categoriesPage.select.adding")
+                    : t(editingCategory ? "categoriesPage.save" : "categoriesPage.select.add")}
                 </button>
               </div>
             </div>
@@ -295,7 +355,17 @@ export default function CategorySelect({
             <>
               {/* قائمة الاختيارات المسترجعة من الـ API */}
               {listError && <p className="px-3 py-1.5 text-xs text-rose-600">{listError}</p>}
-              <div className="max-h-56 overflow-y-auto space-y-0.5">
+              <div
+                className="max-h-28 overflow-y-auto overscroll-y-auto space-y-0.5"
+                onWheel={(event) => {
+                  const list = event.currentTarget;
+                  const atTop = list.scrollTop <= 0;
+                  const atBottom = list.scrollTop + list.clientHeight >= list.scrollHeight - 1;
+                  if ((event.deltaY < 0 && atTop) || (event.deltaY > 0 && atBottom)) {
+                    scrollExpenseDialog(event);
+                  }
+                }}
+              >
                 {categories.length === 0 ? (
                   <p className="px-3 py-2 text-xs text-slate-400">
                     {loading ? t("categoriesPage.select.loadingList") : t("categoriesPage.select.none")}
@@ -309,35 +379,61 @@ export default function CategorySelect({
                       <div
                         key={cat._id || cat.name}
                         onClick={() => handleSelect(cat.name)}
-                        className={`group flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition hover:bg-slate-100 ${
+                        className={`group flex h-9 shrink-0 cursor-pointer items-center justify-between rounded-lg px-3 py-0 text-sm transition hover:bg-slate-100 ${
                           isSelected ? "bg-brand-50 font-semibold text-brand-700" : "text-slate-700"
                         }`}
                       >
                         <div className="flex items-center gap-2">
                           <span
                             className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full"
-                            style={{ backgroundColor: cat.color || "#6b7280" }}
+                            style={{ backgroundColor: getCategoryDisplayColor(cat) }}
                           />
                           <span>{categoryLabel(cat.name)}</span>
                         </div>
 
                         {/* أيقونة الحذف SVG للتصنيفات المخصصة */}
                         {isCustom && (
-                          <button
-                            type="button"
-                            title={t("categoriesPage.select.deleteTitle")}
-                            onClick={(e) => handleDelete(e, cat)}
-                            disabled={deletingId === cat._id}
-                            className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 hover:bg-rose-100 hover:text-rose-600 disabled:opacity-50"
-                          >
-                            {deletingId === cat._id ? (
-                              <span className="text-xs">...</span>
-                            ) : (
-                              <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                          <span className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              title={t("categoriesPage.select.editTitle")}
+                              aria-label={t("categoriesPage.select.editTitle")}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingCategory(cat);
+                                setAdding(false);
+                                setNewName(cat.name);
+                                setNewType(cat.type || expenseType || "daily");
+                                setNewColor(
+                                  cat.color && cat.color.toLowerCase() !== DEFAULT_COLOR
+                                    ? cat.color
+                                    : getCategoryDisplayColor(cat)
+                                );
+                                setError("");
+                              }}
+                              className="flex h-6 w-6 items-center justify-center rounded-full text-slate-400 hover:bg-brand-100 hover:text-brand-700"
+                            >
+                              <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path d="M13.586 3.586a2 2 0 0 1 2.828 2.828l-8.9 8.9-3.9 1.1 1.1-3.9 8.872-8.928ZM4.5 17.25h11a.75.75 0 0 0 0-1.5h-11a.75.75 0 0 0 0 1.5Z" />
                               </svg>
-                            )}
-                          </button>
+                            </button>
+                            <button
+                              type="button"
+                              title={t("categoriesPage.select.deleteTitle")}
+                              aria-label={t("categoriesPage.select.deleteTitle")}
+                              onClick={(e) => handleDelete(e, cat)}
+                              disabled={deletingId === cat._id}
+                              className="flex h-6 w-6 items-center justify-center rounded-full text-slate-400 hover:bg-rose-100 hover:text-rose-600 disabled:opacity-50"
+                            >
+                              {deletingId === cat._id ? (
+                                <span className="text-xs">...</span>
+                              ) : (
+                                <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                  <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0-1.06-1.06L11.06 10l-3.72 3.72a.75.75 0 0 1-1.06-1.06L11.06 8.94 6.28 5.22Z" />
+                                </svg>
+                              )}
+                            </button>
+                          </span>
                         )}
                       </div>
                     );
@@ -351,6 +447,10 @@ export default function CategorySelect({
                   type="button"
                   onClick={() => {
                     setNewType(expenseType || "daily");
+                    setEditingCategory(null);
+                    setNewName("");
+                    setNewColor(DEFAULT_COLOR);
+                    setError("");
                     setAdding(true);
                   }}
                   className="flex w-full items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-brand-600 transition hover:bg-brand-50"

@@ -12,7 +12,8 @@ import {
 } from "../../store/slices/expensesSlice";
 import { getAccounts } from "../../api/accountsApi";
 import { listCategories } from "../../api/categoryApi";
-import { EMPTY_FORM, EMPTY_FILTERS, FALLBACK_CATEGORY_COLORS } from "./constants";
+import { EMPTY_FORM, EMPTY_FILTERS } from "./constants";
+import { getCategoryDisplayColor } from "../categories/components/mandatoryCategories";
 import { todayISODate, formatMoney } from "../../utils/formatAmount";
 import ExpenseToast from "./components/ExpenseToast";
 import ExpensesSummary from "./components/ExpensesSummary";
@@ -53,8 +54,7 @@ function ExpensesPage() {
 
   const [toastMessage, setToastMessage] = useState("");
 
-  // US-303: when the chosen account's real (backend) balance can't cover the amount,
-  // confirm before going negative instead of silently allowing or blocking it.
+  // Confirm before creating or editing an expense that would take its account below zero.
   const [balanceWarning, setBalanceWarning] = useState(null); // "create" | "edit" | null
 
   const findAccount = (accountId) =>
@@ -89,6 +89,8 @@ function ExpensesPage() {
   useEffect(() => {
     loadAccounts();
     loadCategories();
+    window.addEventListener("expense-categories:changed", loadCategories);
+    return () => window.removeEventListener("expense-categories:changed", loadCategories);
   }, [loadAccounts, loadCategories]);
 
   // دالة تحويل أي قيمة فئة (سواء كانت ID أو اسم) إلى اسم الفئة الفعلي المضاف
@@ -115,21 +117,20 @@ function ExpensesPage() {
   // دالة تحويل أي قيمة فئة إلى لونها المخصص
   const getCategoryColor = useCallback(
     (categoryValue) => {
-      if (!categoryValue) return "#6b7280";
+      if (!categoryValue) return getCategoryDisplayColor("");
       // البحث بالـ _id
       const byId = availableCategories.find(
         (c) => String(c._id) === String(categoryValue)
       );
-      if (byId) return byId.color || FALLBACK_CATEGORY_COLORS[byId.name] || "#6b7280";
+      if (byId) return getCategoryDisplayColor(byId);
 
       // البحث بالاسم
       const byName = availableCategories.find(
         (c) => c.name === categoryValue
       );
-      if (byName) return byName.color || FALLBACK_CATEGORY_COLORS[byName.name] || "#6b7280";
+      if (byName) return getCategoryDisplayColor(byName);
 
-      // fallback للتصنيفات الافتراضية
-      return FALLBACK_CATEGORY_COLORS[categoryValue] || "#6b7280";
+      return getCategoryDisplayColor(categoryValue);
     },
     [availableCategories]
   );
@@ -154,6 +155,11 @@ function ExpensesPage() {
   }, [refetchExpenses]);
 
   useEffect(() => {
+    window.addEventListener("expense-categories:changed", refetchExpenses);
+    return () => window.removeEventListener("expense-categories:changed", refetchExpenses);
+  }, [refetchExpenses]);
+
+  useEffect(() => {
     return () => dispatch(resetExpenseCreateStatus());
   }, [dispatch]);
 
@@ -169,6 +175,15 @@ function ExpensesPage() {
 
   const handleChange = ({ target }) => {
     const { name, value } = target;
+    if (name === "accountId") {
+      const selectedAccount = findAccount(value);
+      setForm((prev) => ({
+        ...prev,
+        accountId: value,
+        currency: selectedAccount?.currency || (value ? "EGP" : prev.currency || "EGP"),
+      }));
+      return;
+    }
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -205,7 +220,7 @@ function ExpensesPage() {
       expenseType: form.expenseType,
       category: catName,
       notes: form.notes.trim(),
-      currency: "EGP",
+      currency: form.currency || "EGP",
       status: "confirmed",
     };
 
@@ -311,7 +326,11 @@ function ExpensesPage() {
     }
 
     const account = findAccount(editForm.accountId);
-    if (account && Number(editForm.amount) > Number(account.balance)) {
+    const balanceAfterReversingCurrentExpense = account &&
+      String(editingExpense?.account?._id || editingExpense?.account || "") === String(account._id)
+      ? Number(account.balance) + Number(editingExpense.amount || 0)
+      : Number(account?.balance || 0);
+    if (account && Number(editForm.amount) > balanceAfterReversingCurrentExpense) {
       dispatch(insufficientBalanceDetected({ source: "expense", account, amount: editForm.amount }));
       setBalanceWarning("edit");
       return;
@@ -345,7 +364,7 @@ function ExpensesPage() {
     <button
       type="button"
       onClick={() => setIsCreateOpen(true)}
-      className={`min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 ${extraClass}`}
+      className={`mali-primary-action min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 ${extraClass}`}
     >
       <Plus size={18} strokeWidth={2.5} />
       {t("expenses.addFormTitle")}
@@ -375,10 +394,11 @@ function ExpensesPage() {
           onClose={closeCreateForm}
           createStatus={createStatus}
           createError={createError}
+          availableAccounts={availableAccounts}
         />
       )}
 
-      <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
+      <section className="mali-surface mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
         <ExpenseFilters
           filters={filters}
           setFilters={setFilters}
@@ -440,9 +460,13 @@ function ExpensesPage() {
           const account = findAccount(balanceWarning === "edit" ? editForm.accountId : form.accountId);
           const amount = Number(balanceWarning === "edit" ? editForm.amount : form.amount);
           if (!account) return "";
+          const balance = balanceWarning === "edit" &&
+            String(editingExpense?.account?._id || editingExpense?.account || "") === String(account._id)
+            ? Number(account.balance) + Number(editingExpense.amount || 0)
+            : Number(account.balance);
           return t("expenses.insufficientBalance.message", {
             account: account.name,
-            balance: formatMoney(account.balance, account.currency),
+            balance: formatMoney(balance, account.currency),
             amount: formatMoney(amount, account.currency),
           });
         })()}

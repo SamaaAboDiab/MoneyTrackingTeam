@@ -28,7 +28,7 @@ function IncomeList({
   const totalsTitle = t(displayCurrency === "ALL" ? "income.totalByCurrencyLabel" : "income.totalConvertedLabel");
 
   return (
-    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
+    <section className="mali-surface mt-6 rounded-2xl bg-white p-6 shadow-sm shadow-slate-200 ring-1 ring-slate-100 emerald:ring-slate-200/80">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-lg font-bold text-slate-900">{t("income.listTitle")}</h2>
         <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">

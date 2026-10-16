@@ -1,4 +1,5 @@
 import FormModal from "../../../components/common/FormModal";
+import { CircleAlert, LoaderCircle, Plus } from "lucide-react";
 import DatePicker from "../../../components/common/DatePicker";
 import Select from "../../../components/common/Select";
 import NumberInput from "../../../components/common/NumberInput";
@@ -134,19 +135,35 @@ function IncomeForm({ form, createStatus, createError, onChange, onSubmit, onCan
           />
         </div>
 
-        <div className="flex flex-col justify-end gap-3 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:col-span-2">
           {createError && (
-            <p className="rounded-xl bg-expense-soft px-4 py-2.5 text-sm font-medium text-expense">
+            <p role="alert" className="flex items-start gap-2 rounded-xl border border-rose-100 bg-rose-50 px-3.5 py-3 text-xs font-medium leading-5 text-rose-700 sm:text-sm">
+              <CircleAlert size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
               {createError}
             </p>
           )}
-          <button
-            type="submit"
-            disabled={createStatus === "loading"}
-            className="ms-auto min-h-11 w-full rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-65 sm:w-auto"
-          >
-            {createStatus === "loading" ? t("income.submitting") : t("income.submit")}
-          </button>
+          <div className="flex items-center justify-end gap-2.5">
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={createStatus === "loading"}
+              className="min-h-11 shrink-0 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
+            >
+              {t("common.cancel")}
+            </button>
+            <button
+              type="submit"
+              disabled={createStatus === "loading"}
+              className="mali-primary-action flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-2 text-sm font-bold text-white shadow-sm shadow-brand-900/15 transition hover:bg-brand-800 focus:outline-none focus:ring-4 focus:ring-brand-500/20 disabled:cursor-wait disabled:opacity-65"
+            >
+              {createStatus === "loading" ? (
+                <LoaderCircle size={16} className="animate-spin" aria-hidden="true" />
+              ) : (
+                <Plus size={17} aria-hidden="true" />
+              )}
+              {createStatus === "loading" ? t("income.submitting") : t("income.submit")}
+            </button>
+          </div>
         </div>
       </form>
     </FormModal>

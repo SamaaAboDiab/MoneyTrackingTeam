@@ -71,7 +71,7 @@ function ProfilePage() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[20rem_1fr]">
         <aside>
-          <nav className="h-full rounded-3xl border border-slate-200/80 bg-white p-2 shadow-sm">
+          <nav className="mali-surface h-full rounded-3xl border border-slate-200/80 bg-white p-2 shadow-sm">
             <div role="tablist" aria-orientation="vertical" aria-label={t("profile.sectionsLabel")} onKeyDown={handleTabKeyDown}>
               {TABS.map(({ key, icon: TabIcon, label, hint, tone }) => {
                 const selected = activeTab === key;
@@ -102,16 +102,13 @@ function ProfilePage() {
               })}
             </div>
 
-            {/* Language and theme: each opens a small menu in place (not a section). */}
-            <div className="mt-1 space-y-2 border-t border-slate-100 px-3 pt-3 pb-1">
+            {/* Keep language and theme controls visible in the settings card. */}
+            <div className="mt-1 space-y-3 border-t border-slate-100 px-3 pt-3 pb-1">
               <div className="flex items-center justify-between gap-3">
                 <span className="text-xs font-semibold text-slate-500">{t("admin.settings.languageTitle")}</span>
                 <LanguageMenu t={t} i18n={i18n} placement="below" onChange={changeLanguage} />
               </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-xs font-semibold text-slate-500">{t("layout.theme")}</span>
-                <ThemePicker t={t} placement="below" />
-              </div>
+              <ThemePicker t={t} />
             </div>
           </nav>
         </aside>
@@ -130,7 +127,7 @@ function ProfilePage() {
             role="tabpanel"
             aria-labelledby="profile-tab-security"
             hidden={activeTab !== "security"}
-            className="h-full overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm"
+            className="mali-surface h-full overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm"
           >
             <header className="flex items-start gap-3 px-5 py-5 sm:px-6">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">

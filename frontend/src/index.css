@@ -478,3 +478,52 @@ button:not(:disabled),
     scroll-behavior: auto !important;
   }
 }
+
+/* Gray theme trial: unify card surfaces and primary actions without changing Emerald. */
+html[data-theme="mali"] .mali-surface {
+  border-color: rgb(226 232 240 / 0.85);
+  --tw-ring-color: rgb(226 232 240 / 0.85);
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.035), 0 8px 20px -16px rgb(51 65 85 / 0.24);
+}
+
+html[data-theme="mali"] .mali-surface-hover {
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+html[data-theme="mali"] .mali-surface-hover:hover {
+  transform: translateY(-1px);
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 20px -14px rgb(51 65 85 / 0.28);
+}
+
+html[data-theme="mali"] .mali-primary-action {
+  min-height: 2.75rem;
+  border-radius: 0.75rem;
+  background-color: #334155;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  box-shadow: 0 2px 5px rgb(51 65 85 / 0.16);
+  transition: background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+html[data-theme="mali"] .mali-primary-action:hover:not(:disabled) {
+  background-color: #1e293b;
+  box-shadow: 0 4px 10px rgb(51 65 85 / 0.2);
+  transform: translateY(-1px);
+}
+
+html[data-theme="mali"] .mali-primary-action:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+html[data-theme="mali"] .mali-primary-action:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px #ffe6d3;
+}
+
+html[data-theme="mali"] .mali-primary-action:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
