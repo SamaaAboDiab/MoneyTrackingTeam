@@ -94,38 +94,10 @@ I was the **Front-End Team Lead** and also a **developer** on the team.
 
 ---
 
-## Run Locally — التشغيل على جهازك
-
-Use a MongoDB deployment that supports transactions (MongoDB Atlas or a local replica set).
-
-In `backend-accounting-system`, copy `.env.example` to `.env` and fill in the MongoDB URI and two distinct JWT secrets.
-
-Start the API:
-
-```bash
-cd backend-accounting-system
-npm install
-npm run dev
-```
-
-In a second terminal, start the frontend:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The frontend runs at `http://localhost:5174`; the API defaults to `http://localhost:5000/api`. Set `CLIENT_URL` in the backend environment to the frontend origin when it differs from the default, and `VITE_API_URL` in the frontend environment when the API URL differs.
-
-Email features need the `SMTP_*` settings in the backend `.env`. The Postman collections and API notes are in `backend-accounting-system/postman`.
-
-**Data integrity:** account balance changes and their ledger records use MongoDB transactions. A standalone MongoDB server does not support these operations; use Atlas or configure a local replica set.
-
----
-
 <div align="center">
 
 Team Lead: **Samaa Abo Diab** · [Portfolio](https://samaa-portfolio21.vercel.app) · [LinkedIn](https://www.linkedin.com/in/samaa-abo-diab)
+
+© All rights reserved.
 
 </div>
